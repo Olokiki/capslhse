@@ -82,9 +82,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "Compression and Power Systems Limited – Health, Safety & Environment reporting and compliance platform." },
       { name: "author", content: "CAPSL" },
       { property: "og:title", content: "CAPSL HSE Platform" },
-      { property: "og:description", content: "Report, action and close out HSE events across all CAPSL field operations." },
+      { property: "og:description", content: "Compression and Power Systems Limited – Health, Safety & Environment reporting and compliance platform." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "CAPSL HSE Platform" },
+      { name: "twitter:description", content: "Compression and Power Systems Limited – Health, Safety & Environment reporting and compliance platform." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/5b3bc08c-5e77-4999-95a7-aac1e3ecaece" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/5b3bc08c-5e77-4999-95a7-aac1e3ecaece" },
     ],
     links: [
       {
