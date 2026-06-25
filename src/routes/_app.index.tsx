@@ -110,13 +110,15 @@ function Dashboard() {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            Global Dashboard
+            {isStaff ? `My Site · ${session?.location}` : "Global Dashboard"}
           </div>
           <h1 className="mt-1 text-3xl font-bold tracking-tight text-foreground">
-            HSE Command Center
+            {isStaff ? "My HSE Analytics" : "HSE Command Center"}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Live overview of health, safety and environment performance across all CAPSL sites.
+            {isStaff
+              ? "Live overview of HSE performance at your current work location."
+              : "Live overview of health, safety and environment performance across all CAPSL sites."}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
