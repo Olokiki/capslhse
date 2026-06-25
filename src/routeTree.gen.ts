@@ -10,7 +10,10 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
+import { Route as LoginIndexRouteImport } from './routes/login.index'
 import { Route as AppIndexRouteImport } from './routes/_app.index'
+import { Route as LoginStaffRouteImport } from './routes/login.staff'
+import { Route as LoginAdminRouteImport } from './routes/login.admin'
 import { Route as AppReportsRouteImport } from './routes/_app.reports'
 import { Route as AppLocationsRouteImport } from './routes/_app.locations'
 import { Route as AppAuditRouteImport } from './routes/_app.audit'
@@ -21,10 +24,25 @@ const AppRoute = AppRouteImport.update({
   id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginIndexRoute = LoginIndexRouteImport.update({
+  id: '/login/',
+  path: '/login/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppRoute,
+} as any)
+const LoginStaffRoute = LoginStaffRouteImport.update({
+  id: '/login/staff',
+  path: '/login/staff',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginAdminRoute = LoginAdminRouteImport.update({
+  id: '/login/admin',
+  path: '/login/admin',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AppReportsRoute = AppReportsRouteImport.update({
   id: '/reports',
@@ -57,6 +75,9 @@ export interface FileRoutesByFullPath {
   '/audit': typeof AppAuditRoute
   '/locations': typeof AppLocationsRoute
   '/reports': typeof AppReportsRouteWithChildren
+  '/login/admin': typeof LoginAdminRoute
+  '/login/staff': typeof LoginStaffRoute
+  '/login/': typeof LoginIndexRoute
   '/reports/$id': typeof AppReportsIdRoute
   '/reports/new': typeof AppReportsNewRoute
 }
@@ -64,7 +85,10 @@ export interface FileRoutesByTo {
   '/audit': typeof AppAuditRoute
   '/locations': typeof AppLocationsRoute
   '/reports': typeof AppReportsRouteWithChildren
+  '/login/admin': typeof LoginAdminRoute
+  '/login/staff': typeof LoginStaffRoute
   '/': typeof AppIndexRoute
+  '/login': typeof LoginIndexRoute
   '/reports/$id': typeof AppReportsIdRoute
   '/reports/new': typeof AppReportsNewRoute
 }
@@ -74,7 +98,10 @@ export interface FileRoutesById {
   '/_app/audit': typeof AppAuditRoute
   '/_app/locations': typeof AppLocationsRoute
   '/_app/reports': typeof AppReportsRouteWithChildren
+  '/login/admin': typeof LoginAdminRoute
+  '/login/staff': typeof LoginStaffRoute
   '/_app/': typeof AppIndexRoute
+  '/login/': typeof LoginIndexRoute
   '/_app/reports/$id': typeof AppReportsIdRoute
   '/_app/reports/new': typeof AppReportsNewRoute
 }
@@ -85,6 +112,9 @@ export interface FileRouteTypes {
     | '/audit'
     | '/locations'
     | '/reports'
+    | '/login/admin'
+    | '/login/staff'
+    | '/login/'
     | '/reports/$id'
     | '/reports/new'
   fileRoutesByTo: FileRoutesByTo
@@ -92,7 +122,10 @@ export interface FileRouteTypes {
     | '/audit'
     | '/locations'
     | '/reports'
+    | '/login/admin'
+    | '/login/staff'
     | '/'
+    | '/login'
     | '/reports/$id'
     | '/reports/new'
   id:
@@ -101,13 +134,19 @@ export interface FileRouteTypes {
     | '/_app/audit'
     | '/_app/locations'
     | '/_app/reports'
+    | '/login/admin'
+    | '/login/staff'
     | '/_app/'
+    | '/login/'
     | '/_app/reports/$id'
     | '/_app/reports/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
+  LoginAdminRoute: typeof LoginAdminRoute
+  LoginStaffRoute: typeof LoginStaffRoute
+  LoginIndexRoute: typeof LoginIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -119,12 +158,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login/': {
+      id: '/login/'
+      path: '/login'
+      fullPath: '/login/'
+      preLoaderRoute: typeof LoginIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_app/': {
       id: '/_app/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
+    }
+    '/login/staff': {
+      id: '/login/staff'
+      path: '/login/staff'
+      fullPath: '/login/staff'
+      preLoaderRoute: typeof LoginStaffRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login/admin': {
+      id: '/login/admin'
+      path: '/login/admin'
+      fullPath: '/login/admin'
+      preLoaderRoute: typeof LoginAdminRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_app/reports': {
       id: '/_app/reports'
@@ -196,6 +256,9 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
+  LoginAdminRoute: LoginAdminRoute,
+  LoginStaffRoute: LoginStaffRoute,
+  LoginIndexRoute: LoginIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
