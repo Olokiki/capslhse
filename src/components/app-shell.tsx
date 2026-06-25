@@ -11,6 +11,7 @@ import {
   LogOut,
   MapPin,
   BarChart3,
+  BookOpen,
 } from "lucide-react";
 import { type ReactNode } from "react";
 import capslLogo from "@/assets/capsl-logo.jpeg.asset.json";
