@@ -22,7 +22,7 @@ import { useSession, signOut } from "@/lib/auth-store";
 const ADMIN_NAV = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/reports", label: "HSE Reports", icon: ShieldAlert },
-  { to: "/reports/new", label: "Submit Report", icon: PlusCircle },
+  { to: "/documents", label: "Documents", icon: BookOpen },
   { to: "/locations", label: "Locations", icon: Map },
   { to: "/audit", label: "Audit Log", icon: ClipboardList },
 ];
@@ -30,7 +30,7 @@ const ADMIN_NAV = [
 const STAFF_NAV = [
   { to: "/", label: "My Analytics", icon: BarChart3, exact: true },
   { to: "/reports", label: "HSE Reports", icon: ShieldAlert },
-  { to: "/reports/new", label: "Submit Report", icon: PlusCircle },
+  { to: "/documents", label: "Documents", icon: BookOpen },
 ];
 
 export function AppShell({ children }: { children: ReactNode }) {
