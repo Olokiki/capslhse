@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/select";
 import {
   ASSETS,
-  CURRENT_USER,
   LOCATIONS,
   PEOPLE,
   TYPE_LABEL,
@@ -23,7 +22,8 @@ import {
   type ReportType,
   type Severity,
 } from "@/lib/hse-store";
-import { ShieldAlert, Sparkles, Upload } from "lucide-react";
+import { useSession } from "@/lib/auth-store";
+import { ShieldAlert, Sparkles, Upload, MapPin } from "lucide-react";
 
 export const Route = createFileRoute("/_app/reports/new")({
   head: () => ({
@@ -37,14 +37,17 @@ export const Route = createFileRoute("/_app/reports/new")({
 
 function NewReport() {
   const nav = useNavigate();
+  const session = useSession();
+  const defaultLocation = session?.location ?? LOCATIONS[0];
+  const defaultReporter = session ? `${session.name} (${session.title})` : PEOPLE[0];
   const [form, setForm] = useState({
     title: "",
     description: "",
     type: "near-miss" as ReportType,
     severity: "low" as Severity,
-    location: LOCATIONS[0],
+    location: defaultLocation,
     asset: "",
-    reportedBy: CURRENT_USER,
+    reportedBy: defaultReporter,
   });
   const [aiBusy, setAiBusy] = useState(false);
 

@@ -26,6 +26,7 @@ import {
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LOCATIONS, useHseReports } from "@/lib/hse-store";
+import { useSession } from "@/lib/auth-store";
 import { SeverityBadge, StatusBadge, TypeBadge } from "@/components/hse/badges";
 
 export const Route = createFileRoute("/_app/")({
@@ -39,7 +40,12 @@ export const Route = createFileRoute("/_app/")({
 });
 
 function Dashboard() {
-  const reports = useHseReports();
+  const all = useHseReports();
+  const session = useSession();
+  const isStaff = session?.role === "staff";
+  const reports = isStaff
+    ? all.filter((r) => r.location === session?.location)
+    : all;
 
   const stats = useMemo(() => {
     const open = reports.filter((r) => r.status !== "closed").length;
@@ -104,13 +110,15 @@ function Dashboard() {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            Global Dashboard
+            {isStaff ? `My Site · ${session?.location}` : "Global Dashboard"}
           </div>
           <h1 className="mt-1 text-3xl font-bold tracking-tight text-foreground">
-            HSE Command Center
+            {isStaff ? "My HSE Analytics" : "HSE Command Center"}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Live overview of health, safety and environment performance across all CAPSL sites.
+            {isStaff
+              ? "Live overview of HSE performance at your current work location."
+              : "Live overview of health, safety and environment performance across all CAPSL sites."}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -204,7 +212,8 @@ function Dashboard() {
         </Card>
       </div>
 
-      {/* Locations grid (Limble-style) */}
+      {/* Locations grid (Limble-style) — admins only */}
+      {!isStaff && (
       <Card className="p-5">
         <div className="flex items-center justify-between">
           <div>
@@ -238,6 +247,7 @@ function Dashboard() {
           ))}
         </div>
       </Card>
+      )}
 
       {/* Recent reports */}
       <Card className="p-5">

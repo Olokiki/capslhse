@@ -1,21 +1,24 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard,
   ShieldAlert,
   ClipboardList,
   PlusCircle,
   Map,
-  Settings,
   Search,
   Bell,
   Sparkles,
+  LogOut,
+  MapPin,
+  BarChart3,
 } from "lucide-react";
 import { type ReactNode } from "react";
 import capslLogo from "@/assets/capsl-logo.jpeg.asset.json";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useSession, signOut } from "@/lib/auth-store";
 
-const NAV = [
+const ADMIN_NAV = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/reports", label: "HSE Reports", icon: ShieldAlert },
   { to: "/reports/new", label: "Submit Report", icon: PlusCircle },
@@ -23,8 +26,25 @@ const NAV = [
   { to: "/audit", label: "Audit Log", icon: ClipboardList },
 ];
 
+const STAFF_NAV = [
+  { to: "/", label: "My Analytics", icon: BarChart3, exact: true },
+  { to: "/reports", label: "HSE Reports", icon: ShieldAlert },
+  { to: "/reports/new", label: "Submit Report", icon: PlusCircle },
+];
+
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const session = useSession();
+  const navigate = useNavigate();
+
+  if (!session) return null;
+
+  const NAV = session.role === "admin" ? ADMIN_NAV : STAFF_NAV;
+
+  function handleSignOut() {
+    signOut();
+    navigate({ to: "/login" });
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -36,10 +56,19 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="leading-tight">
             <div className="text-sm font-semibold tracking-tight">CAPSL HSE</div>
             <div className="text-[11px] uppercase tracking-wider text-sidebar-foreground/60">
-              Safety Platform
+              {session.role === "admin" ? "Admin Console" : "Staff Portal"}
             </div>
           </div>
         </div>
+
+        {session.role === "staff" && session.location && (
+          <div className="mx-3 mt-3 rounded-lg border border-sidebar-border bg-sidebar-accent/40 px-3 py-2 text-[11px]">
+            <div className="flex items-center gap-1.5 font-semibold text-sidebar-foreground/80">
+              <MapPin className="h-3.5 w-3.5" /> On site
+            </div>
+            <div className="mt-0.5 text-sidebar-foreground">{session.location}</div>
+          </div>
+        )}
 
         <nav className="flex-1 space-y-1 px-3 py-4">
           {NAV.map((item) => {
@@ -76,12 +105,12 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
 
         <div className="border-t border-sidebar-border p-3">
-          <Link
-            to="/"
-            className="flex items-center gap-3 rounded-lg px-2 py-2 text-sm text-sidebar-foreground/80 hover:bg-sidebar-accent"
+          <button
+            onClick={handleSignOut}
+            className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-sm text-sidebar-foreground/80 hover:bg-sidebar-accent"
           >
-            <Settings className="h-[18px] w-[18px]" /> Settings
-          </Link>
+            <LogOut className="h-[18px] w-[18px]" /> Sign out
+          </button>
         </div>
       </aside>
 
@@ -106,11 +135,11 @@ export function AppShell({ children }: { children: ReactNode }) {
               </Link>
               <div className="ml-2 hidden items-center gap-3 sm:flex">
                 <div className="text-right leading-tight">
-                  <div className="text-xs font-semibold">Adaeze Okafor</div>
-                  <div className="text-[11px] text-muted-foreground">HSE Lead</div>
+                  <div className="text-xs font-semibold">{session.name}</div>
+                  <div className="text-[11px] text-muted-foreground">{session.title}</div>
                 </div>
                 <div className="flex h-9 w-9 items-center justify-center rounded-full brand-gradient text-xs font-bold text-white">
-                  AO
+                  {session.initials}
                 </div>
               </div>
             </div>
