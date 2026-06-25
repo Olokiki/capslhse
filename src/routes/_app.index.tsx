@@ -212,7 +212,8 @@ function Dashboard() {
         </Card>
       </div>
 
-      {/* Locations grid (Limble-style) */}
+      {/* Locations grid (Limble-style) — admins only */}
+      {!isStaff && (
       <Card className="p-5">
         <div className="flex items-center justify-between">
           <div>
@@ -246,6 +247,7 @@ function Dashboard() {
           ))}
         </div>
       </Card>
+      )}
 
       {/* Recent reports */}
       <Card className="p-5">
