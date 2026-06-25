@@ -16,6 +16,7 @@ import { Route as LoginStaffRouteImport } from './routes/login.staff'
 import { Route as LoginAdminRouteImport } from './routes/login.admin'
 import { Route as AppReportsRouteImport } from './routes/_app.reports'
 import { Route as AppLocationsRouteImport } from './routes/_app.locations'
+import { Route as AppDocumentsRouteImport } from './routes/_app.documents'
 import { Route as AppAuditRouteImport } from './routes/_app.audit'
 import { Route as AppReportsNewRouteImport } from './routes/_app.reports.new'
 import { Route as AppReportsIdRouteImport } from './routes/_app.reports.$id'
@@ -54,6 +55,11 @@ const AppLocationsRoute = AppLocationsRouteImport.update({
   path: '/locations',
   getParentRoute: () => AppRoute,
 } as any)
+const AppDocumentsRoute = AppDocumentsRouteImport.update({
+  id: '/documents',
+  path: '/documents',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppAuditRoute = AppAuditRouteImport.update({
   id: '/audit',
   path: '/audit',
@@ -73,6 +79,7 @@ const AppReportsIdRoute = AppReportsIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/audit': typeof AppAuditRoute
+  '/documents': typeof AppDocumentsRoute
   '/locations': typeof AppLocationsRoute
   '/reports': typeof AppReportsRouteWithChildren
   '/login/admin': typeof LoginAdminRoute
@@ -83,6 +90,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/audit': typeof AppAuditRoute
+  '/documents': typeof AppDocumentsRoute
   '/locations': typeof AppLocationsRoute
   '/reports': typeof AppReportsRouteWithChildren
   '/login/admin': typeof LoginAdminRoute
@@ -96,6 +104,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
   '/_app/audit': typeof AppAuditRoute
+  '/_app/documents': typeof AppDocumentsRoute
   '/_app/locations': typeof AppLocationsRoute
   '/_app/reports': typeof AppReportsRouteWithChildren
   '/login/admin': typeof LoginAdminRoute
@@ -110,6 +119,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/audit'
+    | '/documents'
     | '/locations'
     | '/reports'
     | '/login/admin'
@@ -120,6 +130,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/audit'
+    | '/documents'
     | '/locations'
     | '/reports'
     | '/login/admin'
@@ -132,6 +143,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_app'
     | '/_app/audit'
+    | '/_app/documents'
     | '/_app/locations'
     | '/_app/reports'
     | '/login/admin'
@@ -200,6 +212,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppLocationsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/documents': {
+      id: '/_app/documents'
+      path: '/documents'
+      fullPath: '/documents'
+      preLoaderRoute: typeof AppDocumentsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/audit': {
       id: '/_app/audit'
       path: '/audit'
@@ -240,6 +259,7 @@ const AppReportsRouteWithChildren = AppReportsRoute._addFileChildren(
 
 interface AppRouteChildren {
   AppAuditRoute: typeof AppAuditRoute
+  AppDocumentsRoute: typeof AppDocumentsRoute
   AppLocationsRoute: typeof AppLocationsRoute
   AppReportsRoute: typeof AppReportsRouteWithChildren
   AppIndexRoute: typeof AppIndexRoute
@@ -247,6 +267,7 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppAuditRoute: AppAuditRoute,
+  AppDocumentsRoute: AppDocumentsRoute,
   AppLocationsRoute: AppLocationsRoute,
   AppReportsRoute: AppReportsRouteWithChildren,
   AppIndexRoute: AppIndexRoute,
