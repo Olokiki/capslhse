@@ -26,6 +26,7 @@ import {
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LOCATIONS, useHseReports } from "@/lib/hse-store";
+import { useSession } from "@/lib/auth-store";
 import { SeverityBadge, StatusBadge, TypeBadge } from "@/components/hse/badges";
 
 export const Route = createFileRoute("/_app/")({
@@ -39,7 +40,12 @@ export const Route = createFileRoute("/_app/")({
 });
 
 function Dashboard() {
-  const reports = useHseReports();
+  const all = useHseReports();
+  const session = useSession();
+  const isStaff = session?.role === "staff";
+  const reports = isStaff
+    ? all.filter((r) => r.location === session?.location)
+    : all;
 
   const stats = useMemo(() => {
     const open = reports.filter((r) => r.status !== "closed").length;
