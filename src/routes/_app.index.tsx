@@ -122,8 +122,8 @@ function Dashboard() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Link to="/reports"><Button variant="outline" className="rounded-full">View All Reports</Button></Link>
-          <Link to="/reports/new"><Button className="rounded-full font-semibold">Report an Incident</Button></Link>
+          <Button asChild variant="outline" className="rounded-full"><Link to="/reports">View All Reports</Link></Button>
+          <Button asChild className="rounded-full font-semibold"><Link to="/reports/new">Report an Incident</Link></Button>
         </div>
       </div>
 

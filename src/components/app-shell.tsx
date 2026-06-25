@@ -11,6 +11,7 @@ import {
   LogOut,
   MapPin,
   BarChart3,
+  BookOpen,
 } from "lucide-react";
 import { type ReactNode } from "react";
 import capslLogo from "@/assets/capsl-logo.jpeg.asset.json";
@@ -21,7 +22,7 @@ import { useSession, signOut } from "@/lib/auth-store";
 const ADMIN_NAV = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/reports", label: "HSE Reports", icon: ShieldAlert },
-  { to: "/reports/new", label: "Submit Report", icon: PlusCircle },
+  { to: "/documents", label: "Documents", icon: BookOpen },
   { to: "/locations", label: "Locations", icon: Map },
   { to: "/audit", label: "Audit Log", icon: ClipboardList },
 ];
@@ -29,7 +30,7 @@ const ADMIN_NAV = [
 const STAFF_NAV = [
   { to: "/", label: "My Analytics", icon: BarChart3, exact: true },
   { to: "/reports", label: "HSE Reports", icon: ShieldAlert },
-  { to: "/reports/new", label: "Submit Report", icon: PlusCircle },
+  { to: "/documents", label: "Documents", icon: BookOpen },
 ];
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -128,11 +129,11 @@ export function AppShell({ children }: { children: ReactNode }) {
               <Button variant="ghost" size="icon" className="rounded-full">
                 <Bell className="h-5 w-5" />
               </Button>
-              <Link to="/reports/new">
-                <Button className="h-10 rounded-full px-5 font-semibold shadow-sm">
+              <Button asChild className="h-10 rounded-full px-5 font-semibold shadow-sm">
+                <Link to="/reports/new">
                   <PlusCircle className="mr-2 h-4 w-4" /> New HSE Report
-                </Button>
-              </Link>
+                </Link>
+              </Button>
               <div className="ml-2 hidden items-center gap-3 sm:flex">
                 <div className="text-right leading-tight">
                   <div className="text-xs font-semibold">{session.name}</div>

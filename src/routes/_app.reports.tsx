@@ -51,7 +51,7 @@ function ReportsList() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" className="rounded-full"><Download className="mr-2 h-4 w-4" /> Export</Button>
-          <Link to="/reports/new"><Button className="rounded-full font-semibold"><PlusCircle className="mr-2 h-4 w-4" /> New report</Button></Link>
+          <Button asChild className="rounded-full font-semibold"><Link to="/reports/new"><PlusCircle className="mr-2 h-4 w-4" /> New report</Link></Button>
         </div>
       </div>
 
