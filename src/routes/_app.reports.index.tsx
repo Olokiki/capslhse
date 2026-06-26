@@ -11,8 +11,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useHseReports, TYPE_LABEL, type ReportStatus, type Severity, type ReportType } from "@/lib/hse-store";
+import { useSession } from "@/lib/auth-store";
 import { SeverityBadge, StatusBadge, TypeBadge } from "@/components/hse/badges";
-import { Search, Filter, Download, PlusCircle } from "lucide-react";
+import { Search, Filter, Download, PlusCircle, MapPin } from "lucide-react";
 
 export const Route = createFileRoute("/_app/reports/")({
   head: () => ({
