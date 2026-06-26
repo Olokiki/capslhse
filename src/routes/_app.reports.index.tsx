@@ -11,10 +11,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useHseReports, TYPE_LABEL, type ReportStatus, type Severity, type ReportType } from "@/lib/hse-store";
+import { useSession } from "@/lib/auth-store";
 import { SeverityBadge, StatusBadge, TypeBadge } from "@/components/hse/badges";
-import { Search, Filter, Download, PlusCircle } from "lucide-react";
+import { Search, Filter, Download, PlusCircle, MapPin } from "lucide-react";
 
-export const Route = createFileRoute("/_app/reports")({
+export const Route = createFileRoute("/_app/reports/")({
   head: () => ({
     meta: [
       { title: "HSE Reports | CAPSL" },
@@ -26,20 +27,26 @@ export const Route = createFileRoute("/_app/reports")({
 
 function ReportsList() {
   const reports = useHseReports();
+  const session = useSession();
+  const isStaff = session?.role === "staff";
+  const scopedReports = useMemo(
+    () => (isStaff && session?.location ? reports.filter((r) => r.location === session.location) : reports),
+    [reports, isStaff, session?.location],
+  );
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<"all" | ReportStatus>("all");
   const [severity, setSeverity] = useState<"all" | Severity>("all");
   const [type, setType] = useState<"all" | ReportType>("all");
 
   const filtered = useMemo(() => {
-    return reports.filter((r) => {
+    return scopedReports.filter((r) => {
       if (q && !(r.title.toLowerCase().includes(q.toLowerCase()) || r.ref.toLowerCase().includes(q.toLowerCase()) || r.location.toLowerCase().includes(q.toLowerCase()))) return false;
       if (status !== "all" && r.status !== status) return false;
       if (severity !== "all" && r.severity !== severity) return false;
       if (type !== "all" && r.type !== type) return false;
       return true;
     });
-  }, [reports, q, status, severity, type]);
+  }, [scopedReports, q, status, severity, type]);
 
   return (
     <div className="mx-auto max-w-[1400px] space-y-5">
@@ -47,7 +54,14 @@ function ReportsList() {
         <div>
           <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Safety operations</div>
           <h1 className="mt-1 text-3xl font-bold tracking-tight">HSE Reports</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{filtered.length} of {reports.length} reports</p>
+          <p className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
+            {filtered.length} of {scopedReports.length} reports
+            {isStaff && session?.location && (
+              <span className="inline-flex items-center gap-1 rounded-full border border-border bg-secondary px-2 py-0.5 text-[11px] font-semibold text-foreground/80">
+                <MapPin className="h-3 w-3" /> {session.location}
+              </span>
+            )}
+          </p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" className="rounded-full"><Download className="mr-2 h-4 w-4" /> Export</Button>
