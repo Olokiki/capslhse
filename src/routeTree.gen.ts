@@ -14,10 +14,10 @@ import { Route as LoginIndexRouteImport } from './routes/login.index'
 import { Route as AppIndexRouteImport } from './routes/_app.index'
 import { Route as LoginStaffRouteImport } from './routes/login.staff'
 import { Route as LoginAdminRouteImport } from './routes/login.admin'
-import { Route as AppReportsRouteImport } from './routes/_app.reports'
 import { Route as AppLocationsRouteImport } from './routes/_app.locations'
 import { Route as AppDocumentsRouteImport } from './routes/_app.documents'
 import { Route as AppAuditRouteImport } from './routes/_app.audit'
+import { Route as AppReportsIndexRouteImport } from './routes/_app.reports.index'
 import { Route as AppReportsNewRouteImport } from './routes/_app.reports.new'
 import { Route as AppReportsIdRouteImport } from './routes/_app.reports.$id'
 
@@ -45,11 +45,6 @@ const LoginAdminRoute = LoginAdminRouteImport.update({
   path: '/login/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppReportsRoute = AppReportsRouteImport.update({
-  id: '/reports',
-  path: '/reports',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppLocationsRoute = AppLocationsRouteImport.update({
   id: '/locations',
   path: '/locations',
@@ -65,15 +60,20 @@ const AppAuditRoute = AppAuditRouteImport.update({
   path: '/audit',
   getParentRoute: () => AppRoute,
 } as any)
+const AppReportsIndexRoute = AppReportsIndexRouteImport.update({
+  id: '/reports/',
+  path: '/reports/',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppReportsNewRoute = AppReportsNewRouteImport.update({
-  id: '/new',
-  path: '/new',
-  getParentRoute: () => AppReportsRoute,
+  id: '/reports/new',
+  path: '/reports/new',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppReportsIdRoute = AppReportsIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => AppReportsRoute,
+  id: '/reports/$id',
+  path: '/reports/$id',
+  getParentRoute: () => AppRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -81,24 +81,24 @@ export interface FileRoutesByFullPath {
   '/audit': typeof AppAuditRoute
   '/documents': typeof AppDocumentsRoute
   '/locations': typeof AppLocationsRoute
-  '/reports': typeof AppReportsRouteWithChildren
   '/login/admin': typeof LoginAdminRoute
   '/login/staff': typeof LoginStaffRoute
   '/login/': typeof LoginIndexRoute
   '/reports/$id': typeof AppReportsIdRoute
   '/reports/new': typeof AppReportsNewRoute
+  '/reports/': typeof AppReportsIndexRoute
 }
 export interface FileRoutesByTo {
   '/audit': typeof AppAuditRoute
   '/documents': typeof AppDocumentsRoute
   '/locations': typeof AppLocationsRoute
-  '/reports': typeof AppReportsRouteWithChildren
   '/login/admin': typeof LoginAdminRoute
   '/login/staff': typeof LoginStaffRoute
   '/': typeof AppIndexRoute
   '/login': typeof LoginIndexRoute
   '/reports/$id': typeof AppReportsIdRoute
   '/reports/new': typeof AppReportsNewRoute
+  '/reports': typeof AppReportsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -106,13 +106,13 @@ export interface FileRoutesById {
   '/_app/audit': typeof AppAuditRoute
   '/_app/documents': typeof AppDocumentsRoute
   '/_app/locations': typeof AppLocationsRoute
-  '/_app/reports': typeof AppReportsRouteWithChildren
   '/login/admin': typeof LoginAdminRoute
   '/login/staff': typeof LoginStaffRoute
   '/_app/': typeof AppIndexRoute
   '/login/': typeof LoginIndexRoute
   '/_app/reports/$id': typeof AppReportsIdRoute
   '/_app/reports/new': typeof AppReportsNewRoute
+  '/_app/reports/': typeof AppReportsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -121,37 +121,37 @@ export interface FileRouteTypes {
     | '/audit'
     | '/documents'
     | '/locations'
-    | '/reports'
     | '/login/admin'
     | '/login/staff'
     | '/login/'
     | '/reports/$id'
     | '/reports/new'
+    | '/reports/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/audit'
     | '/documents'
     | '/locations'
-    | '/reports'
     | '/login/admin'
     | '/login/staff'
     | '/'
     | '/login'
     | '/reports/$id'
     | '/reports/new'
+    | '/reports'
   id:
     | '__root__'
     | '/_app'
     | '/_app/audit'
     | '/_app/documents'
     | '/_app/locations'
-    | '/_app/reports'
     | '/login/admin'
     | '/login/staff'
     | '/_app/'
     | '/login/'
     | '/_app/reports/$id'
     | '/_app/reports/new'
+    | '/_app/reports/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -198,13 +198,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginAdminRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_app/reports': {
-      id: '/_app/reports'
-      path: '/reports'
-      fullPath: '/reports'
-      preLoaderRoute: typeof AppReportsRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/_app/locations': {
       id: '/_app/locations'
       path: '/locations'
@@ -226,51 +219,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAuditRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/reports/': {
+      id: '/_app/reports/'
+      path: '/reports'
+      fullPath: '/reports/'
+      preLoaderRoute: typeof AppReportsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/reports/new': {
       id: '/_app/reports/new'
-      path: '/new'
+      path: '/reports/new'
       fullPath: '/reports/new'
       preLoaderRoute: typeof AppReportsNewRouteImport
-      parentRoute: typeof AppReportsRoute
+      parentRoute: typeof AppRoute
     }
     '/_app/reports/$id': {
       id: '/_app/reports/$id'
-      path: '/$id'
+      path: '/reports/$id'
       fullPath: '/reports/$id'
       preLoaderRoute: typeof AppReportsIdRouteImport
-      parentRoute: typeof AppReportsRoute
+      parentRoute: typeof AppRoute
     }
   }
 }
-
-interface AppReportsRouteChildren {
-  AppReportsIdRoute: typeof AppReportsIdRoute
-  AppReportsNewRoute: typeof AppReportsNewRoute
-}
-
-const AppReportsRouteChildren: AppReportsRouteChildren = {
-  AppReportsIdRoute: AppReportsIdRoute,
-  AppReportsNewRoute: AppReportsNewRoute,
-}
-
-const AppReportsRouteWithChildren = AppReportsRoute._addFileChildren(
-  AppReportsRouteChildren,
-)
 
 interface AppRouteChildren {
   AppAuditRoute: typeof AppAuditRoute
   AppDocumentsRoute: typeof AppDocumentsRoute
   AppLocationsRoute: typeof AppLocationsRoute
-  AppReportsRoute: typeof AppReportsRouteWithChildren
   AppIndexRoute: typeof AppIndexRoute
+  AppReportsIdRoute: typeof AppReportsIdRoute
+  AppReportsNewRoute: typeof AppReportsNewRoute
+  AppReportsIndexRoute: typeof AppReportsIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppAuditRoute: AppAuditRoute,
   AppDocumentsRoute: AppDocumentsRoute,
   AppLocationsRoute: AppLocationsRoute,
-  AppReportsRoute: AppReportsRouteWithChildren,
   AppIndexRoute: AppIndexRoute,
+  AppReportsIdRoute: AppReportsIdRoute,
+  AppReportsNewRoute: AppReportsNewRoute,
+  AppReportsIndexRoute: AppReportsIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
@@ -284,13 +274,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

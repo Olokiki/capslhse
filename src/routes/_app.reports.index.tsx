@@ -14,7 +14,7 @@ import { useHseReports, TYPE_LABEL, type ReportStatus, type Severity, type Repor
 import { SeverityBadge, StatusBadge, TypeBadge } from "@/components/hse/badges";
 import { Search, Filter, Download, PlusCircle } from "lucide-react";
 
-export const Route = createFileRoute("/_app/reports")({
+export const Route = createFileRoute("/_app/reports/")({
   head: () => ({
     meta: [
       { title: "HSE Reports | CAPSL" },
