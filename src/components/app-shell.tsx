@@ -115,7 +115,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </aside>
 
-      <div className="lg:pl-64">
+      <div className="md:pl-64">
         <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur">
           <div className="flex h-16 items-center gap-3 px-4 sm:px-6">
             <div className="relative w-full max-w-md">
