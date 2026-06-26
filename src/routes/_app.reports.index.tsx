@@ -54,7 +54,14 @@ function ReportsList() {
         <div>
           <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Safety operations</div>
           <h1 className="mt-1 text-3xl font-bold tracking-tight">HSE Reports</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{filtered.length} of {reports.length} reports</p>
+          <p className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
+            {filtered.length} of {scopedReports.length} reports
+            {isStaff && session?.location && (
+              <span className="inline-flex items-center gap-1 rounded-full border border-border bg-secondary px-2 py-0.5 text-[11px] font-semibold text-foreground/80">
+                <MapPin className="h-3 w-3" /> {session.location}
+              </span>
+            )}
+          </p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" className="rounded-full"><Download className="mr-2 h-4 w-4" /> Export</Button>
