@@ -27,20 +27,26 @@ export const Route = createFileRoute("/_app/reports/")({
 
 function ReportsList() {
   const reports = useHseReports();
+  const session = useSession();
+  const isStaff = session?.role === "staff";
+  const scopedReports = useMemo(
+    () => (isStaff && session?.location ? reports.filter((r) => r.location === session.location) : reports),
+    [reports, isStaff, session?.location],
+  );
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<"all" | ReportStatus>("all");
   const [severity, setSeverity] = useState<"all" | Severity>("all");
   const [type, setType] = useState<"all" | ReportType>("all");
 
   const filtered = useMemo(() => {
-    return reports.filter((r) => {
+    return scopedReports.filter((r) => {
       if (q && !(r.title.toLowerCase().includes(q.toLowerCase()) || r.ref.toLowerCase().includes(q.toLowerCase()) || r.location.toLowerCase().includes(q.toLowerCase()))) return false;
       if (status !== "all" && r.status !== status) return false;
       if (severity !== "all" && r.severity !== severity) return false;
       if (type !== "all" && r.type !== type) return false;
       return true;
     });
-  }, [reports, q, status, severity, type]);
+  }, [scopedReports, q, status, severity, type]);
 
   return (
     <div className="mx-auto max-w-[1400px] space-y-5">
