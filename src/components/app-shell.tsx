@@ -49,7 +49,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background">
-      <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col bg-sidebar text-sidebar-foreground lg:flex">
+      <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col bg-sidebar text-sidebar-foreground md:flex">
         <div className="flex items-center gap-3 border-b border-sidebar-border px-5 py-5">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white p-1">
             <img src={capslLogo.url} alt="CAPSL" className="h-full w-full object-contain" />
@@ -115,7 +115,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </aside>
 
-      <div className="lg:pl-64">
+      <div className="md:pl-64">
         <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur">
           <div className="flex h-16 items-center gap-3 px-4 sm:px-6">
             <div className="relative w-full max-w-md">
