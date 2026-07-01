@@ -164,6 +164,19 @@ function ReportDetail() {
                           </Select>
                         </div>
                         <div>
+                          <Label className="text-sm font-semibold">Assignee email</Label>
+                          <Input
+                            type="email"
+                            value={assigneeEmail}
+                            onChange={(e) => setAssigneeEmail(e.target.value)}
+                            placeholder="name@capsl.com"
+                            className="mt-1.5 h-11"
+                          />
+                          <p className="mt-1 text-[11px] text-muted-foreground">
+                            A notification will be sent to this email when the report is assigned.
+                          </p>
+                        </div>
+                        <div>
                           <Label className="text-sm font-semibold">Due date</Label>
                           <Input type="date" value={dueAt} onChange={(e) => setDueAt(e.target.value)} className="mt-1.5 h-11" />
                         </div>
