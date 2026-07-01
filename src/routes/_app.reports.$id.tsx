@@ -67,6 +67,7 @@ function ReportDetail() {
   const [assignOpen, setAssignOpen] = useState(false);
   const [closeOpen, setCloseOpen] = useState(false);
   const [assignee, setAssignee] = useState(report?.assignedTo ?? PEOPLE[2]);
+  const [assigneeEmail, setAssigneeEmail] = useState("");
   const [dueAt, setDueAt] = useState(report?.dueAt?.slice(0, 10) ?? "");
   const [rootCause, setRootCause] = useState("");
   const [corrective, setCorrective] = useState("");
@@ -84,9 +85,14 @@ function ReportDetail() {
 
   const submitAssign = () => {
     if (!assignee) return;
-    assignReport(report.id, assignee, dueAt ? new Date(dueAt).toISOString() : "", CURRENT_USER);
+    const email = assigneeEmail.trim();
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+    assignReport(report.id, assignee, dueAt ? new Date(dueAt).toISOString() : "", CURRENT_USER, email || undefined);
     setAssignOpen(false);
-    toast.success(`Assigned to ${assignee}`);
+    toast.success(email ? `Assigned to ${assignee} · notification sent to ${email}` : `Assigned to ${assignee}`);
   };
 
   const submitClose = () => {
@@ -156,6 +162,19 @@ function ReportDetail() {
                             <SelectTrigger className="mt-1.5 h-11"><SelectValue /></SelectTrigger>
                             <SelectContent>{PEOPLE.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
                           </Select>
+                        </div>
+                        <div>
+                          <Label className="text-sm font-semibold">Assignee email</Label>
+                          <Input
+                            type="email"
+                            value={assigneeEmail}
+                            onChange={(e) => setAssigneeEmail(e.target.value)}
+                            placeholder="name@capsl.com"
+                            className="mt-1.5 h-11"
+                          />
+                          <p className="mt-1 text-[11px] text-muted-foreground">
+                            A notification will be sent to this email when the report is assigned.
+                          </p>
                         </div>
                         <div>
                           <Label className="text-sm font-semibold">Due date</Label>

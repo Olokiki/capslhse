@@ -266,17 +266,18 @@ function update(id: string, mut: (r: HseReport) => void) {
   persist();
 }
 
-export function assignReport(id: string, assignee: string, dueAt: string, actor: string) {
+export function assignReport(id: string, assignee: string, dueAt: string, actor: string, assigneeEmail?: string) {
   update(id, (r) => {
     r.assignedTo = assignee;
     r.dueAt = dueAt;
     if (r.status === "open") r.status = "assigned";
+    const emailPart = assigneeEmail ? ` — notification sent to ${assigneeEmail}` : "";
     r.activity.push({
       id: uid(),
       at: new Date().toISOString(),
       actor,
       kind: "assigned",
-      message: `Assigned to ${assignee}${dueAt ? ` (due ${new Date(dueAt).toLocaleDateString()})` : ""}`,
+      message: `Assigned to ${assignee}${dueAt ? ` (due ${new Date(dueAt).toLocaleDateString()})` : ""}${emailPart}`,
     });
   });
 }
