@@ -67,6 +67,7 @@ function ReportDetail() {
   const [assignOpen, setAssignOpen] = useState(false);
   const [closeOpen, setCloseOpen] = useState(false);
   const [assignee, setAssignee] = useState(report?.assignedTo ?? PEOPLE[2]);
+  const [assigneeEmail, setAssigneeEmail] = useState("");
   const [dueAt, setDueAt] = useState(report?.dueAt?.slice(0, 10) ?? "");
   const [rootCause, setRootCause] = useState("");
   const [corrective, setCorrective] = useState("");
