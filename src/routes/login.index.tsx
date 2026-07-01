@@ -1,9 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ShieldCheck, HardHat, ArrowRight } from "lucide-react";
 import capslLogo from "@/assets/capsl-logo.jpeg.asset.json";
 import { useSession } from "@/lib/auth-store";
-import { useEffect } from "react";
 
 export const Route = createFileRoute("/login/")({
   component: LoginChooser,
@@ -19,15 +18,34 @@ function LoginChooser() {
   }, [session, navigate]);
 
   return (
-    <div className="min-h-screen bg-sidebar text-sidebar-foreground">
-      <div className="mx-auto flex min-h-screen max-w-6xl flex-col px-6 py-10">
-        <header className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-white p-1">
+    <div className="relative min-h-screen overflow-hidden bg-sidebar text-sidebar-foreground">
+      {/* Brand ambient background */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -left-32 -top-32 h-[420px] w-[420px] rounded-full bg-[oklch(0.68_0.17_152)]/25 blur-3xl" />
+        <div className="absolute right-[-120px] top-1/3 h-[460px] w-[460px] rounded-full bg-[oklch(0.76_0.17_60)]/25 blur-3xl" />
+        <div className="absolute bottom-[-140px] left-1/3 h-[420px] w-[420px] rounded-full bg-[oklch(0.62_0.23_27)]/20 blur-3xl" />
+        <div
+          className="absolute inset-0 opacity-[0.05]"
+          style={{
+            backgroundImage:
+              "linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)",
+            backgroundSize: "56px 56px",
+          }}
+        />
+      </div>
+
+      <div className="relative mx-auto flex min-h-screen max-w-6xl flex-col px-6 py-8">
+        <header className="flex items-center gap-4">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white p-1.5 shadow-lg ring-1 ring-white/20 sm:h-20 sm:w-20">
             <img src={capslLogo.url} alt="CAPSL" className="h-full w-full object-contain" />
           </div>
-          <div>
-            <div className="text-base font-semibold">CAPSL HSE Platform</div>
-            <div className="text-xs text-sidebar-foreground/60">Compression and Power Systems Limited</div>
+          <div className="leading-tight">
+            <div className="text-2xl font-bold tracking-tight sm:text-3xl">
+              CAPSL <span className="brand-text-gradient">HSE Platform</span>
+            </div>
+            <div className="mt-1 text-sm text-sidebar-foreground/70 sm:text-base">
+              Compression and Power Systems Limited
+            </div>
           </div>
         </header>
 
@@ -45,14 +63,15 @@ function LoginChooser() {
               onMouseEnter={() => setHover("admin")}
               onMouseLeave={() => setHover(null)}
               className={[
-                "group rounded-2xl border border-sidebar-border bg-sidebar-accent/30 p-7 transition-all",
-                hover === "admin" ? "scale-[1.02] border-primary/60" : "",
+                "group relative overflow-hidden rounded-2xl border border-sidebar-border bg-sidebar-accent/40 p-7 backdrop-blur transition-all",
+                hover === "admin" ? "scale-[1.02] border-primary/60 shadow-elegant" : "",
               ].join(" ")}
             >
+              <div className="absolute inset-x-0 top-0 h-1 brand-gradient" />
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/20 text-primary">
                 <ShieldCheck className="h-6 w-6" />
               </div>
-              <div className="mt-5 text-lg font-semibold">HSE Administrator</div>
+              <div className="mt-5 text-lg font-semibold">CAPSL HSE Administrator</div>
               <p className="mt-1 text-sm text-sidebar-foreground/70">
                 Full access to all reports, locations, analytics, audit log, and close-outs.
               </p>
@@ -66,14 +85,15 @@ function LoginChooser() {
               onMouseEnter={() => setHover("staff")}
               onMouseLeave={() => setHover(null)}
               className={[
-                "group rounded-2xl border border-sidebar-border bg-sidebar-accent/30 p-7 transition-all",
-                hover === "staff" ? "scale-[1.02] border-[oklch(0.78_0.17_60)]" : "",
+                "group relative overflow-hidden rounded-2xl border border-sidebar-border bg-sidebar-accent/40 p-7 backdrop-blur transition-all",
+                hover === "staff" ? "scale-[1.02] border-[oklch(0.78_0.17_60)] shadow-elegant" : "",
               ].join(" ")}
             >
+              <div className="absolute inset-x-0 top-0 h-1 brand-gradient" />
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[oklch(0.78_0.17_60)]/20 text-[oklch(0.85_0.18_60)]">
                 <HardHat className="h-6 w-6" />
               </div>
-              <div className="mt-5 text-lg font-semibold">Field Staff</div>
+              <div className="mt-5 text-lg font-semibold">CAPSL Staff</div>
               <p className="mt-1 text-sm text-sidebar-foreground/70">
                 Submit reports, assign actions to teammates, and track your own report analytics.
               </p>
