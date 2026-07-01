@@ -16,6 +16,9 @@ import { SeverityBadge, StatusBadge, TypeBadge } from "@/components/hse/badges";
 import { Search, Filter, Download, PlusCircle, MapPin } from "lucide-react";
 
 export const Route = createFileRoute("/_app/reports/")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    location: typeof search.location === "string" ? search.location : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "HSE Reports | CAPSL" },
