@@ -22,7 +22,7 @@ export const Route = createFileRoute("/_app/locations")({
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent text-primary"><MapPin className="h-5 w-5" /></div>
                 <div className="mt-3 text-sm font-bold uppercase">{loc.replace("CAPSL - ", "")}</div>
                 <div className="mt-1 text-xs text-muted-foreground">{items.length} total · {open} open</div>
-                <Link to="/reports" className="mt-3 inline-block text-xs font-semibold text-primary hover:underline">View reports →</Link>
+                <Link to="/reports" search={{ location: loc }} className="mt-3 inline-block text-xs font-semibold text-primary hover:underline">View reports →</Link>
               </Card>
             );
           })}
