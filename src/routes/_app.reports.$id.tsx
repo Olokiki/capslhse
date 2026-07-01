@@ -85,9 +85,14 @@ function ReportDetail() {
 
   const submitAssign = () => {
     if (!assignee) return;
-    assignReport(report.id, assignee, dueAt ? new Date(dueAt).toISOString() : "", CURRENT_USER);
+    const email = assigneeEmail.trim();
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+    assignReport(report.id, assignee, dueAt ? new Date(dueAt).toISOString() : "", CURRENT_USER, email || undefined);
     setAssignOpen(false);
-    toast.success(`Assigned to ${assignee}`);
+    toast.success(email ? `Assigned to ${assignee} · notification sent to ${email}` : `Assigned to ${assignee}`);
   };
 
   const submitClose = () => {
