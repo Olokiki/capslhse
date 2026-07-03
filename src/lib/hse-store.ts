@@ -41,6 +41,7 @@ export type HseReport = {
 
 const LOCATIONS = [
   "CAPSL - Egbaoma",
+  "CAPSL - Heritage",
   "CAPSL - Lagos",
   "CAPSL - Midwestern (Umusadege, Kwale)",
   "CAPSL - Sapele West",
@@ -57,6 +58,16 @@ export const PEOPLE = [
   "Bayo Akinola (Site Engineer)",
 ];
 
+export const ASSETS_BY_LOCATION: Record<string, string[]> = {
+  "CAPSL - Egbaoma": ["Unit A", "Unit B"],
+  "CAPSL - Oben": ["C501", "C502", "C503", "C504"],
+  "CAPSL - Heritage": ["Olomoro C200", "Afiesere Unit 1", "Uzere Unit 1"],
+};
+
+export function assetsForLocation(location: string): string[] {
+  return ASSETS_BY_LOCATION[location] ?? [];
+}
+
 export const ASSETS = [
   "Air Compressor A-101",
   "Air Compressor B-204",
@@ -65,6 +76,7 @@ export const ASSETS = [
   "Flare Stack F-12",
   "Separator V-301",
 ];
+
 
 export { LOCATIONS };
 
