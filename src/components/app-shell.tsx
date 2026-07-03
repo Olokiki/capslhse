@@ -13,6 +13,7 @@ import {
   BarChart3,
   BookOpen,
   Menu,
+  Trophy,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import capslLogo from "@/assets/capsl-logo.jpeg.asset.json";
