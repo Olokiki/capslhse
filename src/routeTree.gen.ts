@@ -56,11 +56,6 @@ const AppLeaderboardRoute = AppLeaderboardRouteImport.update({
   path: '/leaderboard',
   getParentRoute: () => AppRoute,
 } as any)
-const AppLeaderboardRoute = AppLeaderboardRouteImport.update({
-  id: '/leaderboard',
-  path: '/leaderboard',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppDocumentsRoute = AppDocumentsRouteImport.update({
   id: '/documents',
   path: '/documents',
