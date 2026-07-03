@@ -16,7 +16,6 @@ import { Route as LoginStaffRouteImport } from './routes/login.staff'
 import { Route as LoginAdminRouteImport } from './routes/login.admin'
 import { Route as AppLocationsRouteImport } from './routes/_app.locations'
 import { Route as AppLeaderboardRouteImport } from './routes/_app.leaderboard'
-import { Route as AppLeaderboardRouteImport } from './routes/_app.leaderboard'
 import { Route as AppDocumentsRouteImport } from './routes/_app.documents'
 import { Route as AppAuditRouteImport } from './routes/_app.audit'
 import { Route as AppReportsIndexRouteImport } from './routes/_app.reports.index'
@@ -50,6 +49,11 @@ const LoginAdminRoute = LoginAdminRouteImport.update({
 const AppLocationsRoute = AppLocationsRouteImport.update({
   id: '/locations',
   path: '/locations',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppLeaderboardRoute = AppLeaderboardRouteImport.update({
+  id: '/leaderboard',
+  path: '/leaderboard',
   getParentRoute: () => AppRoute,
 } as any)
 const AppLeaderboardRoute = AppLeaderboardRouteImport.update({
