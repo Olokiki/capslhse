@@ -15,6 +15,7 @@ import { Route as AppIndexRouteImport } from './routes/_app.index'
 import { Route as LoginStaffRouteImport } from './routes/login.staff'
 import { Route as LoginAdminRouteImport } from './routes/login.admin'
 import { Route as AppLocationsRouteImport } from './routes/_app.locations'
+import { Route as AppLeaderboardRouteImport } from './routes/_app.leaderboard'
 import { Route as AppDocumentsRouteImport } from './routes/_app.documents'
 import { Route as AppAuditRouteImport } from './routes/_app.audit'
 import { Route as AppReportsIndexRouteImport } from './routes/_app.reports.index'
@@ -50,6 +51,11 @@ const AppLocationsRoute = AppLocationsRouteImport.update({
   path: '/locations',
   getParentRoute: () => AppRoute,
 } as any)
+const AppLeaderboardRoute = AppLeaderboardRouteImport.update({
+  id: '/leaderboard',
+  path: '/leaderboard',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppDocumentsRoute = AppDocumentsRouteImport.update({
   id: '/documents',
   path: '/documents',
@@ -80,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/audit': typeof AppAuditRoute
   '/documents': typeof AppDocumentsRoute
+  '/leaderboard': typeof AppLeaderboardRoute
   '/locations': typeof AppLocationsRoute
   '/login/admin': typeof LoginAdminRoute
   '/login/staff': typeof LoginStaffRoute
@@ -91,6 +98,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/audit': typeof AppAuditRoute
   '/documents': typeof AppDocumentsRoute
+  '/leaderboard': typeof AppLeaderboardRoute
   '/locations': typeof AppLocationsRoute
   '/login/admin': typeof LoginAdminRoute
   '/login/staff': typeof LoginStaffRoute
@@ -105,6 +113,7 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/_app/audit': typeof AppAuditRoute
   '/_app/documents': typeof AppDocumentsRoute
+  '/_app/leaderboard': typeof AppLeaderboardRoute
   '/_app/locations': typeof AppLocationsRoute
   '/login/admin': typeof LoginAdminRoute
   '/login/staff': typeof LoginStaffRoute
@@ -120,6 +129,7 @@ export interface FileRouteTypes {
     | '/'
     | '/audit'
     | '/documents'
+    | '/leaderboard'
     | '/locations'
     | '/login/admin'
     | '/login/staff'
@@ -131,6 +141,7 @@ export interface FileRouteTypes {
   to:
     | '/audit'
     | '/documents'
+    | '/leaderboard'
     | '/locations'
     | '/login/admin'
     | '/login/staff'
@@ -144,6 +155,7 @@ export interface FileRouteTypes {
     | '/_app'
     | '/_app/audit'
     | '/_app/documents'
+    | '/_app/leaderboard'
     | '/_app/locations'
     | '/login/admin'
     | '/login/staff'
@@ -205,6 +217,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppLocationsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/leaderboard': {
+      id: '/_app/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/leaderboard'
+      preLoaderRoute: typeof AppLeaderboardRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/documents': {
       id: '/_app/documents'
       path: '/documents'
@@ -246,6 +265,7 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppAuditRoute: typeof AppAuditRoute
   AppDocumentsRoute: typeof AppDocumentsRoute
+  AppLeaderboardRoute: typeof AppLeaderboardRoute
   AppLocationsRoute: typeof AppLocationsRoute
   AppIndexRoute: typeof AppIndexRoute
   AppReportsIdRoute: typeof AppReportsIdRoute
@@ -256,6 +276,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppAuditRoute: AppAuditRoute,
   AppDocumentsRoute: AppDocumentsRoute,
+  AppLeaderboardRoute: AppLeaderboardRoute,
   AppLocationsRoute: AppLocationsRoute,
   AppIndexRoute: AppIndexRoute,
   AppReportsIdRoute: AppReportsIdRoute,

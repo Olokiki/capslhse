@@ -13,6 +13,7 @@ import {
   BarChart3,
   BookOpen,
   Menu,
+  Trophy,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import capslLogo from "@/assets/capsl-logo.jpeg.asset.json";
@@ -27,6 +28,7 @@ const ADMIN_NAV = [
   { to: "/reports", label: "HSE Reports", icon: ShieldAlert },
   { to: "/documents", label: "Documents", icon: BookOpen },
   { to: "/locations", label: "Locations", icon: Map },
+  { to: "/leaderboard", label: "Leaderboard", icon: Trophy },
   { to: "/audit", label: "Audit Log", icon: ClipboardList },
 ];
 
@@ -34,6 +36,7 @@ const STAFF_NAV = [
   { to: "/", label: "My Analytics", icon: BarChart3, exact: true },
   { to: "/reports", label: "HSE Reports", icon: ShieldAlert },
   { to: "/documents", label: "Documents", icon: BookOpen },
+  { to: "/leaderboard", label: "Leaderboard", icon: Trophy },
 ];
 
 function SidebarContent({
