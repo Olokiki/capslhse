@@ -1,0 +1,7 @@
+[build]
+  command = "npm run build"
+  # Nitro's `netlify` preset emits functions + static assets under .netlify/
+  # and Netlify auto-detects that layout, so no publish dir is set here.
+
+[build.environment]
+  NODE_VERSION = "22"
