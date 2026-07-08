@@ -3,7 +3,7 @@
 //   - tanstackStart, viteReact, tailwindcss, tsConfigPaths, nitro (build-only),
 //     componentTagger (dev-only), VITE_* env injection, @ path alias, React/TanStack dedupe,
 //     error logger plugins, and sandbox detection (port/host/strictPort).
-// You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
+
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
@@ -14,14 +14,5 @@ export default defineConfig({
     server: {
       entry: "server",
     },
-  },
-});
-  // Deploy target: Netlify. Nitro produces a Netlify Functions build under
-  // .netlify/ that `netlify deploy` / the Netlify build plugin picks up
-  // automatically. Note: inside a Lovable-managed build the preset is forced
-  // back to Cloudflare; this override only applies to self-hosted builds
-  // (e.g. Netlify CI running `npm run build`).
-  nitro: {
-    preset: "netlify",
   },
 });
