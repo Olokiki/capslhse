@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { ShieldCheck, HardHat, ArrowRight } from "lucide-react";
-import capslLogo from "@/assets/capsl-logo.jpeg.asset.json";
+import capslLogo from "@/assets/capsl-logo.jpeg";
 import { useSession } from "@/lib/auth-store";
 
 export const Route = createFileRoute("/login/")({

@@ -16,7 +16,7 @@ import {
   Trophy,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
-import capslLogo from "@/assets/capsl-logo.jpeg.asset.json";
+import capslLogo from "@/assets/capsl-logo.jpeg";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";

@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ShieldCheck, ArrowLeft } from "lucide-react";
-import capslLogo from "@/assets/capsl-logo.jpeg.asset.json";
+import capslLogo from "@/assets/capsl-logo.jpeg";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
