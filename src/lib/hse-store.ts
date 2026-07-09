@@ -268,13 +268,13 @@ export async function assignReport(
   actor: string,
   assigneeEmail?: string,
 ) {
-  const patch: Record<string, unknown> = {
+  const existing = cache.find((r) => r.id === id);
+  const patch = {
     assigned_to: assignee,
     assigned_email: assigneeEmail ?? null,
     due_at: dueAt || null,
+    ...(existing?.status === "open" ? { status: "assigned" } : {}),
   };
-  const existing = cache.find((r) => r.id === id);
-  if (existing?.status === "open") patch.status = "assigned";
   const { error } = await supabase.from("hse_reports").update(patch).eq("id", id);
   if (error) throw error;
 
