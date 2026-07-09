@@ -4,13 +4,12 @@ import { o as require_jsx_runtime } from "../_libs/@radix-ui/react-arrow+[...].m
 import { t as Input } from "./input-B8Q2ztVi.mjs";
 import { t as Button } from "./button-Bq5vK6RO.mjs";
 import { i as useSession, n as signInStaff } from "./auth-store-Ba8VgCnR.mjs";
-import { t as capsl_logo_jpeg_asset_default } from "./capsl-logo.jpeg.asset-6Y8Y-gcq.mjs";
 import { d as Link, f as useNavigate } from "../_libs/@tanstack/react-router+[...].mjs";
 import { E as HardHat, Y as ArrowLeft, x as MapPin } from "../_libs/lucide-react.mjs";
 import { n as LOCATIONS } from "./hse-store-C0HW7ztA.mjs";
 import { t as Label } from "./label-DBD1bRRP.mjs";
 import { a as SelectValue, i as SelectTrigger, n as SelectContent, r as SelectItem, t as Select } from "./select-Dg1urBTx.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/login.staff-B3ibxI0X.js
+//#region node_modules/.nitro/vite/services/ssr/assets/login.staff-CNhrgG7u.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 function StaffLogin() {
@@ -43,7 +42,7 @@ function StaffLogin() {
 					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 						className: "flex h-11 w-11 items-center justify-center rounded-lg bg-white p-1",
 						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
-							src: capsl_logo_jpeg_asset_default.url,
+							src: "/capsl-logo.jpeg",
 							alt: "CAPSL",
 							className: "h-full w-full object-contain"
 						})

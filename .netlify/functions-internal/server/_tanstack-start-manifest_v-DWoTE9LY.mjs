@@ -1,4 +1,4 @@
-//#region node_modules/.nitro/vite/services/ssr/assets/_tanstack-start-manifest_v-DOsJV6S9.js
+//#region node_modules/.nitro/vite/services/ssr/assets/_tanstack-start-manifest_v-DWoTE9LY.js
 var tsrStartManifest = () => ({
 	routes: {
 		__root__: {
@@ -11,7 +11,7 @@ var tsrStartManifest = () => ({
 			],
 			assets: void 0,
 			preloads: [
-				"/assets/index-Rqx2oJPX.js",
+				"/assets/index-Q3G3scj7.js",
 				"/assets/jsx-runtime-DUAcabCT.js",
 				"/assets/link-BMJPHTWF.js",
 				"/assets/matchContext-MKdqb8ed.js",
@@ -33,7 +33,7 @@ var tsrStartManifest = () => ({
 			],
 			assets: void 0,
 			preloads: [
-				"/assets/_app-D3jbEmrk.js",
+				"/assets/_app-Bv8H0Yjv.js",
 				"/assets/Combination-vFqwSuNj.js",
 				"/assets/button-BBGcvTar.js",
 				"/assets/dist-DuNTKjtj.js",
@@ -46,7 +46,6 @@ var tsrStartManifest = () => ({
 				"/assets/shield-alert-CBnwK7Ak.js",
 				"/assets/sparkles-Ck_ofKIb.js",
 				"/assets/trophy-ruzD42U5.js",
-				"/assets/capsl-logo.jpeg.asset-DJM1IZaS.js",
 				"/assets/input-B2yYTZ51.js",
 				"/assets/auth-store-D5B4YW9A.js"
 			]
@@ -100,12 +99,11 @@ var tsrStartManifest = () => ({
 			children: void 0,
 			assets: void 0,
 			preloads: [
-				"/assets/login.admin-CgfSbcCN.js",
+				"/assets/login.admin-D0QwlATx.js",
 				"/assets/button-BBGcvTar.js",
 				"/assets/label-B5GgEW5J.js",
 				"/assets/arrow-left-DCmUJ_53.js",
 				"/assets/shield-check-D5d0LX2_.js",
-				"/assets/capsl-logo.jpeg.asset-DJM1IZaS.js",
 				"/assets/input-B2yYTZ51.js",
 				"/assets/auth-store-D5B4YW9A.js"
 			]
@@ -115,14 +113,13 @@ var tsrStartManifest = () => ({
 			children: void 0,
 			assets: void 0,
 			preloads: [
-				"/assets/login.staff-DJFOlUO3.js",
+				"/assets/login.staff-CSp_xeep.js",
 				"/assets/select-CzINrPQ3.js",
 				"/assets/button-BBGcvTar.js",
 				"/assets/label-B5GgEW5J.js",
 				"/assets/arrow-left-DCmUJ_53.js",
 				"/assets/hard-hat-DBYLIaPc.js",
 				"/assets/map-pin-B3FjmQRq.js",
-				"/assets/capsl-logo.jpeg.asset-DJM1IZaS.js",
 				"/assets/input-B2yYTZ51.js",
 				"/assets/auth-store-D5B4YW9A.js",
 				"/assets/hse-store-A1Z3qRf7.js"
@@ -146,11 +143,10 @@ var tsrStartManifest = () => ({
 			children: void 0,
 			assets: void 0,
 			preloads: [
-				"/assets/login.index-Bnhu7IQL.js",
+				"/assets/login.index-D2d6ApUX.js",
 				"/assets/createLucideIcon-CLQ5Hlf7.js",
 				"/assets/hard-hat-DBYLIaPc.js",
 				"/assets/shield-check-D5d0LX2_.js",
-				"/assets/capsl-logo.jpeg.asset-DJM1IZaS.js",
 				"/assets/auth-store-D5B4YW9A.js"
 			]
 		},
@@ -159,7 +155,7 @@ var tsrStartManifest = () => ({
 			children: void 0,
 			assets: void 0,
 			preloads: [
-				"/assets/_app.reports._id-BXc6StdW.js",
+				"/assets/_app.reports._id-BLZgyAkX.js",
 				"/assets/select-CzINrPQ3.js",
 				"/assets/label-B5GgEW5J.js",
 				"/assets/arrow-left-DCmUJ_53.js",
@@ -176,7 +172,7 @@ var tsrStartManifest = () => ({
 			children: void 0,
 			assets: void 0,
 			preloads: [
-				"/assets/_app.reports.new-BKZk_3x_.js",
+				"/assets/_app.reports.new-BqumXrJN.js",
 				"/assets/select-CzINrPQ3.js",
 				"/assets/label-B5GgEW5J.js",
 				"/assets/card-CPTfZWhr.js",
@@ -189,7 +185,7 @@ var tsrStartManifest = () => ({
 			children: void 0,
 			assets: void 0,
 			preloads: [
-				"/assets/_app.reports.index-CONJalgB.js",
+				"/assets/_app.reports.index-CxribM14.js",
 				"/assets/select-CzINrPQ3.js",
 				"/assets/download-H7lbVR7i.js",
 				"/assets/badges-CjVOQCAw.js",
@@ -198,7 +194,7 @@ var tsrStartManifest = () => ({
 			]
 		}
 	},
-	clientEntry: "/assets/index-Rqx2oJPX.js"
+	clientEntry: "/assets/index-Q3G3scj7.js"
 });
 //#endregion
 export { tsrStartManifest };

@@ -2,10 +2,9 @@ import { i as __toESM } from "../_runtime.mjs";
 import { u as require_react } from "../_libs/@floating-ui/react-dom+[...].mjs";
 import { o as require_jsx_runtime } from "../_libs/@radix-ui/react-arrow+[...].mjs";
 import { i as useSession } from "./auth-store-Ba8VgCnR.mjs";
-import { t as capsl_logo_jpeg_asset_default } from "./capsl-logo.jpeg.asset-6Y8Y-gcq.mjs";
 import { d as Link, f as useNavigate } from "../_libs/@tanstack/react-router+[...].mjs";
 import { E as HardHat, J as ArrowRight, p as ShieldCheck } from "../_libs/lucide-react.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/login.index-BRwcv5SS.js
+//#region node_modules/.nitro/vite/services/ssr/assets/login.index-r5GlkGaS.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 function LoginChooser() {
@@ -39,7 +38,7 @@ function LoginChooser() {
 					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 						className: "flex h-16 w-16 items-center justify-center rounded-2xl bg-white p-1.5 shadow-lg ring-1 ring-white/20 sm:h-20 sm:w-20",
 						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
-							src: capsl_logo_jpeg_asset_default.url,
+							src: "/capsl-logo.jpeg",
 							alt: "CAPSL",
 							className: "h-full w-full object-contain"
 						})

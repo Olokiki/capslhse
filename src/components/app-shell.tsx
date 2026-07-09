@@ -15,8 +15,7 @@ import {
   Menu,
   Trophy,
 } from "lucide-react";
-import { useState, type ReactNode } from "react";
-import capslLogo from "@/assets/capsl-logo.jpeg";
+import { useState, type ReactNode } from "react";  
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
@@ -55,8 +54,7 @@ function SidebarContent({
     <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
       <div className="flex items-center gap-3 border-b border-sidebar-border px-5 py-5">
         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white p-1">
-          <img src={capslLogo} alt="CAPSL" className="h-full w-full object-contain" />
-        </div>
+        <img src="/capsl-logo.jpeg" alt="CAPSL" className="h-full w-full object-contain" />        </div>
         <div className="leading-tight">
           <div className="text-sm font-semibold tracking-tight">CAPSL HSE</div>
           <div className="text-[11px] uppercase tracking-wider text-sidebar-foreground/60">

@@ -6,12 +6,11 @@ import { o as require_jsx_runtime } from "./_libs/@radix-ui/react-arrow+[...].mj
 import { t as Input } from "./_ssr/input-B8Q2ztVi.mjs";
 import { t as Button } from "./_ssr/button-Bq5vK6RO.mjs";
 import { i as useSession, r as signOut } from "./_ssr/auth-store-Ba8VgCnR.mjs";
-import { t as capsl_logo_jpeg_asset_default } from "./_ssr/capsl-logo.jpeg.asset-6Y8Y-gcq.mjs";
 import { d as Link, f as useNavigate, i as useRouterState, s as Outlet } from "./_libs/@tanstack/react-router+[...].mjs";
 import { F as ClipboardList, G as Bell, H as ChartColumn, L as CirclePlus, S as LogOut, T as LayoutDashboard, W as BookOpen, b as Map, f as Sparkles, g as Search, m as ShieldAlert, o as Trophy, t as X, v as Menu, x as MapPin } from "./_libs/lucide-react.mjs";
 import { a as Portal, c as Trigger, i as Overlay, n as Content, o as Root, r as Description, s as Title, t as Close } from "./_libs/@radix-ui/react-dialog+[...].mjs";
 import { h as VisuallyHidden } from "./_libs/@radix-ui/react-select+[...].mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/_app-KFDzuqKK.js
+//#region node_modules/.nitro/vite/services/ssr/assets/_app-CTCSJWml.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 var Sheet = Root;
@@ -130,13 +129,13 @@ function SidebarContent({ session, pathname, onSignOut, onNavigate }) {
 		children: [
 			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 				className: "flex items-center gap-3 border-b border-sidebar-border px-5 py-5",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 					className: "flex h-10 w-10 items-center justify-center rounded-lg bg-white p-1",
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
-						src: capsl_logo_jpeg_asset_default.url,
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+						src: "/capsl-logo.jpeg",
 						alt: "CAPSL",
 						className: "h-full w-full object-contain"
-					})
+					}), "        "]
 				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 					className: "leading-tight",
 					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {

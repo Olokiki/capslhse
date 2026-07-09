@@ -1,7 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { ShieldCheck, HardHat, ArrowRight } from "lucide-react";
-import capslLogo from "@/assets/capsl-logo.jpeg";
 import { useSession } from "@/lib/auth-store";
 
 export const Route = createFileRoute("/login/")({
@@ -37,7 +36,7 @@ function LoginChooser() {
       <div className="relative mx-auto flex min-h-screen max-w-6xl flex-col px-6 py-8">
         <header className="flex items-center gap-4">
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white p-1.5 shadow-lg ring-1 ring-white/20 sm:h-20 sm:w-20">
-            <img src={capslLogo.url} alt="CAPSL" className="h-full w-full object-contain" />
+            <img src="/capsl-logo.jpeg" alt="CAPSL" className="h-full w-full object-contain" />
           </div>
           <div className="leading-tight">
             <div className="text-2xl font-bold tracking-tight sm:text-3xl">

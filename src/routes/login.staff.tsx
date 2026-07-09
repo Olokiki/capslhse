@@ -1,7 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { HardHat, ArrowLeft, MapPin } from "lucide-react";
-import capslLogo from "@/assets/capsl-logo.jpeg";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -46,7 +45,7 @@ function StaffLogin() {
       <div className="relative hidden flex-col justify-between bg-sidebar p-10 text-sidebar-foreground lg:flex">
         <div className="flex items-center gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-white p-1">
-            <img src={capslLogo.url} alt="CAPSL" className="h-full w-full object-contain" />
+            <img src="/capsl-logo.jpeg" alt="CAPSL" className="h-full w-full object-contain" />
           </div>
           <div>
             <div className="text-base font-semibold">CAPSL HSE Platform</div>
