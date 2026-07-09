@@ -14,7 +14,110 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      hse_activities: {
+        Row: {
+          actor: string
+          at: string
+          id: string
+          kind: string
+          message: string
+          report_id: string
+        }
+        Insert: {
+          actor: string
+          at?: string
+          id?: string
+          kind: string
+          message: string
+          report_id: string
+        }
+        Update: {
+          actor?: string
+          at?: string
+          id?: string
+          kind?: string
+          message?: string
+          report_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hse_activities_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "hse_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hse_reports: {
+        Row: {
+          asset: string | null
+          assigned_email: string | null
+          assigned_to: string | null
+          closed_at: string | null
+          closed_by: string | null
+          corrective_action: string | null
+          created_at: string
+          description: string
+          due_at: string | null
+          id: string
+          location: string
+          ref: string
+          reported_at: string
+          reported_by: string
+          root_cause: string | null
+          severity: string
+          status: string
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          asset?: string | null
+          assigned_email?: string | null
+          assigned_to?: string | null
+          closed_at?: string | null
+          closed_by?: string | null
+          corrective_action?: string | null
+          created_at?: string
+          description: string
+          due_at?: string | null
+          id?: string
+          location: string
+          ref: string
+          reported_at?: string
+          reported_by: string
+          root_cause?: string | null
+          severity: string
+          status?: string
+          title: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          asset?: string | null
+          assigned_email?: string | null
+          assigned_to?: string | null
+          closed_at?: string | null
+          closed_by?: string | null
+          corrective_action?: string | null
+          created_at?: string
+          description?: string
+          due_at?: string | null
+          id?: string
+          location?: string
+          ref?: string
+          reported_at?: string
+          reported_by?: string
+          root_cause?: string | null
+          severity?: string
+          status?: string
+          title?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
