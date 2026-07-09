@@ -82,7 +82,8 @@ function NewReport() {
     }, 700);
   };
 
-  const submit = (e: React.FormEvent) => {
+  const [submitting, setSubmitting] = useState(false);
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.title.trim()) return toast.error("Title is required.");
     if (!form.description.trim()) return toast.error("Description is required.");
@@ -97,17 +98,24 @@ function NewReport() {
         : form.asset;
     if (!finalAsset) return toast.error("Asset is required. Pick one or enter a custom asset.");
 
-    const r = createReport({
-      title: form.title.trim(),
-      description: form.description.trim(),
-      type: form.type as ReportType,
-      severity: form.severity as Severity,
-      location: form.location,
-      asset: finalAsset,
-      reportedBy: form.reportedBy,
-    });
-    toast.success(`Report ${r.ref} submitted`);
-    nav({ to: "/reports/$id", params: { id: r.id } });
+    setSubmitting(true);
+    try {
+      const r = await createReport({
+        title: form.title.trim(),
+        description: form.description.trim(),
+        type: form.type as ReportType,
+        severity: form.severity as Severity,
+        location: form.location,
+        asset: finalAsset,
+        reportedBy: form.reportedBy,
+      });
+      toast.success(`Report ${r.ref} submitted`);
+      nav({ to: "/reports/$id", params: { id: r.id } });
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to submit report. Please try again.");
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -212,8 +220,8 @@ function NewReport() {
           </div>
 
           <div className="flex items-center justify-end gap-2 border-t border-border pt-4">
-            <Button type="button" variant="ghost" onClick={() => nav({ to: "/reports" })}>Cancel</Button>
-            <Button type="submit" className="rounded-full px-6 font-semibold shadow-sm">Submit Report</Button>
+            <Button type="button" variant="ghost" onClick={() => nav({ to: "/reports" })} disabled={submitting}>Cancel</Button>
+            <Button type="submit" disabled={submitting} className="rounded-full px-6 font-semibold shadow-sm">{submitting ? "Submitting…" : "Submit Report"}</Button>
           </div>
         </form>
       </Card>

@@ -12,8 +12,10 @@ import {
 } from "@/components/ui/select";
 import { useHseReports, TYPE_LABEL, type ReportStatus, type Severity, type ReportType } from "@/lib/hse-store";
 import { useSession } from "@/lib/auth-store";
+import { exportReportsToExcel } from "@/lib/hse-export";
 import { SeverityBadge, StatusBadge, TypeBadge } from "@/components/hse/badges";
 import { Search, Filter, Download, PlusCircle, MapPin } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/reports/")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -78,7 +80,18 @@ function ReportsList() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" className="rounded-full"><Download className="mr-2 h-4 w-4" /> Export</Button>
+          <Button
+            variant="outline"
+            className="rounded-full"
+            onClick={() => {
+              if (filtered.length === 0) return toast.error("No reports to export.");
+              const suffix = activeLocation ? `-${activeLocation.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}` : "";
+              exportReportsToExcel(filtered, `hse-reports${suffix}-${new Date().toISOString().slice(0, 10)}.xlsx`);
+              toast.success(`Exported ${filtered.length} report${filtered.length === 1 ? "" : "s"} to Excel`);
+            }}
+          >
+            <Download className="mr-2 h-4 w-4" /> Export Excel
+          </Button>
           <Button asChild className="rounded-full font-semibold"><Link to="/reports/new"><PlusCircle className="mr-2 h-4 w-4" /> New report</Link></Button>
         </div>
       </div>
