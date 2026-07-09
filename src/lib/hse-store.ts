@@ -1,4 +1,5 @@
-import { useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export type Severity = "low" | "medium" | "high" | "critical";
 export type ReportType =
@@ -30,6 +31,7 @@ export type HseReport = {
   reportedBy: string;
   reportedAt: string;
   assignedTo?: string;
+  assignedEmail?: string;
   dueAt?: string;
   status: ReportStatus;
   rootCause?: string;
@@ -68,179 +70,155 @@ export function assetsForLocation(location: string): string[] {
   return ASSETS_BY_LOCATION[location] ?? [];
 }
 
-export const ASSETS = [
-  "Air Compressor A-101",
-  "Air Compressor B-204",
-  "Gas Turbine UNIT C-501",
-  "Gas Turbine UNIT C-502",
-  "Flare Stack F-12",
-  "Separator V-301",
-];
-
-
 export { LOCATIONS };
 
-const KEY = "capsl-hse-v1";
+export const CURRENT_USER = "Adaeze Okafor (HSE Lead)";
+
+// ------------------------- DB mapping -------------------------
+
+type ReportRow = {
+  id: string;
+  ref: string;
+  title: string;
+  description: string;
+  type: string;
+  severity: string;
+  location: string;
+  asset: string | null;
+  reported_by: string;
+  reported_at: string;
+  assigned_to: string | null;
+  assigned_email: string | null;
+  due_at: string | null;
+  status: string;
+  root_cause: string | null;
+  corrective_action: string | null;
+  closed_at: string | null;
+  closed_by: string | null;
+};
+
+type ActivityRow = {
+  id: string;
+  report_id: string;
+  at: string;
+  actor: string;
+  kind: string;
+  message: string;
+};
+
+function rowToReport(r: ReportRow, activities: ActivityRow[]): HseReport {
+  return {
+    id: r.id,
+    ref: r.ref,
+    title: r.title,
+    description: r.description,
+    type: r.type as ReportType,
+    severity: r.severity as Severity,
+    location: r.location,
+    asset: r.asset ?? undefined,
+    reportedBy: r.reported_by,
+    reportedAt: r.reported_at,
+    assignedTo: r.assigned_to ?? undefined,
+    assignedEmail: r.assigned_email ?? undefined,
+    dueAt: r.due_at ?? undefined,
+    status: r.status as ReportStatus,
+    rootCause: r.root_cause ?? undefined,
+    correctiveAction: r.corrective_action ?? undefined,
+    closedAt: r.closed_at ?? undefined,
+    closedBy: r.closed_by ?? undefined,
+    activity: activities
+      .filter((a) => a.report_id === r.id)
+      .sort((a, b) => a.at.localeCompare(b.at))
+      .map((a) => ({
+        id: a.id,
+        at: a.at,
+        actor: a.actor,
+        kind: a.kind as Activity["kind"],
+        message: a.message,
+      })),
+  };
+}
+
+// ------------------------- Store -------------------------
+
+let cache: HseReport[] = [];
+let loaded = false;
+let loading: Promise<void> | null = null;
+const listeners = new Set<() => void>();
+
+function notify() {
+  listeners.forEach((l) => l());
+}
+
+async function fetchAll(): Promise<void> {
+  const [{ data: reports, error: e1 }, { data: activities, error: e2 }] = await Promise.all([
+    supabase.from("hse_reports").select("*").order("reported_at", { ascending: false }),
+    supabase.from("hse_activities").select("*"),
+  ]);
+  if (e1) throw e1;
+  if (e2) throw e2;
+  const acts = (activities ?? []) as ActivityRow[];
+  cache = ((reports ?? []) as ReportRow[]).map((r) => rowToReport(r, acts));
+  loaded = true;
+  notify();
+}
+
+function ensureLoaded() {
+  if (loaded || loading) return;
+  loading = fetchAll()
+    .catch((err) => console.error("[hse-store] load failed", err))
+    .finally(() => {
+      loading = null;
+    });
+}
+
+let realtimeSubscribed = false;
+function ensureRealtime() {
+  if (realtimeSubscribed || typeof window === "undefined") return;
+  realtimeSubscribed = true;
+  supabase
+    .channel("hse-reports-realtime")
+    .on("postgres_changes", { event: "*", schema: "public", table: "hse_reports" }, () => {
+      fetchAll().catch(() => {});
+    })
+    .on("postgres_changes", { event: "*", schema: "public", table: "hse_activities" }, () => {
+      fetchAll().catch(() => {});
+    })
+    .subscribe();
+}
+
+export function useHseReports(): HseReport[] {
+  const [snap, setSnap] = useState<HseReport[]>(cache);
+  useEffect(() => {
+    const l = () => setSnap([...cache]);
+    listeners.add(l);
+    ensureLoaded();
+    ensureRealtime();
+    // Sync on mount in case cache was populated before subscription
+    setSnap([...cache]);
+    return () => {
+      listeners.delete(l);
+    };
+  }, []);
+  return snap;
+}
+
+export function getReport(id: string): HseReport | undefined {
+  return cache.find((r) => r.id === id);
+}
+
+// ------------------------- Mutations -------------------------
 
 function uid() {
   return Math.random().toString(36).slice(2, 10);
 }
 
-function seed(): HseReport[] {
-  const now = Date.now();
-  const day = 86400000;
-  const mk = (i: number, p: Partial<HseReport>): HseReport => ({
-    id: uid(),
-    ref: `HSE-${String(2400 + i).padStart(4, "0")}`,
-    title: "",
-    description: "",
-    type: "near-miss",
-    severity: "low",
-    location: LOCATIONS[i % LOCATIONS.length],
-    reportedBy: PEOPLE[i % PEOPLE.length],
-    reportedAt: new Date(now - i * day * 0.7).toISOString(),
-    status: "open",
-    activity: [
-      {
-        id: uid(),
-        at: new Date(now - i * day * 0.7).toISOString(),
-        actor: PEOPLE[i % PEOPLE.length],
-        kind: "created",
-        message: "Report submitted",
-      },
-    ],
-    ...p,
-  });
-
-  return [
-    mk(1, {
-      title: "Oil spill near separator V-301",
-      description:
-        "Approx. 5L hydraulic oil leak observed beneath the separator. Area cordoned off, no personnel exposure.",
-      type: "environmental",
-      severity: "high",
-      asset: "Separator V-301",
-      status: "assigned",
-      assignedTo: PEOPLE[2],
-      dueAt: new Date(now + 2 * day).toISOString(),
-    }),
-    mk(2, {
-      title: "Worker observed without safety harness at elevation",
-      description: "Technician working at ~3m height without harness on platform 2.",
-      type: "unsafe-act",
-      severity: "critical",
-      status: "in-progress",
-      assignedTo: PEOPLE[0],
-      dueAt: new Date(now + 1 * day).toISOString(),
-    }),
-    mk(3, {
-      title: "Frayed power cable on compressor B-204",
-      description: "Insulation worn through on supply cable, exposed copper visible.",
-      type: "unsafe-condition",
-      severity: "medium",
-      asset: "Air Compressor B-204",
-      status: "open",
-    }),
-    mk(4, {
-      title: "Slip on wet floor – control room entrance",
-      description: "Operator slipped, no injury. AC condensate drain blocked.",
-      type: "near-miss",
-      severity: "low",
-      status: "closed",
-      assignedTo: PEOPLE[3],
-      closedAt: new Date(now - 2 * day).toISOString(),
-      closedBy: PEOPLE[0],
-      rootCause: "Blocked condensate drain line",
-      correctiveAction: "Cleared drain, added weekly inspection to PM schedule",
-    }),
-    mk(5, {
-      title: "Minor hand laceration during valve service",
-      description: "Technician sustained 2cm cut on left index finger. First aid administered.",
-      type: "injury",
-      severity: "medium",
-      asset: "Gas Turbine UNIT C-501",
-      status: "in-progress",
-      assignedTo: PEOPLE[0],
-      dueAt: new Date(now + 3 * day).toISOString(),
-    }),
-    mk(6, {
-      title: "Flare stack abnormal smoke observed",
-      description: "Black smoke for ~4 minutes during startup sequence.",
-      type: "environmental",
-      severity: "high",
-      asset: "Flare Stack F-12",
-      status: "open",
-    }),
-    mk(7, {
-      title: "Missing fire extinguisher inspection tag",
-      description: "Extinguisher FE-08 inspection tag missing/illegible.",
-      type: "unsafe-condition",
-      severity: "low",
-      status: "assigned",
-      assignedTo: PEOPLE[1],
-      dueAt: new Date(now + 5 * day).toISOString(),
-    }),
-  ];
+function newRef() {
+  const t = Date.now().toString().slice(-6);
+  return `HSE-${t}`;
 }
 
-function load(): HseReport[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = window.localStorage.getItem(KEY);
-    if (!raw) {
-      const s = seed();
-      window.localStorage.setItem(KEY, JSON.stringify(s));
-      return s;
-    }
-    return JSON.parse(raw) as HseReport[];
-  } catch {
-    return seed();
-  }
-}
-
-let data: HseReport[] = [];
-let initialized = false;
-const listeners = new Set<() => void>();
-
-function ensureInit() {
-  if (!initialized && typeof window !== "undefined") {
-    data = load();
-    initialized = true;
-  }
-}
-
-function persist() {
-  if (typeof window !== "undefined") {
-    window.localStorage.setItem(KEY, JSON.stringify(data));
-  }
-  listeners.forEach((l) => l());
-}
-
-function subscribe(l: () => void) {
-  listeners.add(l);
-  return () => listeners.delete(l);
-}
-
-export function useHseReports(): HseReport[] {
-  ensureInit();
-  return useSyncExternalStore(
-    subscribe,
-    () => {
-      ensureInit();
-      return data;
-    },
-    () => [],
-  );
-}
-
-export function getReport(id: string): HseReport | undefined {
-  ensureInit();
-  return data.find((r) => r.id === id);
-}
-
-export const CURRENT_USER = "Adaeze Okafor (HSE Lead)";
-
-export function createReport(input: {
+export async function createReport(input: {
   title: string;
   description: string;
   type: ReportType;
@@ -248,96 +226,116 @@ export function createReport(input: {
   location: string;
   asset?: string;
   reportedBy: string;
-}): HseReport {
-  ensureInit();
-  const now = new Date().toISOString();
-  const ref = `HSE-${String(2500 + data.length).padStart(4, "0")}`;
-  const r: HseReport = {
-    id: uid(),
-    ref,
-    ...input,
-    reportedAt: now,
-    status: "open",
-    activity: [
-      { id: uid(), at: now, actor: input.reportedBy, kind: "created", message: "Report submitted" },
-    ],
+}): Promise<HseReport> {
+  const ref = newRef();
+  const { data, error } = await supabase
+    .from("hse_reports")
+    .insert({
+      ref,
+      title: input.title,
+      description: input.description,
+      type: input.type,
+      severity: input.severity,
+      location: input.location,
+      asset: input.asset ?? null,
+      reported_by: input.reportedBy,
+      status: "open",
+    })
+    .select("*")
+    .single();
+  if (error) throw error;
+  const row = data as ReportRow;
+
+  await supabase.from("hse_activities").insert({
+    report_id: row.id,
+    actor: input.reportedBy,
+    kind: "created",
+    message: "Report submitted",
+  });
+
+  const report = rowToReport(row, []);
+  // Optimistic prepend so navigation to /$id works immediately.
+  cache = [report, ...cache];
+  notify();
+  fetchAll().catch(() => {});
+  return report;
+}
+
+export async function assignReport(
+  id: string,
+  assignee: string,
+  dueAt: string,
+  actor: string,
+  assigneeEmail?: string,
+) {
+  const patch: Record<string, unknown> = {
+    assigned_to: assignee,
+    assigned_email: assigneeEmail ?? null,
+    due_at: dueAt || null,
   };
-  data = [r, ...data];
-  persist();
-  return r;
-}
+  const existing = cache.find((r) => r.id === id);
+  if (existing?.status === "open") patch.status = "assigned";
+  const { error } = await supabase.from("hse_reports").update(patch).eq("id", id);
+  if (error) throw error;
 
-function update(id: string, mut: (r: HseReport) => void) {
-  ensureInit();
-  data = data.map((r) => {
-    if (r.id !== id) return r;
-    const copy: HseReport = { ...r, activity: [...r.activity] };
-    mut(copy);
-    return copy;
+  const emailPart = assigneeEmail ? ` — notification sent to ${assigneeEmail}` : "";
+  await supabase.from("hse_activities").insert({
+    report_id: id,
+    actor,
+    kind: "assigned",
+    message: `Assigned to ${assignee}${
+      dueAt ? ` (due ${new Date(dueAt).toLocaleDateString()})` : ""
+    }${emailPart}`,
   });
-  persist();
+  fetchAll().catch(() => {});
 }
 
-export function assignReport(id: string, assignee: string, dueAt: string, actor: string, assigneeEmail?: string) {
-  update(id, (r) => {
-    r.assignedTo = assignee;
-    r.dueAt = dueAt;
-    if (r.status === "open") r.status = "assigned";
-    const emailPart = assigneeEmail ? ` — notification sent to ${assigneeEmail}` : "";
-    r.activity.push({
-      id: uid(),
-      at: new Date().toISOString(),
-      actor,
-      kind: "assigned",
-      message: `Assigned to ${assignee}${dueAt ? ` (due ${new Date(dueAt).toLocaleDateString()})` : ""}${emailPart}`,
-    });
+export async function setStatus(id: string, status: ReportStatus, actor: string) {
+  const { error } = await supabase.from("hse_reports").update({ status }).eq("id", id);
+  if (error) throw error;
+  await supabase.from("hse_activities").insert({
+    report_id: id,
+    actor,
+    kind: "status",
+    message: `Status changed to ${status.replace("-", " ")}`,
   });
+  fetchAll().catch(() => {});
 }
 
-export function setStatus(id: string, status: ReportStatus, actor: string) {
-  update(id, (r) => {
-    r.status = status;
-    r.activity.push({
-      id: uid(),
-      at: new Date().toISOString(),
-      actor,
-      kind: "status",
-      message: `Status changed to ${status.replace("-", " ")}`,
-    });
-  });
+export async function addComment(id: string, message: string, actor: string) {
+  const { error } = await supabase
+    .from("hse_activities")
+    .insert({ report_id: id, actor, kind: "comment", message });
+  if (error) throw error;
+  fetchAll().catch(() => {});
 }
 
-export function addComment(id: string, message: string, actor: string) {
-  update(id, (r) => {
-    r.activity.push({
-      id: uid(),
-      at: new Date().toISOString(),
-      actor,
-      kind: "comment",
-      message,
-    });
-  });
-}
-
-export function closeReport(
+export async function closeReport(
   id: string,
   data2: { rootCause: string; correctiveAction: string; actor: string },
 ) {
-  update(id, (r) => {
-    r.status = "closed";
-    r.rootCause = data2.rootCause;
-    r.correctiveAction = data2.correctiveAction;
-    r.closedAt = new Date().toISOString();
-    r.closedBy = data2.actor;
-    r.activity.push({
-      id: uid(),
-      at: new Date().toISOString(),
-      actor: data2.actor,
-      kind: "closed",
-      message: "Report closed out with root cause & corrective action",
-    });
+  const { error } = await supabase
+    .from("hse_reports")
+    .update({
+      status: "closed",
+      root_cause: data2.rootCause,
+      corrective_action: data2.correctiveAction,
+      closed_at: new Date().toISOString(),
+      closed_by: data2.actor,
+    })
+    .eq("id", id);
+  if (error) throw error;
+  await supabase.from("hse_activities").insert({
+    report_id: id,
+    actor: data2.actor,
+    kind: "closed",
+    message: "Report closed out with root cause & corrective action",
   });
+  fetchAll().catch(() => {});
 }
+
+// Kept for compatibility with any legacy imports
+export const _uid = uid;
 
 export const SEVERITY_META: Record<Severity, { label: string; color: string; ring: string }> = {
   low: { label: "Low", color: "bg-emerald-100 text-emerald-800 border-emerald-200", ring: "bg-emerald-500" },
