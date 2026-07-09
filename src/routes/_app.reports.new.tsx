@@ -220,8 +220,8 @@ function NewReport() {
           </div>
 
           <div className="flex items-center justify-end gap-2 border-t border-border pt-4">
-            <Button type="button" variant="ghost" onClick={() => nav({ to: "/reports" })}>Cancel</Button>
-            <Button type="submit" className="rounded-full px-6 font-semibold shadow-sm">Submit Report</Button>
+            <Button type="button" variant="ghost" onClick={() => nav({ to: "/reports" })} disabled={submitting}>Cancel</Button>
+            <Button type="submit" disabled={submitting} className="rounded-full px-6 font-semibold shadow-sm">{submitting ? "Submitting…" : "Submit Report"}</Button>
           </div>
         </form>
       </Card>
