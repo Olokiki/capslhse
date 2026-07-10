@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { AppShell } from "@/components/app-shell";
-import { useSession } from "@/lib/auth-store";
+import { useAuthLoading, useSession } from "@/lib/auth-store";
 
 export const Route = createFileRoute("/_app")({
   component: AppLayout,
@@ -9,12 +9,20 @@ export const Route = createFileRoute("/_app")({
 
 function AppLayout() {
   const session = useSession();
+  const loading = useAuthLoading();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!session) navigate({ to: "/login" });
-  }, [session, navigate]);
+    if (!loading && !session) navigate({ to: "/login" });
+  }, [session, loading, navigate]);
 
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center text-sm text-muted-foreground">
+        Loading…
+      </div>
+    );
+  }
   if (!session) return null;
 
   return (
