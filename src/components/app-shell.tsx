@@ -6,7 +6,6 @@ import {
   PlusCircle,
   Map,
   Search,
-  Bell,
   Sparkles,
   LogOut,
   MapPin,
