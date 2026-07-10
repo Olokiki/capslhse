@@ -318,7 +318,7 @@ function Legend({ color, label }: { color: string; label: string }) {
 // Real KPIs derived from the actual reports the users have submitted.
 function RealKpis({ reports }: { reports: ReturnType<typeof useHseReports> }) {
   const now = Date.now();
-  const MS_MONTH = 30 * 86400000;
+  
   const in12mo = reports.filter((r) => now - new Date(r.reportedAt).getTime() < 365 * 86400000);
   const in3mo = reports.filter((r) => now - new Date(r.reportedAt).getTime() < 90 * 86400000);
   const prev3mo = reports.filter((r) => {
