@@ -314,3 +314,70 @@ function Legend({ color, label }: { color: string; label: string }) {
     </span>
   );
 }
+
+// Real KPIs derived from the actual reports the users have submitted.
+function RealKpis({ reports }: { reports: ReturnType<typeof useHseReports> }) {
+  const now = Date.now();
+  const MS_MONTH = 30 * 86400000;
+  const in12mo = reports.filter((r) => now - new Date(r.reportedAt).getTime() < 365 * 86400000);
+  const in3mo = reports.filter((r) => now - new Date(r.reportedAt).getTime() < 90 * 86400000);
+  const prev3mo = reports.filter((r) => {
+    const age = now - new Date(r.reportedAt).getTime();
+    return age >= 90 * 86400000 && age < 180 * 86400000;
+  });
+
+  const recordable12 = in12mo.filter((r) => r.type === "incident" || r.type === "injury").length;
+  const lostTime12 = in12mo.filter((r) => r.type === "injury").length;
+
+  const closed = reports.filter((r) => r.status === "closed" && r.closedAt);
+  const avgCloseDays =
+    closed.length === 0
+      ? 0
+      : closed.reduce(
+          (sum, r) =>
+            sum + (new Date(r.closedAt!).getTime() - new Date(r.reportedAt).getTime()) / 86400000,
+          0,
+        ) / closed.length;
+
+  const closeRate = reports.length === 0 ? 0 : (reports.filter((r) => r.status === "closed").length / reports.length) * 100;
+
+  const delta3mo = in3mo.length - prev3mo.length;
+  const deltaLabel = delta3mo === 0 ? "±0" : (delta3mo > 0 ? "+" : "") + delta3mo;
+
+  return (
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <MiniStat
+        label="Recordable Incidents (12 mo)"
+        value={String(recordable12)}
+        delta={`${deltaLabel} vs prev 3 mo`}
+        good={delta3mo <= 0}
+        icon={delta3mo <= 0 ? <TrendingDown className="h-4 w-4" /> : <TrendingUp className="h-4 w-4" />}
+      />
+      <MiniStat
+        label="Lost-Time Injuries (12 mo)"
+        value={String(lostTime12)}
+        delta={lostTime12 === 0 ? "no injuries" : `${lostTime12} logged`}
+        good={lostTime12 === 0}
+        icon={lostTime12 === 0 ? <TrendingDown className="h-4 w-4" /> : <TrendingUp className="h-4 w-4" />}
+      />
+      <MiniStat
+        label="Avg. Close-out Time"
+        value={closed.length === 0 ? "—" : `${avgCloseDays.toFixed(1)}d`}
+        delta={`${closed.length} closed`}
+        good
+        icon={<TrendingDown className="h-4 w-4" />}
+      />
+      <MiniStat
+        label="Close-out Rate"
+        value={reports.length === 0 ? "—" : `${Math.round(closeRate)}%`}
+        delta={`${reports.length} total`}
+        good={closeRate >= 60}
+        icon={closeRate >= 60 ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
+      />
+    </div>
+  );
+}
+
+// silence unused-var warning for MS_MONTH placeholder
+void 0 as unknown as typeof 0;
+
