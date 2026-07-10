@@ -378,6 +378,3 @@ function RealKpis({ reports }: { reports: ReturnType<typeof useHseReports> }) {
   );
 }
 
-// silence unused-var warning for MS_MONTH placeholder
-void 0 as unknown as typeof 0;
-
