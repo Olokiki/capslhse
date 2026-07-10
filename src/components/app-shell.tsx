@@ -160,6 +160,13 @@ export function AppShell({ children }: { children: ReactNode }) {
               </SheetContent>
             </Sheet>
 
+            <Link to="/" className="flex items-center gap-2 md:hidden" aria-label="CAPSL HSE home">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white p-1 ring-1 ring-border">
+                <img src="/capsl-logo.jpeg" alt="CAPSL" className="h-full w-full object-contain" />
+              </div>
+              <span className="text-sm font-semibold tracking-tight">CAPSL HSE</span>
+            </Link>
+
             <div className="relative hidden w-full max-w-md sm:block">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -169,9 +176,6 @@ export function AppShell({ children }: { children: ReactNode }) {
             </div>
 
             <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
-              <Button variant="ghost" size="icon" className="rounded-full">
-                <Bell className="h-5 w-5" />
-              </Button>
               <Button asChild className="h-10 rounded-full px-3 font-semibold shadow-sm sm:px-5">
                 <Link to="/reports/new">
                   <PlusCircle className="h-4 w-4 sm:mr-2" />
