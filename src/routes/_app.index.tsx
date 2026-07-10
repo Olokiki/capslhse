@@ -140,13 +140,9 @@ function Dashboard() {
         </div>
       </Card>
 
-      {/* KPI cards row */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <MiniStat label="TRIR (12 mo)" value="0.42" delta="-18%" good icon={<TrendingDown className="h-4 w-4" />} />
-        <MiniStat label="LTIR" value="0.11" delta="-25%" good icon={<TrendingDown className="h-4 w-4" />} />
-        <MiniStat label="Avg. Close-out Time" value="3.4d" delta="-0.6d" good icon={<TrendingDown className="h-4 w-4" />} />
-        <MiniStat label="Reporting Rate" value="92%" delta="+7%" good icon={<TrendingUp className="h-4 w-4" />} />
-      </div>
+      {/* KPI cards row — derived from real report data */}
+      <RealKpis reports={reports} />
+
 
       {/* Charts row */}
       <div className="grid gap-4 lg:grid-cols-3">
