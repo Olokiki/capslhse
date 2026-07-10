@@ -12,8 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as LoginIndexRouteImport } from './routes/login.index'
 import { Route as AppIndexRouteImport } from './routes/_app.index'
-import { Route as LoginStaffRouteImport } from './routes/login.staff'
-import { Route as LoginAdminRouteImport } from './routes/login.admin'
 import { Route as AppLocationsRouteImport } from './routes/_app.locations'
 import { Route as AppLeaderboardRouteImport } from './routes/_app.leaderboard'
 import { Route as AppDocumentsRouteImport } from './routes/_app.documents'
@@ -35,16 +33,6 @@ const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppRoute,
-} as any)
-const LoginStaffRoute = LoginStaffRouteImport.update({
-  id: '/login/staff',
-  path: '/login/staff',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginAdminRoute = LoginAdminRouteImport.update({
-  id: '/login/admin',
-  path: '/login/admin',
-  getParentRoute: () => rootRouteImport,
 } as any)
 const AppLocationsRoute = AppLocationsRouteImport.update({
   id: '/locations',
@@ -88,8 +76,6 @@ export interface FileRoutesByFullPath {
   '/documents': typeof AppDocumentsRoute
   '/leaderboard': typeof AppLeaderboardRoute
   '/locations': typeof AppLocationsRoute
-  '/login/admin': typeof LoginAdminRoute
-  '/login/staff': typeof LoginStaffRoute
   '/login/': typeof LoginIndexRoute
   '/reports/$id': typeof AppReportsIdRoute
   '/reports/new': typeof AppReportsNewRoute
@@ -100,8 +86,6 @@ export interface FileRoutesByTo {
   '/documents': typeof AppDocumentsRoute
   '/leaderboard': typeof AppLeaderboardRoute
   '/locations': typeof AppLocationsRoute
-  '/login/admin': typeof LoginAdminRoute
-  '/login/staff': typeof LoginStaffRoute
   '/': typeof AppIndexRoute
   '/login': typeof LoginIndexRoute
   '/reports/$id': typeof AppReportsIdRoute
@@ -115,8 +99,6 @@ export interface FileRoutesById {
   '/_app/documents': typeof AppDocumentsRoute
   '/_app/leaderboard': typeof AppLeaderboardRoute
   '/_app/locations': typeof AppLocationsRoute
-  '/login/admin': typeof LoginAdminRoute
-  '/login/staff': typeof LoginStaffRoute
   '/_app/': typeof AppIndexRoute
   '/login/': typeof LoginIndexRoute
   '/_app/reports/$id': typeof AppReportsIdRoute
@@ -131,8 +113,6 @@ export interface FileRouteTypes {
     | '/documents'
     | '/leaderboard'
     | '/locations'
-    | '/login/admin'
-    | '/login/staff'
     | '/login/'
     | '/reports/$id'
     | '/reports/new'
@@ -143,8 +123,6 @@ export interface FileRouteTypes {
     | '/documents'
     | '/leaderboard'
     | '/locations'
-    | '/login/admin'
-    | '/login/staff'
     | '/'
     | '/login'
     | '/reports/$id'
@@ -157,8 +135,6 @@ export interface FileRouteTypes {
     | '/_app/documents'
     | '/_app/leaderboard'
     | '/_app/locations'
-    | '/login/admin'
-    | '/login/staff'
     | '/_app/'
     | '/login/'
     | '/_app/reports/$id'
@@ -168,8 +144,6 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
-  LoginAdminRoute: typeof LoginAdminRoute
-  LoginStaffRoute: typeof LoginStaffRoute
   LoginIndexRoute: typeof LoginIndexRoute
 }
 
@@ -195,20 +169,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
-    }
-    '/login/staff': {
-      id: '/login/staff'
-      path: '/login/staff'
-      fullPath: '/login/staff'
-      preLoaderRoute: typeof LoginStaffRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login/admin': {
-      id: '/login/admin'
-      path: '/login/admin'
-      fullPath: '/login/admin'
-      preLoaderRoute: typeof LoginAdminRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/_app/locations': {
       id: '/_app/locations'
@@ -288,8 +248,6 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
-  LoginAdminRoute: LoginAdminRoute,
-  LoginStaffRoute: LoginStaffRoute,
   LoginIndexRoute: LoginIndexRoute,
 }
 export const routeTree = rootRouteImport
