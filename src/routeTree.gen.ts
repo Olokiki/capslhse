@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
+import { Route as SignupIndexRouteImport } from './routes/signup.index'
 import { Route as LoginIndexRouteImport } from './routes/login.index'
 import { Route as AppIndexRouteImport } from './routes/_app.index'
 import { Route as AppLocationsRouteImport } from './routes/_app.locations'
@@ -22,6 +23,11 @@ import { Route as AppReportsIdRouteImport } from './routes/_app.reports.$id'
 
 const AppRoute = AppRouteImport.update({
   id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupIndexRoute = SignupIndexRouteImport.update({
+  id: '/signup/',
+  path: '/signup/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginIndexRoute = LoginIndexRouteImport.update({
@@ -77,6 +83,7 @@ export interface FileRoutesByFullPath {
   '/leaderboard': typeof AppLeaderboardRoute
   '/locations': typeof AppLocationsRoute
   '/login/': typeof LoginIndexRoute
+  '/signup/': typeof SignupIndexRoute
   '/reports/$id': typeof AppReportsIdRoute
   '/reports/new': typeof AppReportsNewRoute
   '/reports/': typeof AppReportsIndexRoute
@@ -88,6 +95,7 @@ export interface FileRoutesByTo {
   '/locations': typeof AppLocationsRoute
   '/': typeof AppIndexRoute
   '/login': typeof LoginIndexRoute
+  '/signup': typeof SignupIndexRoute
   '/reports/$id': typeof AppReportsIdRoute
   '/reports/new': typeof AppReportsNewRoute
   '/reports': typeof AppReportsIndexRoute
@@ -101,6 +109,7 @@ export interface FileRoutesById {
   '/_app/locations': typeof AppLocationsRoute
   '/_app/': typeof AppIndexRoute
   '/login/': typeof LoginIndexRoute
+  '/signup/': typeof SignupIndexRoute
   '/_app/reports/$id': typeof AppReportsIdRoute
   '/_app/reports/new': typeof AppReportsNewRoute
   '/_app/reports/': typeof AppReportsIndexRoute
@@ -114,6 +123,7 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/locations'
     | '/login/'
+    | '/signup/'
     | '/reports/$id'
     | '/reports/new'
     | '/reports/'
@@ -125,6 +135,7 @@ export interface FileRouteTypes {
     | '/locations'
     | '/'
     | '/login'
+    | '/signup'
     | '/reports/$id'
     | '/reports/new'
     | '/reports'
@@ -137,6 +148,7 @@ export interface FileRouteTypes {
     | '/_app/locations'
     | '/_app/'
     | '/login/'
+    | '/signup/'
     | '/_app/reports/$id'
     | '/_app/reports/new'
     | '/_app/reports/'
@@ -145,6 +157,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   LoginIndexRoute: typeof LoginIndexRoute
+  SignupIndexRoute: typeof SignupIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -154,6 +167,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup/': {
+      id: '/signup/'
+      path: '/signup'
+      fullPath: '/signup/'
+      preLoaderRoute: typeof SignupIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login/': {
@@ -249,6 +269,7 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   LoginIndexRoute: LoginIndexRoute,
+  SignupIndexRoute: SignupIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
