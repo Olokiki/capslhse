@@ -1,60 +1,27 @@
-import { useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { LOCATIONS, PEOPLE } from "./hse-store";
 
 export type Role = "admin" | "staff";
 
 export type Session = {
+  userId: string;
   name: string;
   email: string;
   role: Role;
-  location?: string; // required for staff
+  location?: string;
   initials: string;
   title: string;
 };
 
-const KEY = "capsl-auth-v1";
-
-// Demo credentials (prototype only — replace with real auth later)
-export const DEMO_ADMINS: Array<{ email: string; password: string; name: string; title: string }> = [
-  { email: "admin@capsl.com", password: "admin123", name: "Adaeze Okafor", title: "HSE Lead (Admin)" },
-  { email: "hse.manager@capsl.com", password: "admin123", name: "Ifeoma Nwosu", title: "HSE Manager" },
-];
-
-export const DEMO_STAFF: Array<{ email: string; password: string; name: string; title: string }> = [
-  { email: "chinedu.eze@capsl.com", password: "staff123", name: "Chinedu Eze", title: "Field Supervisor" },
-  { email: "tobi.adewale@capsl.com", password: "staff123", name: "Tobi Adewale", title: "Maintenance Manager" },
-  { email: "bayo.akinola@capsl.com", password: "staff123", name: "Bayo Akinola", title: "Site Engineer" },
-  { email: "staff@capsl.com", password: "staff123", name: "Field Staff", title: "Technician" },
-];
-
 export { LOCATIONS, PEOPLE };
 
 let session: Session | null = null;
-let initialized = false;
+let loading = true;
 const listeners = new Set<() => void>();
+let initialized = false;
 
-function load(): Session | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = window.localStorage.getItem(KEY);
-    return raw ? (JSON.parse(raw) as Session) : null;
-  } catch {
-    return null;
-  }
-}
-
-function ensureInit() {
-  if (!initialized && typeof window !== "undefined") {
-    session = load();
-    initialized = true;
-  }
-}
-
-function persist() {
-  if (typeof window !== "undefined") {
-    if (session) window.localStorage.setItem(KEY, JSON.stringify(session));
-    else window.localStorage.removeItem(KEY);
-  }
+function notify() {
   listeners.forEach((l) => l());
 }
 
@@ -67,61 +34,120 @@ function initials(name: string) {
     .join("");
 }
 
+async function hydrate(userId: string, email: string) {
+  const [{ data: profile }, { data: roles }] = await Promise.all([
+    supabase.from("profiles").select("*").eq("user_id", userId).maybeSingle(),
+    supabase.from("user_roles").select("role").eq("user_id", userId),
+  ]);
+  const role: Role =
+    (roles ?? []).some((r) => r.role === "admin") ? "admin" : "staff";
+  const name = profile?.full_name ?? email.split("@")[0];
+  session = {
+    userId,
+    email,
+    name,
+    role,
+    location: profile?.location ?? undefined,
+    initials: initials(name),
+    title: profile?.title ?? (role === "admin" ? "Administrator" : "Staff"),
+  };
+  loading = false;
+  notify();
+}
+
+async function clearSession() {
+  session = null;
+  loading = false;
+  notify();
+}
+
+function ensureInit() {
+  if (initialized || typeof window === "undefined") return;
+  initialized = true;
+  supabase.auth.getSession().then(({ data }) => {
+    const u = data.session?.user;
+    if (u) hydrate(u.id, u.email ?? "");
+    else clearSession();
+  });
+  supabase.auth.onAuthStateChange((_evt, s) => {
+    const u = s?.user;
+    if (u) hydrate(u.id, u.email ?? "");
+    else clearSession();
+  });
+}
+
 export function useSession(): Session | null {
   ensureInit();
-  return useSyncExternalStore(
-    (l) => {
-      listeners.add(l);
-      return () => listeners.delete(l);
-    },
-    () => {
-      ensureInit();
-      return session;
-    },
-    () => null,
-  );
+  const [snap, setSnap] = useState<Session | null>(session);
+  useEffect(() => {
+    const l = () => setSnap(session);
+    listeners.add(l);
+    setSnap(session);
+    return () => {
+      listeners.delete(l);
+    };
+  }, []);
+  return snap;
 }
 
-export function getSession(): Session | null {
+export function useAuthLoading() {
   ensureInit();
-  return session;
+  const [l, setL] = useState(loading);
+  useEffect(() => {
+    const fn = () => setL(loading);
+    listeners.add(fn);
+    setL(loading);
+    return () => {
+      listeners.delete(fn);
+    };
+  }, []);
+  return l;
 }
 
-export function signInAdmin(email: string, password: string): { ok: true } | { ok: false; error: string } {
-  const user = DEMO_ADMINS.find((u) => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
-  if (!user) return { ok: false, error: "Invalid admin email or password" };
-  session = {
-    name: user.name,
-    email: user.email,
-    role: "admin",
-    initials: initials(user.name),
-    title: user.title,
-  };
-  persist();
-  return { ok: true };
+export async function signIn(email: string, password: string) {
+  const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+  if (error) return { ok: false as const, error: error.message };
+  return { ok: true as const };
 }
 
-export function signInStaff(
-  email: string,
-  password: string,
-  location: string,
-): { ok: true } | { ok: false; error: string } {
-  if (!location) return { ok: false, error: "Please select your current work location" };
-  const user = DEMO_STAFF.find((u) => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
-  if (!user) return { ok: false, error: "Invalid staff email or password" };
-  session = {
-    name: user.name,
-    email: user.email,
-    role: "staff",
-    location,
-    initials: initials(user.name),
-    title: user.title,
-  };
-  persist();
-  return { ok: true };
+export type SignUpInput = {
+  email: string;
+  password: string;
+  fullName: string;
+  title: string;
+  role: Role;
+  location?: string;
+};
+
+export async function signUp(input: SignUpInput) {
+  const email = input.email.trim().toLowerCase();
+  if (!email.endsWith("@capslgas.com")) {
+    return { ok: false as const, error: "You must use a @capslgas.com email address" };
+  }
+  if (input.role === "staff" && !input.location) {
+    return { ok: false as const, error: "Please select your work location" };
+  }
+  const { error } = await supabase.auth.signUp({
+    email,
+    password: input.password,
+    options: {
+      emailRedirectTo: `${window.location.origin}/`,
+      data: {
+        full_name: input.fullName,
+        title: input.title,
+        role: input.role,
+        location: input.location ?? null,
+      },
+    },
+  });
+  if (error) return { ok: false as const, error: error.message };
+  // Auto-confirm is on; sign the user in.
+  const signInRes = await signIn(email, input.password);
+  return signInRes;
 }
 
-export function signOut() {
+export async function signOut() {
+  await supabase.auth.signOut();
   session = null;
-  persist();
+  notify();
 }
