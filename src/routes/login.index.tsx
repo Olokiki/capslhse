@@ -1,123 +1,116 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ShieldCheck, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { signIn, useSession } from "@/lib/auth-store";
+import { HardHat, ArrowRight, ShieldCheck } from "lucide-react";
+import { useSession } from "@/lib/auth-store";
 
 export const Route = createFileRoute("/login/")({
   head: () => ({
     meta: [
       { title: "Sign in | CAPSL HSE" },
-      { name: "description", content: "Sign in to the CAPSL HSE Platform." },
+      { name: "description", content: "Choose your CAPSL HSE portal to sign in." },
     ],
   }),
-  component: LoginPage,
+  component: LoginChooser,
 });
 
-function LoginPage() {
+function LoginChooser() {
   const session = useSession();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
+  const [hover, setHover] = useState<"admin" | "staff" | null>(null);
 
   useEffect(() => {
     if (session) navigate({ to: "/" });
   }, [session, navigate]);
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-    setBusy(true);
-    const res = await signIn(email, password);
-    setBusy(false);
-    if (!res.ok) setError(res.error);
-  }
-
   return (
-    <div className="grid min-h-screen lg:grid-cols-2">
-      <div className="relative hidden flex-col justify-between bg-sidebar p-10 text-sidebar-foreground lg:flex">
-        <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-white p-1">
+    <div className="relative min-h-screen overflow-hidden bg-sidebar text-sidebar-foreground">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -left-32 -top-32 h-[420px] w-[420px] rounded-full bg-[oklch(0.68_0.17_152)]/25 blur-3xl" />
+        <div className="absolute right-[-120px] top-1/3 h-[460px] w-[460px] rounded-full bg-[oklch(0.76_0.17_60)]/25 blur-3xl" />
+        <div className="absolute bottom-[-140px] left-1/3 h-[420px] w-[420px] rounded-full bg-[oklch(0.62_0.23_27)]/20 blur-3xl" />
+        <div
+          className="absolute inset-0 opacity-[0.05]"
+          style={{
+            backgroundImage:
+              "linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)",
+            backgroundSize: "56px 56px",
+          }}
+        />
+      </div>
+
+      <div className="relative mx-auto flex min-h-screen max-w-6xl flex-col px-6 py-8">
+        <header className="flex items-center gap-4">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white p-1.5 shadow-lg ring-1 ring-white/20 sm:h-20 sm:w-20">
             <img src="/capsl-logo.jpeg" alt="CAPSL" className="h-full w-full object-contain" />
           </div>
-          <div>
-            <div className="text-base font-semibold">CAPSL HSE Platform</div>
-            <div className="text-xs text-sidebar-foreground/60">
+          <div className="leading-tight">
+            <div className="text-2xl font-bold tracking-tight sm:text-3xl">
+              CAPSL <span className="brand-text-gradient">HSE Platform</span>
+            </div>
+            <div className="mt-1 text-sm text-sidebar-foreground/70 sm:text-base">
               Compression and Power Systems Limited
             </div>
           </div>
-        </div>
+        </header>
 
-        <div>
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/20 text-primary">
-            <ShieldCheck className="h-7 w-7" />
-          </div>
-          <h2 className="mt-6 text-3xl font-semibold tracking-tight">Sign in to CAPSL HSE</h2>
-          <p className="mt-3 max-w-md text-sm text-sidebar-foreground/70">
-            Report hazards, near-misses and incidents, assign corrective actions, and track
-            close-outs across every CAPSL site.
-          </p>
-        </div>
-
-        <div className="text-xs text-sidebar-foreground/50">
-          © {new Date().getFullYear()} Compression and Power Systems Limited
-        </div>
-      </div>
-
-      <div className="flex items-center justify-center bg-background px-6 py-10">
-        <div className="w-full max-w-sm">
-          <h1 className="text-2xl font-semibold tracking-tight">Sign in</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Use your CAPSL work email (<span className="font-medium">@capslgas.com</span>).
+        <div className="flex flex-1 flex-col items-center justify-center py-10">
+          <h1 className="text-center text-3xl font-semibold tracking-tight sm:text-4xl">
+            Welcome. How are you signing in today?
+          </h1>
+          <p className="mt-3 text-center text-sm text-sidebar-foreground/70">
+            Choose the portal that matches your role.
           </p>
 
-          <form onSubmit={onSubmit} className="mt-8 space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Work email</Label>
-              <Input
-                id="email"
-                type="email"
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                placeholder="firstname.lastname@capslgas.com"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                autoComplete="current-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-
-            {error && (
-              <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
-                {error}
+          <div className="mt-10 grid w-full gap-5 sm:grid-cols-2">
+            <Link
+              to="/login/admin"
+              onMouseEnter={() => setHover("admin")}
+              onMouseLeave={() => setHover(null)}
+              className={[
+                "group relative overflow-hidden rounded-2xl border border-sidebar-border bg-sidebar-accent/40 p-7 backdrop-blur transition-all",
+                hover === "admin" ? "scale-[1.02] border-primary/60 shadow-elegant" : "",
+              ].join(" ")}
+            >
+              <div className="absolute inset-x-0 top-0 h-1 brand-gradient" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/20 text-primary">
+                <ShieldCheck className="h-6 w-6" />
               </div>
-            )}
-
-            <Button type="submit" disabled={busy} className="h-11 w-full rounded-full font-semibold">
-              {busy ? "Signing in…" : "Sign in"}
-            </Button>
-          </form>
-
-          <p className="mt-6 text-center text-sm text-muted-foreground">
-            Don't have an account?{" "}
-            <Link to="/signup" className="inline-flex items-center gap-1 font-medium text-primary hover:underline">
-              Create one <ArrowRight className="h-3.5 w-3.5" />
+              <div className="mt-5 text-lg font-semibold">CAPSL HSE Administrator</div>
+              <p className="mt-1 text-sm text-sidebar-foreground/70">
+                Full access to all reports, locations, analytics, audit log, and close-outs.
+              </p>
+              <div className="mt-6 inline-flex items-center text-sm font-medium text-primary">
+                Continue as Admin <ArrowRight className="ml-1 h-4 w-4" />
+              </div>
             </Link>
-          </p>
+
+            <Link
+              to="/login/staff"
+              onMouseEnter={() => setHover("staff")}
+              onMouseLeave={() => setHover(null)}
+              className={[
+                "group relative overflow-hidden rounded-2xl border border-sidebar-border bg-sidebar-accent/40 p-7 backdrop-blur transition-all",
+                hover === "staff" ? "scale-[1.02] border-[oklch(0.78_0.17_60)] shadow-elegant" : "",
+              ].join(" ")}
+            >
+              <div className="absolute inset-x-0 top-0 h-1 brand-gradient" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[oklch(0.78_0.17_60)]/20 text-[oklch(0.85_0.18_60)]">
+                <HardHat className="h-6 w-6" />
+              </div>
+              <div className="mt-5 text-lg font-semibold">CAPSL Staff</div>
+              <p className="mt-1 text-sm text-sidebar-foreground/70">
+                Submit reports, assign actions to teammates, and track your own report analytics.
+              </p>
+              <div className="mt-6 inline-flex items-center text-sm font-medium text-[oklch(0.85_0.18_60)]">
+                Continue as Staff <ArrowRight className="ml-1 h-4 w-4" />
+              </div>
+            </Link>
+          </div>
         </div>
+
+        <footer className="text-center text-xs text-sidebar-foreground/50">
+          © {new Date().getFullYear()} Compression and Power Systems Limited
+        </footer>
       </div>
     </div>
   );
