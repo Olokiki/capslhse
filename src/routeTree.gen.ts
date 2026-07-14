@@ -15,6 +15,7 @@ import { Route as LoginIndexRouteImport } from './routes/login.index'
 import { Route as AppIndexRouteImport } from './routes/_app.index'
 import { Route as LoginStaffRouteImport } from './routes/login.staff'
 import { Route as LoginAdminRouteImport } from './routes/login.admin'
+import { Route as AppUsersRouteImport } from './routes/_app.users'
 import { Route as AppLocationsRouteImport } from './routes/_app.locations'
 import { Route as AppLeaderboardRouteImport } from './routes/_app.leaderboard'
 import { Route as AppDocumentsRouteImport } from './routes/_app.documents'
@@ -51,6 +52,11 @@ const LoginAdminRoute = LoginAdminRouteImport.update({
   id: '/login/admin',
   path: '/login/admin',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppUsersRoute = AppUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppLocationsRoute = AppLocationsRouteImport.update({
   id: '/locations',
@@ -94,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/documents': typeof AppDocumentsRoute
   '/leaderboard': typeof AppLeaderboardRoute
   '/locations': typeof AppLocationsRoute
+  '/users': typeof AppUsersRoute
   '/login/admin': typeof LoginAdminRoute
   '/login/staff': typeof LoginStaffRoute
   '/login/': typeof LoginIndexRoute
@@ -107,6 +114,7 @@ export interface FileRoutesByTo {
   '/documents': typeof AppDocumentsRoute
   '/leaderboard': typeof AppLeaderboardRoute
   '/locations': typeof AppLocationsRoute
+  '/users': typeof AppUsersRoute
   '/login/admin': typeof LoginAdminRoute
   '/login/staff': typeof LoginStaffRoute
   '/': typeof AppIndexRoute
@@ -123,6 +131,7 @@ export interface FileRoutesById {
   '/_app/documents': typeof AppDocumentsRoute
   '/_app/leaderboard': typeof AppLeaderboardRoute
   '/_app/locations': typeof AppLocationsRoute
+  '/_app/users': typeof AppUsersRoute
   '/login/admin': typeof LoginAdminRoute
   '/login/staff': typeof LoginStaffRoute
   '/_app/': typeof AppIndexRoute
@@ -140,6 +149,7 @@ export interface FileRouteTypes {
     | '/documents'
     | '/leaderboard'
     | '/locations'
+    | '/users'
     | '/login/admin'
     | '/login/staff'
     | '/login/'
@@ -153,6 +163,7 @@ export interface FileRouteTypes {
     | '/documents'
     | '/leaderboard'
     | '/locations'
+    | '/users'
     | '/login/admin'
     | '/login/staff'
     | '/'
@@ -168,6 +179,7 @@ export interface FileRouteTypes {
     | '/_app/documents'
     | '/_app/leaderboard'
     | '/_app/locations'
+    | '/_app/users'
     | '/login/admin'
     | '/login/staff'
     | '/_app/'
@@ -230,6 +242,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginAdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/users': {
+      id: '/_app/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof AppUsersRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/locations': {
       id: '/_app/locations'
       path: '/locations'
@@ -287,6 +306,7 @@ interface AppRouteChildren {
   AppDocumentsRoute: typeof AppDocumentsRoute
   AppLeaderboardRoute: typeof AppLeaderboardRoute
   AppLocationsRoute: typeof AppLocationsRoute
+  AppUsersRoute: typeof AppUsersRoute
   AppIndexRoute: typeof AppIndexRoute
   AppReportsIdRoute: typeof AppReportsIdRoute
   AppReportsNewRoute: typeof AppReportsNewRoute
@@ -298,6 +318,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppDocumentsRoute: AppDocumentsRoute,
   AppLeaderboardRoute: AppLeaderboardRoute,
   AppLocationsRoute: AppLocationsRoute,
+  AppUsersRoute: AppUsersRoute,
   AppIndexRoute: AppIndexRoute,
   AppReportsIdRoute: AppReportsIdRoute,
   AppReportsNewRoute: AppReportsNewRoute,
@@ -316,13 +337,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
