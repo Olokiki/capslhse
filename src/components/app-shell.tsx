@@ -13,6 +13,7 @@ import {
   BookOpen,
   Menu,
   Trophy,
+  Users as UsersIcon,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";  
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,7 @@ import { useSession, signOut, type Session } from "@/lib/auth-store";
 const ADMIN_NAV = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/reports", label: "HSE Reports", icon: ShieldAlert },
+  { to: "/users", label: "Users", icon: UsersIcon },
   { to: "/documents", label: "Documents", icon: BookOpen },
   { to: "/locations", label: "Locations", icon: Map },
   { to: "/leaderboard", label: "Leaderboard", icon: Trophy },
