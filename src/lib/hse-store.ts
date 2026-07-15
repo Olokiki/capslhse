@@ -43,10 +43,7 @@ export type HseReport = {
 
 const LOCATIONS = [
   "CAPSL - Egbaoma",
-  "CAPSL - Heritage",
   "CAPSL - Lagos",
-  "CAPSL - Midwestern (Umusadege, Kwale)",
-  "CAPSL - Sapele West",
   "CAPSL - Waltersmith",
   "CAPSL - Warri",
   "CAPSL - Oben",
@@ -63,7 +60,6 @@ export const PEOPLE = [
 export const ASSETS_BY_LOCATION: Record<string, string[]> = {
   "CAPSL - Egbaoma": ["Unit A", "Unit B"],
   "CAPSL - Oben": ["C501", "C502", "C503", "C504"],
-  "CAPSL - Heritage": ["Olomoro C200", "Afiesere Unit 1", "Uzere Unit 1"],
 };
 
 export function assetsForLocation(location: string): string[] {

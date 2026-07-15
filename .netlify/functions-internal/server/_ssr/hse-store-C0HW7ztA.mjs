@@ -4,10 +4,7 @@ import { u as require_react } from "../_libs/@floating-ui/react-dom+[...].mjs";
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var LOCATIONS = [
 	"CAPSL - Egbaoma",
-	"CAPSL - Heritage",
 	"CAPSL - Lagos",
-	"CAPSL - Midwestern (Umusadege, Kwale)",
-	"CAPSL - Sapele West",
 	"CAPSL - Waltersmith",
 	"CAPSL - Warri",
 	"CAPSL - Oben"
@@ -27,11 +24,6 @@ var ASSETS_BY_LOCATION = {
 		"C503",
 		"C504"
 	],
-	"CAPSL - Heritage": [
-		"Olomoro C200",
-		"Afiesere Unit 1",
-		"Uzere Unit 1"
-	]
 };
 function assetsForLocation(location) {
 	return ASSETS_BY_LOCATION[location] ?? [];
