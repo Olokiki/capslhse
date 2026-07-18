@@ -9,13 +9,7 @@ var LOCATIONS = [
 	"CAPSL - Warri",
 	"CAPSL - Oben"
 ];
-var PEOPLE = [
-	"Adaeze Okafor (HSE Lead)",
-	"Chinedu Eze (Field Supervisor)",
-	"Tobi Adewale (Maintenance Manager)",
-	"Ifeoma Nwosu (Operations Lead)",
-	"Bayo Akinola (Site Engineer)"
-];
+var PEOPLE = [...];
 var ASSETS_BY_LOCATION = {
 	"CAPSL - Egbaoma": ["Unit A", "Unit B"],
 	"CAPSL - Oben": [

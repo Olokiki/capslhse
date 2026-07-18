@@ -49,13 +49,7 @@ const LOCATIONS = [
   "CAPSL - Oben",
 ];
 
-export const PEOPLE = [
-  "Adaeze Okafor (HSE Lead)",
-  "Chinedu Eze (Field Supervisor)",
-  "Tobi Adewale (Maintenance Manager)",
-  "Ifeoma Nwosu (Operations Lead)",
-  "Bayo Akinola (Site Engineer)",
-];
+export const PEOPLE = [ " " ];
 
 export const ASSETS_BY_LOCATION: Record<string, string[]> = {
   "CAPSL - Egbaoma": ["Unit A", "Unit B"],
@@ -68,7 +62,7 @@ export function assetsForLocation(location: string): string[] {
 
 export { LOCATIONS };
 
-export const CURRENT_USER = "Adaeze Okafor (HSE Lead)";
+export const CURRENT_USER = "";
 
 // ------------------------- DB mapping -------------------------
 

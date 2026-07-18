@@ -36,7 +36,6 @@ import {
 import { Separator } from "@/components/ui/separator";
 import {
   CURRENT_USER,
-  PEOPLE,
   TYPE_LABEL,
   addComment,
   assignReport,
@@ -66,7 +65,7 @@ function ReportDetail() {
   const [comment, setComment] = useState("");
   const [assignOpen, setAssignOpen] = useState(false);
   const [closeOpen, setCloseOpen] = useState(false);
-  const [assignee, setAssignee] = useState(report?.assignedTo ?? PEOPLE[2]);
+  const [assignee, setAssignee] = useState(report?.assignedTo ?? "");
   const [assigneeEmail, setAssigneeEmail] = useState("");
   const [dueAt, setDueAt] = useState(report?.dueAt?.slice(0, 10) ?? "");
   const [rootCause, setRootCause] = useState("");
@@ -91,6 +90,29 @@ function ReportDetail() {
       return;
     }
     assignReport(report.id, assignee, dueAt ? new Date(dueAt).toISOString() : "", CURRENT_USER, email || undefined);
+    await fetch("/.netlify/functions/send-assignment-email", {
+
+  method: "POST",
+
+  headers: {
+    "Content-Type": "application/json",
+  },
+
+  body: JSON.stringify({
+
+    assignee,
+
+    email,
+
+    reportRef: report.ref,
+
+    reportTitle: report.title,
+
+    dueDate: dueAt,
+
+  }),
+
+});
     setAssignOpen(false);
     toast.success(email ? `Assigned to ${assignee} · notification sent to ${email}` : `Assigned to ${assignee}`);
   };
@@ -158,10 +180,11 @@ function ReportDetail() {
                       <div className="space-y-4 pt-2">
                         <div>
                           <Label className="text-sm font-semibold">Assignee</Label>
-                          <Select value={assignee} onValueChange={setAssignee}>
-                            <SelectTrigger className="mt-1.5 h-11"><SelectValue /></SelectTrigger>
-                            <SelectContent>{PEOPLE.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
-                          </Select>
+                          <Input
+                            className="mt-1.5 h-11"
+                            value={assignee}
+                            onChange={(e) => setAssignee(e.target.value)}
+                            placeholder="Enter assignee name"/>
                         </div>
                         <div>
                           <Label className="text-sm font-semibold">Assignee email</Label>
