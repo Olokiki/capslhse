@@ -309,7 +309,7 @@ function ReportDetail() {
 									variant: "outline",
 									className: "rounded-full",
 									onClick: () => {
-										setStatus(report.id, "in-progress", "Adaeze Okafor (HSE Lead)");
+										setStatus(report.id, "in-progress");
 										toast.success("Marked in progress");
 									},
 									children: "Start work"
@@ -500,7 +500,7 @@ function ReportDetail() {
 									className: "rounded-full font-semibold",
 									onClick: () => {
 										if (!comment.trim()) return;
-										addComment(report.id, comment.trim(), "Adaeze Okafor (HSE Lead)");
+										addComment(report.id, comment.trim(), "...");
 										setComment("");
 										toast.success("Comment added");
 									},

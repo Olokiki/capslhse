@@ -156,7 +156,7 @@ function useHseReports() {
 		return data;
 	}, () => []);
 }
-var CURRENT_USER = "Adaeze Okafor (HSE Lead)";
+var CURRENT_USER = "...";
 function createReport(input) {
 	ensureInit();
 	const now = (/* @__PURE__ */ new Date()).toISOString();

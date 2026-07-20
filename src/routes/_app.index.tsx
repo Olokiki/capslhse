@@ -64,13 +64,51 @@ function Dashboard() {
   }, [reports]);
 
   const trend = useMemo(() => {
-    const months = ["Dec", "Jan", "Feb", "Mar", "Apr", "May", "Jun"];
-    return months.map((m, i) => ({
-      month: m,
-      reports: Math.round(8 + Math.sin(i / 1.3) * 4 + i * 1.2 + (i === 6 ? reports.length / 3 : 0)),
-      closed: Math.round(5 + Math.sin(i / 1.1) * 3 + i * 0.9),
-    }));
-  }, [reports.length]);
+
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  const trendData = months.map((month) => ({
+    month,
+    reports: 0,
+    closed: 0,
+  }));
+
+  reports.forEach((report) => {
+
+    const month = new Date(report.reportedAt).toLocaleString("en-US", {
+      month: "short",
+    });
+
+    const row = trendData.find((m) => m.month === month);
+
+    if (!row) return;
+
+    row.reports++;
+
+    if (report.status === "closed") {
+      row.closed++;
+    }
+
+  });
+
+  return trendData.filter(
+    (m) => m.reports > 0 || m.closed > 0
+  );
+
+}, [reports]);
 
   const typeMix = useMemo(() => {
     const counts: Record<string, number> = {};
