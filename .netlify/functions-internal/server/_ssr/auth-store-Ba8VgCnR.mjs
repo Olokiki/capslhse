@@ -6,40 +6,15 @@ var KEY = "capsl-auth-v1";
 var DEMO_ADMINS = [{
 	email: "admin@capsl.com",
 	password: "admin123",
-	name: "Adaeze Okafor",
+	name: "Eniola",
 	title: "HSE Lead (Admin)"
 }, {
 	email: "hse.manager@capsl.com",
 	password: "admin123",
-	name: "Ifeoma Nwosu",
+	name: "Charles",
 	title: "HSE Manager"
 }];
-var DEMO_STAFF = [
-	{
-		email: "chinedu.eze@capsl.com",
-		password: "staff123",
-		name: "Chinedu Eze",
-		title: "Field Supervisor"
-	},
-	{
-		email: "tobi.adewale@capsl.com",
-		password: "staff123",
-		name: "Tobi Adewale",
-		title: "Maintenance Manager"
-	},
-	{
-		email: "bayo.akinola@capsl.com",
-		password: "staff123",
-		name: "Bayo Akinola",
-		title: "Site Engineer"
-	},
-	{
-		email: "staff@capsl.com",
-		password: "staff123",
-		name: "Field Staff",
-		title: "Technician"
-	}
-];
+var DEMO_STAFF = [ ... ];
 var session = null;
 var initialized = false;
 var listeners = /* @__PURE__ */ new Set();

@@ -82,7 +82,7 @@ function ReportDetail() {
 
   const overdue = report.dueAt && new Date(report.dueAt) < new Date() && report.status !== "closed";
 
-  const submitAssign = () => {
+  const submitAssign = async () => {
     if (!assignee) return;
     const email = assigneeEmail.trim();
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
