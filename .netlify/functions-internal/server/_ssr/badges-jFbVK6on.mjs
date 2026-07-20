@@ -1,6 +1,6 @@
 import { o as require_jsx_runtime } from "../_libs/@radix-ui/react-arrow+[...].mjs";
-import { a as STATUS_META, i as SEVERITY_META, o as TYPE_LABEL } from "./hse-store-C0HW7ztA.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/badges-CxkT40Uu.js
+import { a as TYPE_LABEL, i as STATUS_META, r as SEVERITY_META } from "./hse-store-B8fwR4lK.mjs";
+//#region node_modules/.nitro/vite/services/ssr/assets/badges-jFbVK6on.js
 var import_jsx_runtime = require_jsx_runtime();
 function SeverityBadge({ s }) {
 	const m = SEVERITY_META[s];

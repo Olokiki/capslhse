@@ -3,16 +3,16 @@ import { u as require_react } from "./_libs/@floating-ui/react-dom+[...].mjs";
 import { o as require_jsx_runtime } from "./_libs/@radix-ui/react-arrow+[...].mjs";
 import { t as Input } from "./_ssr/input-B8Q2ztVi.mjs";
 import { t as Button } from "./_ssr/button-Bq5vK6RO.mjs";
-import { i as useSession } from "./_ssr/auth-store-Ba8VgCnR.mjs";
+import { a as useSession } from "./_ssr/auth-store-DU4Ijm7u.mjs";
 import { f as useNavigate } from "./_libs/@tanstack/react-router+[...].mjs";
-import { C as Lock, a as Upload, f as Sparkles, m as ShieldAlert, x as MapPin } from "./_libs/lucide-react.mjs";
-import { t as Card } from "./_ssr/card-CzXpCsbD.mjs";
-import { c as assetsForLocation, d as createReport, n as LOCATIONS, o as TYPE_LABEL, r as PEOPLE } from "./_ssr/hse-store-C0HW7ztA.mjs";
+import { S as MapPin, T as Lock, h as ShieldAlert, o as Upload, p as Sparkles } from "./_libs/lucide-react.mjs";
+import { t as Card } from "./_ssr/card-BXjpJ96D.mjs";
+import { a as TYPE_LABEL, n as PEOPLE, s as assetsForLocation, t as LOCATIONS, u as createReport } from "./_ssr/hse-store-B8fwR4lK.mjs";
 import { t as Textarea } from "./_ssr/textarea-kko37XEX.mjs";
 import { t as Label } from "./_ssr/label-DBD1bRRP.mjs";
-import { a as SelectValue, i as SelectTrigger, n as SelectContent, r as SelectItem, t as Select } from "./_ssr/select-Dg1urBTx.mjs";
 import { n as toast } from "./_libs/sonner.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/_app.reports.new-Dp6sAsTN.js
+import { a as SelectValue, i as SelectTrigger, n as SelectContent, r as SelectItem, t as Select } from "./_ssr/select-Dg1urBTx.mjs";
+//#region node_modules/.nitro/vite/services/ssr/assets/_app.reports.new-DzYDebOI.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 function NewReport() {
@@ -60,7 +60,8 @@ function NewReport() {
 			toast.success(`AI classified as ${TYPE_LABEL[type]} · ${sev.toUpperCase()}`);
 		}, 700);
 	};
-	const submit = (e) => {
+	const [submitting, setSubmitting] = (0, import_react.useState)(false);
+	const submit = async (e) => {
 		e.preventDefault();
 		if (!form.title.trim()) return toast.error("Title is required.");
 		if (!form.description.trim()) return toast.error("Description is required.");
@@ -70,20 +71,27 @@ function NewReport() {
 		if (!form.reportedBy) return toast.error("Reporter is required.");
 		const finalAsset = form.asset === "__other__" ? form.assetOther.trim() : form.asset;
 		if (!finalAsset) return toast.error("Asset is required. Pick one or enter a custom asset.");
-		const r = createReport({
-			title: form.title.trim(),
-			description: form.description.trim(),
-			type: form.type,
-			severity: form.severity,
-			location: form.location,
-			asset: finalAsset,
-			reportedBy: form.reportedBy
-		});
-		toast.success(`Report ${r.ref} submitted`);
-		nav({
-			to: "/reports/$id",
-			params: { id: r.id }
-		});
+		setSubmitting(true);
+		try {
+			const r = await createReport({
+				title: form.title.trim(),
+				description: form.description.trim(),
+				type: form.type,
+				severity: form.severity,
+				location: form.location,
+				asset: finalAsset,
+				reportedBy: form.reportedBy
+			});
+			toast.success(`Report ${r.ref} submitted`);
+			nav({
+				to: "/reports/$id",
+				params: { id: r.id }
+			});
+		} catch (err) {
+			console.error(err);
+			toast.error("Failed to submit report. Please try again.");
+			setSubmitting(false);
+		}
 	};
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "mx-auto max-w-3xl",
@@ -227,7 +235,7 @@ function NewReport() {
 											children: form.location
 										})
 									]
-								}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
+								}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
 									value: form.location,
 									onValueChange: (v) => {
 										set("location", v);
@@ -235,12 +243,21 @@ function NewReport() {
 									},
 									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
 										className: "mt-1.5 h-11",
-										children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, {})
-									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectContent, { children: LOCATIONS.map((l) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+										children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "CAPSL- your current location" })
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [LOCATIONS.map((l) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
 										value: l,
 										children: l
-									}, l)) })]
-								}),
+									}, l)), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+										value: "__other__",
+										children: " Other (Specify) "
+									})] })]
+								}), form.location === "__other__" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+									required: true,
+									value: form.locationOther,
+									onChange: (e) => set("locationOther", e.target.value),
+									placeholder: "CAPSL- your current location",
+									className: "mt-2 h-11"
+								})] }),
 								isStaff && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
 									className: "mt-1 text-[11px] text-muted-foreground",
 									children: "Fixed to the site you signed in from."
@@ -313,11 +330,13 @@ function NewReport() {
 							type: "button",
 							variant: "ghost",
 							onClick: () => nav({ to: "/reports" }),
+							disabled: submitting,
 							children: "Cancel"
 						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
 							type: "submit",
+							disabled: submitting,
 							className: "rounded-full px-6 font-semibold shadow-sm",
-							children: "Submit Report"
+							children: submitting ? "Submitting…" : "Submit Report"
 						})]
 					})
 				]

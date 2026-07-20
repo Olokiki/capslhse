@@ -1,30 +1,14 @@
 import { i as __toESM } from "./_runtime.mjs";
-import { t as cva } from "./_libs/class-variance-authority+clsx.mjs";
-import { t as cn } from "./_ssr/utils-C_uf36nf.mjs";
 import { u as require_react } from "./_libs/@floating-ui/react-dom+[...].mjs";
 import { o as require_jsx_runtime } from "./_libs/@radix-ui/react-arrow+[...].mjs";
 import { t as Input } from "./_ssr/input-B8Q2ztVi.mjs";
 import { t as Button } from "./_ssr/button-Bq5vK6RO.mjs";
-import { A as Flame, D as GraduationCap, E as HardHat, I as ClipboardCheck, M as ExternalLink, N as Download, W as BookOpen, d as Star, g as Search, j as FileText, k as Folder, n as Wrench, p as ShieldCheck, s as TriangleAlert, u as Stethoscope, w as Leaf } from "./_libs/lucide-react.mjs";
-import { t as Card } from "./_ssr/card-CzXpCsbD.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/_app.documents-CI9zn-2V.js
+import { E as Leaf, F as Download, M as Flame, N as FileText, O as HardHat, P as ExternalLink, R as ClipboardCheck, _ as Search, c as TriangleAlert, d as Stethoscope, f as Star, j as Folder, k as GraduationCap, m as ShieldCheck, n as Wrench, q as BookOpen } from "./_libs/lucide-react.mjs";
+import { t as Card } from "./_ssr/card-BXjpJ96D.mjs";
+import { t as Badge } from "./_ssr/badge-D1Dupn2y.mjs";
+//#region node_modules/.nitro/vite/services/ssr/assets/_app.documents-CfuEihh9.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
-var badgeVariants = cva("inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2", {
-	variants: { variant: {
-		default: "border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/80",
-		secondary: "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
-		destructive: "border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80",
-		outline: "text-foreground"
-	} },
-	defaultVariants: { variant: "default" }
-});
-function Badge({ className, variant, ...props }) {
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-		className: cn(badgeVariants({ variant }), className),
-		...props
-	});
-}
 var CATEGORY_META = {
 	Policy: {
 		icon: ShieldCheck,

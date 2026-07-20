@@ -177,23 +177,24 @@ function NewReport() {
                   <span className="font-medium">{form.location}</span>
                 </div>
               ) : (
+                <>
                 <Select value={form.location} onValueChange={(v) => { set("location", v); set("asset", ""); }}>
                   <SelectTrigger className="mt-1.5 h-11"><SelectValue placeholder="CAPSL- your current location" /></SelectTrigger>
                   <SelectContent>{LOCATIONS.map((l) => <SelectItem key={l} value={l}>{l}</SelectItem>)}
                   <SelectItem value="__other__"> Other (Specify) </SelectItem>
                   </SelectContent>
                 </Select>
-
-                  {form.location === "__other__" && (
+                {form.location === "__other__" && (
                      <Input
                       required
                       value={form.locationOther}
-                      onChange={(e)=> set("locationOther",e.target.value)}
+                      onChange={(e)=> set("locationOther", e.target.value)}
                       placeholder="CAPSL- your current location"
                       className="mt-2 h-11"
                     />
                   )}
-              )
+                  </>
+              )}
               {isStaff && (
                 <p className="mt-1 text-[11px] text-muted-foreground">Fixed to the site you signed in from.</p>
               )}

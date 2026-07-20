@@ -5,12 +5,12 @@ import { u as require_react } from "./_libs/@floating-ui/react-dom+[...].mjs";
 import { o as require_jsx_runtime } from "./_libs/@radix-ui/react-arrow+[...].mjs";
 import { t as Input } from "./_ssr/input-B8Q2ztVi.mjs";
 import { t as Button } from "./_ssr/button-Bq5vK6RO.mjs";
-import { i as useSession, r as signOut } from "./_ssr/auth-store-Ba8VgCnR.mjs";
+import { a as useSession, i as useAuthLoading, n as signOut } from "./_ssr/auth-store-DU4Ijm7u.mjs";
 import { d as Link, f as useNavigate, i as useRouterState, s as Outlet } from "./_libs/@tanstack/react-router+[...].mjs";
-import { F as ClipboardList, G as Bell, H as ChartColumn, L as CirclePlus, S as LogOut, T as LayoutDashboard, W as BookOpen, b as Map, f as Sparkles, g as Search, m as ShieldAlert, o as Trophy, t as X, v as Menu, x as MapPin } from "./_libs/lucide-react.mjs";
+import { D as LayoutDashboard, L as ClipboardList, S as MapPin, W as ChartColumn, _ as Search, h as ShieldAlert, p as Sparkles, q as BookOpen, r as Users, s as Trophy, t as X, w as LogOut, x as Map, y as Menu, z as CirclePlus } from "./_libs/lucide-react.mjs";
 import { a as Portal, c as Trigger, i as Overlay, n as Content, o as Root, r as Description, s as Title, t as Close } from "./_libs/@radix-ui/react-dialog+[...].mjs";
 import { h as VisuallyHidden } from "./_libs/@radix-ui/react-select+[...].mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/_app-CTCSJWml.js
+//#region node_modules/.nitro/vite/services/ssr/assets/_app--ZqQ_ioL.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 var Sheet = Root;
@@ -77,6 +77,11 @@ var ADMIN_NAV = [
 		to: "/reports",
 		label: "HSE Reports",
 		icon: ShieldAlert
+	},
+	{
+		to: "/users",
+		label: "Users",
+		icon: Users
 	},
 	{
 		to: "/documents",
@@ -241,6 +246,22 @@ function AppShell({ children }) {
 								})]
 							})]
 						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Link, {
+							to: "/",
+							className: "flex items-center gap-2 md:hidden",
+							"aria-label": "CAPSL HSE home",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+								className: "flex h-9 w-9 items-center justify-center rounded-lg bg-white p-1 ring-1 ring-border",
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+									src: "/capsl-logo.jpeg",
+									alt: "CAPSL",
+									className: "h-full w-full object-contain"
+								})
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								className: "text-sm font-semibold tracking-tight",
+								children: "CAPSL HSE"
+							})]
+						}),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 							className: "relative hidden w-full max-w-md sm:block",
 							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Search, { className: "pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
@@ -251,12 +272,6 @@ function AppShell({ children }) {
 						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 							className: "ml-auto flex items-center gap-1.5 sm:gap-2",
 							children: [
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-									variant: "ghost",
-									size: "icon",
-									className: "rounded-full",
-									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Bell, { className: "h-5 w-5" })
-								}),
 								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
 									asChild: true,
 									className: "h-10 rounded-full px-3 font-semibold shadow-sm sm:px-5",
@@ -308,10 +323,19 @@ function AppShell({ children }) {
 }
 function AppLayout() {
 	const session = useSession();
+	const loading = useAuthLoading();
 	const navigate = useNavigate();
 	(0, import_react.useEffect)(() => {
-		if (!session) navigate({ to: "/login" });
-	}, [session, navigate]);
+		if (!loading && !session) navigate({ to: "/login" });
+	}, [
+		session,
+		loading,
+		navigate
+	]);
+	if (loading) return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+		className: "flex min-h-screen items-center justify-center text-sm text-muted-foreground",
+		children: "Loading…"
+	});
 	if (!session) return null;
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AppShell, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Outlet, {}) });
 }

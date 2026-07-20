@@ -2,7 +2,7 @@ import { i as __toESM } from "../_runtime.mjs";
 import { t as cn } from "./utils-C_uf36nf.mjs";
 import { u as require_react } from "../_libs/@floating-ui/react-dom+[...].mjs";
 import { o as require_jsx_runtime } from "../_libs/@radix-ui/react-arrow+[...].mjs";
-import { B as ChevronDown, V as Check, z as ChevronUp } from "../_libs/lucide-react.mjs";
+import { H as ChevronDown, U as Check, V as ChevronUp } from "../_libs/lucide-react.mjs";
 import { a as ItemText, c as Root2, d as Separator, f as Trigger, i as ItemIndicator, l as ScrollDownButton, m as Viewport, n as Icon, o as Label, p as Value, r as Item, s as Portal, t as Content2, u as ScrollUpButton } from "../_libs/@radix-ui/react-select+[...].mjs";
 //#region node_modules/.nitro/vite/services/ssr/assets/select-Dg1urBTx.js
 var import_react = /* @__PURE__ */ __toESM(require_react());

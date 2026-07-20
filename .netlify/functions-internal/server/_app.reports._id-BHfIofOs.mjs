@@ -5,18 +5,17 @@ import { o as require_jsx_runtime } from "./_libs/@radix-ui/react-arrow+[...].mj
 import { t as Input } from "./_ssr/input-B8Q2ztVi.mjs";
 import { t as Button } from "./_ssr/button-Bq5vK6RO.mjs";
 import { d as Link, f as useNavigate } from "./_libs/@tanstack/react-router+[...].mjs";
-import { R as CircleCheck, U as Calendar, Y as ArrowLeft, _ as MessageSquare, f as Sparkles, h as Send, i as UserPlus, n as Wrench, r as User, t as X, x as MapPin } from "./_libs/lucide-react.mjs";
+import { B as CircleCheck, G as Calendar, S as MapPin, Z as ArrowLeft, a as UserPlus, g as Send, i as User, n as Wrench, p as Sparkles, t as X, v as MessageSquare } from "./_libs/lucide-react.mjs";
 import { a as Portal, c as Trigger, i as Overlay, n as Content, o as Root, r as Description, s as Title, t as Close } from "./_libs/@radix-ui/react-dialog+[...].mjs";
-import { t as Card } from "./_ssr/card-CzXpCsbD.mjs";
-import { f as setStatus, l as assignReport, o as TYPE_LABEL, p as useHseReports, r as PEOPLE, s as addComment, t as CURRENT_USER, u as closeReport } from "./_ssr/hse-store-C0HW7ztA.mjs";
-import { n as StatusBadge, r as TypeBadge, t as SeverityBadge } from "./_ssr/badges-CxkT40Uu.mjs";
-import { t as Route } from "./_app.reports._id-DUMvi5yE.mjs";
+import { t as Card } from "./_ssr/card-BXjpJ96D.mjs";
+import { a as TYPE_LABEL, c as assignReport, d as setStatus, f as useHseReports, l as closeReport, o as addComment } from "./_ssr/hse-store-B8fwR4lK.mjs";
+import { n as StatusBadge, r as TypeBadge, t as SeverityBadge } from "./_ssr/badges-jFbVK6on.mjs";
+import { t as Route } from "./_app.reports._id-CU_XUawb.mjs";
 import { t as Textarea } from "./_ssr/textarea-kko37XEX.mjs";
 import { t as Label } from "./_ssr/label-DBD1bRRP.mjs";
-import { a as SelectValue, i as SelectTrigger, n as SelectContent, r as SelectItem, t as Select } from "./_ssr/select-Dg1urBTx.mjs";
 import { n as toast } from "./_libs/sonner.mjs";
 import { t as Root$1 } from "./_libs/radix-ui__react-separator.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/_app.reports._id-BuFo99_m.js
+//#region node_modules/.nitro/vite/services/ssr/assets/_app.reports._id-BHfIofOs.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 var Dialog = Root;
@@ -79,7 +78,7 @@ function ReportDetail() {
 	const [comment, setComment] = (0, import_react.useState)("");
 	const [assignOpen, setAssignOpen] = (0, import_react.useState)(false);
 	const [closeOpen, setCloseOpen] = (0, import_react.useState)(false);
-	const [assignee, setAssignee] = (0, import_react.useState)(report?.assignedTo ?? PEOPLE[2]);
+	const [assignee, setAssignee] = (0, import_react.useState)(report?.assignedTo ?? "");
 	const [assigneeEmail, setAssigneeEmail] = (0, import_react.useState)("");
 	const [dueAt, setDueAt] = (0, import_react.useState)(report?.dueAt?.slice(0, 10) ?? "");
 	const [rootCause, setRootCause] = (0, import_react.useState)("");
@@ -99,14 +98,25 @@ function ReportDetail() {
 		})]
 	});
 	const overdue = report.dueAt && new Date(report.dueAt) < /* @__PURE__ */ new Date() && report.status !== "closed";
-	const submitAssign = () => {
+	const submitAssign = async () => {
 		if (!assignee) return;
 		const email = assigneeEmail.trim();
 		if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
 			toast.error("Please enter a valid email address");
 			return;
 		}
-		assignReport(report.id, assignee, dueAt ? new Date(dueAt).toISOString() : "", CURRENT_USER, email || void 0);
+		assignReport(report.id, assignee, dueAt ? new Date(dueAt).toISOString() : "", "", email || void 0);
+		await fetch("/.netlify/functions/send-assignment-email", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				assignee,
+				email,
+				reportRef: report.ref,
+				reportTitle: report.title,
+				dueDate: dueAt
+			})
+		});
 		setAssignOpen(false);
 		toast.success(email ? `Assigned to ${assignee} · notification sent to ${email}` : `Assigned to ${assignee}`);
 	};
@@ -118,7 +128,7 @@ function ReportDetail() {
 		closeReport(report.id, {
 			rootCause,
 			correctiveAction: corrective,
-			actor: CURRENT_USER
+			actor: ""
 		});
 		setCloseOpen(false);
 		toast.success(`${report.ref} closed`);
@@ -255,16 +265,11 @@ function ReportDetail() {
 												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
 													className: "text-sm font-semibold",
 													children: "Assignee"
-												}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
+												}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+													className: "mt-1.5 h-11",
 													value: assignee,
-													onValueChange: setAssignee,
-													children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
-														className: "mt-1.5 h-11",
-														children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, {})
-													}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectContent, { children: PEOPLE.map((p) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-														value: p,
-														children: p
-													}, p)) })]
+													onChange: (e) => setAssignee(e.target.value),
+													placeholder: "Enter assignee name"
 												})] }),
 												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
 													/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
@@ -309,7 +314,7 @@ function ReportDetail() {
 									variant: "outline",
 									className: "rounded-full",
 									onClick: () => {
-										setStatus(report.id, "in-progress");
+										setStatus(report.id, "in-progress", "");
 										toast.success("Marked in progress");
 									},
 									children: "Start work"
@@ -500,7 +505,7 @@ function ReportDetail() {
 									className: "rounded-full font-semibold",
 									onClick: () => {
 										if (!comment.trim()) return;
-										addComment(report.id, comment.trim(), "...");
+										addComment(report.id, comment.trim(), "");
 										setComment("");
 										toast.success("Comment added");
 									},

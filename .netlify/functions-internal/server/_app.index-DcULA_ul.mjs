@@ -2,14 +2,14 @@ import { i as __toESM } from "./_runtime.mjs";
 import { u as require_react } from "./_libs/@floating-ui/react-dom+[...].mjs";
 import { o as require_jsx_runtime } from "./_libs/@radix-ui/react-arrow+[...].mjs";
 import { t as Button } from "./_ssr/button-Bq5vK6RO.mjs";
-import { i as useSession } from "./_ssr/auth-store-Ba8VgCnR.mjs";
+import { a as useSession } from "./_ssr/auth-store-DU4Ijm7u.mjs";
 import { d as Link } from "./_libs/@tanstack/react-router+[...].mjs";
-import { P as Clock, X as Activity, c as TrendingUp, l as TrendingDown, p as ShieldCheck, q as ArrowUpRight, s as TriangleAlert, w as Leaf, x as MapPin } from "./_libs/lucide-react.mjs";
-import { t as Card } from "./_ssr/card-CzXpCsbD.mjs";
-import { n as LOCATIONS, p as useHseReports } from "./_ssr/hse-store-C0HW7ztA.mjs";
-import { n as StatusBadge, r as TypeBadge, t as SeverityBadge } from "./_ssr/badges-CxkT40Uu.mjs";
+import { E as Leaf, I as Clock, Q as Activity, S as MapPin, Y as ArrowUpRight, c as TriangleAlert, l as TrendingUp, m as ShieldCheck, u as TrendingDown } from "./_libs/lucide-react.mjs";
+import { t as Card } from "./_ssr/card-BXjpJ96D.mjs";
+import { f as useHseReports, t as LOCATIONS } from "./_ssr/hse-store-B8fwR4lK.mjs";
+import { n as StatusBadge, r as TypeBadge, t as SeverityBadge } from "./_ssr/badges-jFbVK6on.mjs";
 import { a as Area, c as Cell, i as XAxis, l as ResponsiveContainer, n as PieChart, o as CartesianGrid, r as YAxis, s as Pie, t as AreaChart, u as Tooltip } from "./_libs/recharts+[...].mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/_app.index-CiwE53kv.js
+//#region node_modules/.nitro/vite/services/ssr/assets/_app.index-DcULA_ul.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 function Dashboard() {
@@ -32,20 +32,33 @@ function Dashboard() {
 		};
 	}, [reports]);
 	const trend = (0, import_react.useMemo)(() => {
-		return [
-			"Dec",
+		const trendData = [
 			"Jan",
 			"Feb",
 			"Mar",
 			"Apr",
 			"May",
-			"Jun"
-		].map((m, i) => ({
-			month: m,
-			reports: Math.round(8 + Math.sin(i / 1.3) * 4 + i * 1.2 + (i === 6 ? reports.length / 3 : 0)),
-			closed: Math.round(5 + Math.sin(i / 1.1) * 3 + i * .9)
+			"Jun",
+			"Jul",
+			"Aug",
+			"Sep",
+			"Oct",
+			"Nov",
+			"Dec"
+		].map((month) => ({
+			month,
+			reports: 0,
+			closed: 0
 		}));
-	}, [reports.length]);
+		reports.forEach((report) => {
+			const month = new Date(report.reportedAt).toLocaleString("en-US", { month: "short" });
+			const row = trendData.find((m) => m.month === month);
+			if (!row) return;
+			row.reports++;
+			if (report.status === "closed") row.closed++;
+		});
+		return trendData.filter((m) => m.reports > 0 || m.closed > 0);
+	}, [reports]);
 	const typeMix = (0, import_react.useMemo)(() => {
 		const counts = {};
 		reports.forEach((r) => counts[r.type] = (counts[r.type] || 0) + 1);
@@ -167,39 +180,7 @@ function Dashboard() {
 					})]
 				})
 			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				className: "grid gap-4 md:grid-cols-2 lg:grid-cols-4",
-				children: [
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MiniStat, {
-						label: "TRIR (12 mo)",
-						value: "0.42",
-						delta: "-18%",
-						good: true,
-						icon: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TrendingDown, { className: "h-4 w-4" })
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MiniStat, {
-						label: "LTIR",
-						value: "0.11",
-						delta: "-25%",
-						good: true,
-						icon: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TrendingDown, { className: "h-4 w-4" })
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MiniStat, {
-						label: "Avg. Close-out Time",
-						value: "3.4d",
-						delta: "-0.6d",
-						good: true,
-						icon: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TrendingDown, { className: "h-4 w-4" })
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MiniStat, {
-						label: "Reporting Rate",
-						value: "92%",
-						delta: "+7%",
-						good: true,
-						icon: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TrendingUp, { className: "h-4 w-4" })
-					})
-				]
-			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(RealKpis, { reports }),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 				className: "grid gap-4 lg:grid-cols-3",
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
@@ -535,6 +516,55 @@ function Legend({ color, label }) {
 			}),
 			" ",
 			label
+		]
+	});
+}
+function RealKpis({ reports }) {
+	const now = Date.now();
+	const in12mo = reports.filter((r) => now - new Date(r.reportedAt).getTime() < 365 * 864e5);
+	const in3mo = reports.filter((r) => now - new Date(r.reportedAt).getTime() < 90 * 864e5);
+	const prev3mo = reports.filter((r) => {
+		const age = now - new Date(r.reportedAt).getTime();
+		return age >= 90 * 864e5 && age < 180 * 864e5;
+	});
+	const recordable12 = in12mo.filter((r) => r.type === "incident" || r.type === "injury").length;
+	const lostTime12 = in12mo.filter((r) => r.type === "injury").length;
+	const closed = reports.filter((r) => r.status === "closed" && r.closedAt);
+	const avgCloseDays = closed.length === 0 ? 0 : closed.reduce((sum, r) => sum + (new Date(r.closedAt).getTime() - new Date(r.reportedAt).getTime()) / 864e5, 0) / closed.length;
+	const closeRate = reports.length === 0 ? 0 : reports.filter((r) => r.status === "closed").length / reports.length * 100;
+	const delta3mo = in3mo.length - prev3mo.length;
+	const deltaLabel = delta3mo === 0 ? "±0" : (delta3mo > 0 ? "+" : "") + delta3mo;
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: "grid gap-4 md:grid-cols-2 lg:grid-cols-4",
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MiniStat, {
+				label: "Recordable Incidents (12 mo)",
+				value: String(recordable12),
+				delta: `${deltaLabel} vs prev 3 mo`,
+				good: delta3mo <= 0,
+				icon: delta3mo <= 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TrendingDown, { className: "h-4 w-4" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TrendingUp, { className: "h-4 w-4" })
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MiniStat, {
+				label: "Lost-Time Injuries (12 mo)",
+				value: String(lostTime12),
+				delta: lostTime12 === 0 ? "no injuries" : `${lostTime12} logged`,
+				good: lostTime12 === 0,
+				icon: lostTime12 === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TrendingDown, { className: "h-4 w-4" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TrendingUp, { className: "h-4 w-4" })
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MiniStat, {
+				label: "Avg. Close-out Time",
+				value: closed.length === 0 ? "—" : `${avgCloseDays.toFixed(1)}d`,
+				delta: `${closed.length} closed`,
+				good: true,
+				icon: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TrendingDown, { className: "h-4 w-4" })
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MiniStat, {
+				label: "Close-out Rate",
+				value: reports.length === 0 ? "—" : `${Math.round(closeRate)}%`,
+				delta: `${reports.length} total`,
+				good: closeRate >= 60,
+				icon: closeRate >= 60 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TrendingUp, { className: "h-4 w-4" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TrendingDown, { className: "h-4 w-4" })
+			})
 		]
 	});
 }

@@ -1,10 +1,10 @@
 import { i as __toESM } from "../_runtime.mjs";
 import { u as require_react } from "../_libs/@floating-ui/react-dom+[...].mjs";
 import { o as require_jsx_runtime } from "../_libs/@radix-ui/react-arrow+[...].mjs";
-import { i as useSession } from "./auth-store-Ba8VgCnR.mjs";
+import { a as useSession } from "./auth-store-DU4Ijm7u.mjs";
 import { d as Link, f as useNavigate } from "../_libs/@tanstack/react-router+[...].mjs";
-import { E as HardHat, J as ArrowRight, p as ShieldCheck } from "../_libs/lucide-react.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/login.index-r5GlkGaS.js
+import { O as HardHat, X as ArrowRight, m as ShieldCheck } from "../_libs/lucide-react.mjs";
+//#region node_modules/.nitro/vite/services/ssr/assets/login.index-B7inQtus.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 function LoginChooser() {
@@ -90,7 +90,7 @@ function LoginChooser() {
 									}),
 									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 										className: "mt-6 inline-flex items-center text-sm font-medium text-primary",
-										children: ["Sign in as Admin ", /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArrowRight, { className: "ml-1 h-4 w-4" })]
+										children: ["Continue as Admin ", /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArrowRight, { className: "ml-1 h-4 w-4" })]
 									})
 								]
 							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Link, {
@@ -114,7 +114,7 @@ function LoginChooser() {
 									}),
 									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 										className: "mt-6 inline-flex items-center text-sm font-medium text-[oklch(0.85_0.18_60)]",
-										children: ["Sign in as Staff ", /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArrowRight, { className: "ml-1 h-4 w-4" })]
+										children: ["Continue as Staff ", /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArrowRight, { className: "ml-1 h-4 w-4" })]
 									})
 								]
 							})]

@@ -1,3 +1,4 @@
+import { t as supabase } from "./client-6hwdMcVk.mjs";
 import { t as renderErrorPage } from "./ssr.mjs";
 //#region node_modules/.nitro/vite/services/ssr/assets/createStart-BWB9HM9w.js
 var createMiddleware = (options, __opts) => {
@@ -45,7 +46,12 @@ var createStart = (getOptions) => {
 	};
 };
 //#endregion
-//#region node_modules/.nitro/vite/services/ssr/assets/start-ObTnauo7.js
+//#region node_modules/.nitro/vite/services/ssr/assets/start-Boqis18p.js
+var attachSupabaseAuth = createMiddleware({ type: "function" }).client(async ({ next }) => {
+	const { data } = await supabase.auth.getSession();
+	const token = data.session?.access_token;
+	return next({ headers: token ? { Authorization: `Bearer ${token}` } : {} });
+});
 var errorMiddleware = createMiddleware().server(async ({ next }) => {
 	try {
 		return await next();
@@ -58,6 +64,9 @@ var errorMiddleware = createMiddleware().server(async ({ next }) => {
 		});
 	}
 });
-var startInstance = createStart(() => ({ requestMiddleware: [errorMiddleware] }));
+var startInstance = createStart(() => ({
+	functionMiddleware: [attachSupabaseAuth],
+	requestMiddleware: [errorMiddleware]
+}));
 //#endregion
 export { startInstance };

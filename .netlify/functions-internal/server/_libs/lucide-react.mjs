@@ -179,12 +179,12 @@ var Award = createLucideIcon("award", [["path", {
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
-var Bell = createLucideIcon("bell", [["path", {
-	d: "M10.268 21a2 2 0 0 0 3.464 0",
-	key: "vwvbt9"
+var BookOpen = createLucideIcon("book-open", [["path", {
+	d: "M12 7v14",
+	key: "1akyts"
 }], ["path", {
-	d: "M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326",
-	key: "11g9vi"
+	d: "M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z",
+	key: "ruj8y"
 }]]);
 /**
 * @license lucide-react v0.575.0 - ISC
@@ -192,12 +192,16 @@ var Bell = createLucideIcon("bell", [["path", {
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
-var BookOpen = createLucideIcon("book-open", [["path", {
-	d: "M12 7v14",
-	key: "1akyts"
-}], ["path", {
-	d: "M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z",
-	key: "ruj8y"
+var Briefcase = createLucideIcon("briefcase", [["path", {
+	d: "M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16",
+	key: "jecpp"
+}], ["rect", {
+	width: "20",
+	height: "14",
+	x: "2",
+	y: "6",
+	rx: "2",
+	key: "i6l2r4"
 }]]);
 /**
 * @license lucide-react v0.575.0 - ISC
@@ -638,6 +642,23 @@ var LogOut = createLucideIcon("log-out", [
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
+var Mail = createLucideIcon("mail", [["path", {
+	d: "m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7",
+	key: "132q7q"
+}], ["rect", {
+	x: "2",
+	y: "4",
+	width: "20",
+	height: "16",
+	rx: "2",
+	key: "izxlao"
+}]]);
+/**
+* @license lucide-react v0.575.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
 var MapPin = createLucideIcon("map-pin", [["path", {
 	d: "M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0",
 	key: "1r0f0z"
@@ -1009,6 +1030,32 @@ var User = createLucideIcon("user", [["path", {
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
+var Users = createLucideIcon("users", [
+	["path", {
+		d: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2",
+		key: "1yyitq"
+	}],
+	["path", {
+		d: "M16 3.128a4 4 0 0 1 0 7.744",
+		key: "16gr8j"
+	}],
+	["path", {
+		d: "M22 21v-2a4 4 0 0 0-3-3.87",
+		key: "kshegd"
+	}],
+	["circle", {
+		cx: "9",
+		cy: "7",
+		r: "4",
+		key: "nufk8"
+	}]
+]);
+/**
+* @license lucide-react v0.575.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
 var Wrench = createLucideIcon("wrench", [["path", {
 	d: "M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z",
 	key: "1ngwbx"
@@ -1027,4 +1074,4 @@ var X = createLucideIcon("x", [["path", {
 	key: "d8bk6v"
 }]]);
 //#endregion
-export { Flame as A, ChevronDown as B, Lock as C, GraduationCap as D, HardHat as E, ClipboardList as F, Bell as G, ChartColumn as H, ClipboardCheck as I, ArrowRight as J, Award as K, CirclePlus as L, ExternalLink as M, Download as N, Funnel as O, Clock as P, CircleCheck as R, LogOut as S, LayoutDashboard as T, Calendar as U, Check as V, BookOpen as W, Activity as X, ArrowLeft as Y, MessageSquare as _, Upload as a, Map as b, TrendingUp as c, Star as d, Sparkles as f, Search as g, Send as h, UserPlus as i, FileText as j, Folder as k, TrendingDown as l, ShieldAlert as m, Wrench as n, Trophy as o, ShieldCheck as p, ArrowUpRight as q, User as r, TriangleAlert as s, X as t, Stethoscope as u, Menu as v, Leaf as w, MapPin as x, Medal as y, ChevronUp as z };
+export { Funnel as A, CircleCheck as B, Mail as C, LayoutDashboard as D, Leaf as E, Download as F, Calendar as G, ChevronDown as H, Clock as I, Award as J, Briefcase as K, ClipboardList as L, Flame as M, FileText as N, HardHat as O, ExternalLink as P, Activity as Q, ClipboardCheck as R, MapPin as S, Lock as T, Check as U, ChevronUp as V, ChartColumn as W, ArrowRight as X, ArrowUpRight as Y, ArrowLeft as Z, Search as _, UserPlus as a, Medal as b, TriangleAlert as c, Stethoscope as d, Star as f, Send as g, ShieldAlert as h, User as i, Folder as j, GraduationCap as k, TrendingUp as l, ShieldCheck as m, Wrench as n, Upload as o, Sparkles as p, BookOpen as q, Users as r, Trophy as s, X as t, TrendingDown as u, MessageSquare as v, LogOut as w, Map as x, Menu as y, CirclePlus as z };

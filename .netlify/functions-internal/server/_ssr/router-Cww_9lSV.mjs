@@ -2,15 +2,15 @@ import { i as __toESM } from "../_runtime.mjs";
 import { u as require_react } from "../_libs/@floating-ui/react-dom+[...].mjs";
 import { o as require_jsx_runtime } from "../_libs/@radix-ui/react-arrow+[...].mjs";
 import { c as lazyRouteComponent, d as Link, l as createFileRoute, n as Scripts, o as createRouter, p as useRouter, r as HeadContent, s as Outlet, u as createRootRouteWithContext } from "../_libs/@tanstack/react-router+[...].mjs";
-import { t as Route$11 } from "../_app.reports._id-DUMvi5yE.mjs";
+import { t as Route$13 } from "../_app.reports._id-CU_XUawb.mjs";
 import { t as Toaster } from "../_libs/sonner.mjs";
-import { t as Route$12 } from "../_app.reports.index-D-KOaVKO.mjs";
+import { t as Route$14 } from "../_app.reports.index-CA3UCC4w.mjs";
 import { t as QueryClient } from "../_libs/tanstack__query-core.mjs";
 import { t as QueryClientProvider } from "../_libs/tanstack__react-query.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/router-Cs-92mHV.js
+//#region node_modules/.nitro/vite/services/ssr/assets/router-Cww_9lSV.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
-var styles_default = "/assets/styles-CwSmhfUg.css";
+var styles_default = "/assets/styles-BX9I34Sa.css";
 function reportLovableError(error, context = {}) {
 	if (typeof window === "undefined") return;
 	window.__lovableEvents?.captureException?.(error, {
@@ -103,7 +103,7 @@ function ErrorComponent({ error, reset }) {
 		})
 	});
 }
-var Route$10 = createRootRouteWithContext()({
+var Route$12 = createRootRouteWithContext()({
 	head: () => ({
 		meta: [
 			{ charSet: "utf-8" },
@@ -170,7 +170,7 @@ function RootShell({ children }) {
 	});
 }
 function RootComponent() {
-	const { queryClient } = Route$10.useRouteContext();
+	const { queryClient } = Route$12.useRouteContext();
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(QueryClientProvider, {
 		client: queryClient,
 		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Outlet, {}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Toaster$1, {
@@ -179,28 +179,56 @@ function RootComponent() {
 		})]
 	});
 }
-var $$splitComponentImporter$9 = () => import("../_app-CTCSJWml.mjs");
-var Route$9 = createFileRoute("/_app")({ component: lazyRouteComponent($$splitComponentImporter$9, "component") });
-var $$splitComponentImporter$8 = () => import("./login.index-r5GlkGaS.mjs");
-var Route$8 = createFileRoute("/login/")({ component: lazyRouteComponent($$splitComponentImporter$8, "component") });
-var $$splitComponentImporter$7 = () => import("../_app.index-CiwE53kv.mjs");
-var Route$7 = createFileRoute("/_app/")({
+var $$splitComponentImporter$11 = () => import("../_app--ZqQ_ioL.mjs");
+var Route$11 = createFileRoute("/_app")({ component: lazyRouteComponent($$splitComponentImporter$11, "component") });
+var $$splitComponentImporter$10 = () => import("./signup.index-Dwyq7Zje.mjs");
+var Route$10 = createFileRoute("/signup/")({
+	head: () => ({ meta: [{ title: "Create account | CAPSL HSE" }, {
+		name: "description",
+		content: "Register for the CAPSL HSE Platform with your @capslgas.com email."
+	}] }),
+	component: lazyRouteComponent($$splitComponentImporter$10, "component")
+});
+var $$splitComponentImporter$9 = () => import("./login.index-B7inQtus.mjs");
+var Route$9 = createFileRoute("/login/")({
+	head: () => ({ meta: [{ title: "Sign in | CAPSL HSE" }, {
+		name: "description",
+		content: "Choose your CAPSL HSE portal to sign in."
+	}] }),
+	component: lazyRouteComponent($$splitComponentImporter$9, "component")
+});
+var $$splitComponentImporter$8 = () => import("../_app.index-DcULA_ul.mjs");
+var Route$8 = createFileRoute("/_app/")({
 	head: () => ({ meta: [{ title: "CAPSL HSE | Global Dashboard" }, {
 		name: "description",
 		content: "Compression and Power Systems Limited – Health, Safety & Environment reporting and compliance dashboard."
 	}] }),
+	component: lazyRouteComponent($$splitComponentImporter$8, "component")
+});
+var $$splitComponentImporter$7 = () => import("./login.staff-4YzenY5w.mjs");
+var Route$7 = createFileRoute("/login/staff")({
+	head: () => ({ meta: [{ title: "Staff sign in | CAPSL HSE" }, {
+		name: "description",
+		content: "Sign in or register as CAPSL field staff."
+	}] }),
 	component: lazyRouteComponent($$splitComponentImporter$7, "component")
 });
-var $$splitComponentImporter$6 = () => import("./login.staff-CNhrgG7u.mjs");
-var Route$6 = createFileRoute("/login/staff")({ component: lazyRouteComponent($$splitComponentImporter$6, "component") });
-var $$splitComponentImporter$5 = () => import("./login.admin-m3Atd8WE.mjs");
-var Route$5 = createFileRoute("/login/admin")({ component: lazyRouteComponent($$splitComponentImporter$5, "component") });
-var $$splitComponentImporter$4 = () => import("../_app.locations-WYSJ07e0.mjs");
+var $$splitComponentImporter$6 = () => import("./login.admin-MAzp80rI.mjs");
+var Route$6 = createFileRoute("/login/admin")({
+	head: () => ({ meta: [{ title: "Administrator sign in | CAPSL HSE" }, {
+		name: "description",
+		content: "Sign in or register as a CAPSL HSE Administrator."
+	}] }),
+	component: lazyRouteComponent($$splitComponentImporter$6, "component")
+});
+var $$splitComponentImporter$5 = () => import("../_app.users-BZ1Ym6RG.mjs");
+var Route$5 = createFileRoute("/_app/users")({ component: lazyRouteComponent($$splitComponentImporter$5, "component") });
+var $$splitComponentImporter$4 = () => import("../_app.locations-CV3ZQOqt.mjs");
 var Route$4 = createFileRoute("/_app/locations")({
 	head: () => ({ meta: [{ title: "Locations | CAPSL HSE" }] }),
 	component: lazyRouteComponent($$splitComponentImporter$4, "component")
 });
-var $$splitComponentImporter$3 = () => import("../_app.leaderboard-BD4BeJ6S.mjs");
+var $$splitComponentImporter$3 = () => import("../_app.leaderboard-CIs74K5W.mjs");
 var Route$3 = createFileRoute("/_app/leaderboard")({
 	head: () => ({ meta: [{ title: "Reporter Leaderboard | CAPSL HSE" }, {
 		name: "description",
@@ -208,7 +236,7 @@ var Route$3 = createFileRoute("/_app/leaderboard")({
 	}] }),
 	component: lazyRouteComponent($$splitComponentImporter$3, "component")
 });
-var $$splitComponentImporter$2 = () => import("../_app.documents-CI9zn-2V.mjs");
+var $$splitComponentImporter$2 = () => import("../_app.documents-CfuEihh9.mjs");
 var Route$2 = createFileRoute("/_app/documents")({
 	head: () => ({ meta: [{ title: "HSE Documents & Materials | CAPSL" }, {
 		name: "description",
@@ -216,12 +244,12 @@ var Route$2 = createFileRoute("/_app/documents")({
 	}] }),
 	component: lazyRouteComponent($$splitComponentImporter$2, "component")
 });
-var $$splitComponentImporter$1 = () => import("../_app.audit-Csccm7uu.mjs");
+var $$splitComponentImporter$1 = () => import("../_app.audit-DIJ2Rn94.mjs");
 var Route$1 = createFileRoute("/_app/audit")({
 	head: () => ({ meta: [{ title: "Audit Log | CAPSL HSE" }] }),
 	component: lazyRouteComponent($$splitComponentImporter$1, "component")
 });
-var $$splitComponentImporter = () => import("../_app.reports.new-Dp6sAsTN.mjs");
+var $$splitComponentImporter = () => import("../_app.reports.new-DzYDebOI.mjs");
 var Route = createFileRoute("/_app/reports/new")({
 	head: () => ({ meta: [{ title: "Submit HSE Report | CAPSL" }, {
 		name: "description",
@@ -229,29 +257,39 @@ var Route = createFileRoute("/_app/reports/new")({
 	}] }),
 	component: lazyRouteComponent($$splitComponentImporter, "component")
 });
-var AppRoute = Route$9.update({
+var AppRoute = Route$11.update({
 	id: "/_app",
-	getParentRoute: () => Route$10
+	getParentRoute: () => Route$12
 });
-var LoginIndexRoute = Route$8.update({
+var SignupIndexRoute = Route$10.update({
+	id: "/signup/",
+	path: "/signup/",
+	getParentRoute: () => Route$12
+});
+var LoginIndexRoute = Route$9.update({
 	id: "/login/",
 	path: "/login/",
-	getParentRoute: () => Route$10
+	getParentRoute: () => Route$12
 });
-var AppIndexRoute = Route$7.update({
+var AppIndexRoute = Route$8.update({
 	id: "/",
 	path: "/",
 	getParentRoute: () => AppRoute
 });
-var LoginStaffRoute = Route$6.update({
+var LoginStaffRoute = Route$7.update({
 	id: "/login/staff",
 	path: "/login/staff",
-	getParentRoute: () => Route$10
+	getParentRoute: () => Route$12
 });
-var LoginAdminRoute = Route$5.update({
+var LoginAdminRoute = Route$6.update({
 	id: "/login/admin",
 	path: "/login/admin",
-	getParentRoute: () => Route$10
+	getParentRoute: () => Route$12
+});
+var AppUsersRoute = Route$5.update({
+	id: "/users",
+	path: "/users",
+	getParentRoute: () => AppRoute
 });
 var AppLocationsRoute = Route$4.update({
 	id: "/locations",
@@ -273,7 +311,7 @@ var AppAuditRoute = Route$1.update({
 	path: "/audit",
 	getParentRoute: () => AppRoute
 });
-var AppReportsIndexRoute = Route$12.update({
+var AppReportsIndexRoute = Route$14.update({
 	id: "/reports/",
 	path: "/reports/",
 	getParentRoute: () => AppRoute
@@ -288,8 +326,9 @@ var AppRouteChildren = {
 	AppDocumentsRoute,
 	AppLeaderboardRoute,
 	AppLocationsRoute,
+	AppUsersRoute,
 	AppIndexRoute,
-	AppReportsIdRoute: Route$11.update({
+	AppReportsIdRoute: Route$13.update({
 		id: "/reports/$id",
 		path: "/reports/$id",
 		getParentRoute: () => AppRoute
@@ -301,9 +340,10 @@ var rootRouteChildren = {
 	AppRoute: AppRoute._addFileChildren(AppRouteChildren),
 	LoginAdminRoute,
 	LoginStaffRoute,
-	LoginIndexRoute
+	LoginIndexRoute,
+	SignupIndexRoute
 };
-var routeTree = Route$10._addFileChildren(rootRouteChildren)._addFileTypes();
+var routeTree = Route$12._addFileChildren(rootRouteChildren)._addFileTypes();
 var getRouter = () => {
 	return createRouter({
 		routeTree,
