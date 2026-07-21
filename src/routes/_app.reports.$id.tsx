@@ -44,7 +44,6 @@ import {
   useHseReports,
 } from "@/lib/hse-store";
 import { SeverityBadge, StatusBadge, TypeBadge } from "@/components/hse/badges";
-import { sendAssignmentEmail } from "@/server/send-assignment-email";
 
 export const Route = createFileRoute("/_app/reports/$id")({
   head: ({ params }) => ({
@@ -76,7 +75,7 @@ function ReportDetail() {
     return (
       <div className="mx-auto max-w-2xl py-16 text-center">
         <p className="text-muted-foreground">Report not found.</p>
-        <Link to="/reports"><Button variant="outline" className="mt-4">Back to reports</Button></Link>
+        <Link to="/reports" search= {{location: undefined}}><Button variant="outline" className="mt-4">Back to reports</Button></Link>
       </div>
     );
   }
@@ -104,28 +103,6 @@ function ReportDetail() {
         email || undefined
     );
 
-    if (email) {
-        const response = await fetch("/api/send-assignment-email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          assignee,
-          email,
-          reportRef: report.ref,
-          reportTitle: report.title,
-          dueDate: dueAt,
-          location: report.location,
-        }),
-      });
-
-      const result = await response.json();
-
-      if (!result.success) {
-        throw new Error(result.message);
-      }
-    }
 
     setAssignOpen(false);
     toast.success(
@@ -169,7 +146,7 @@ function ReportDetail() {
 
   return (
     <div className="mx-auto max-w-[1200px] space-y-5">
-      <button onClick={() => nav({ to: "/reports" })} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
+      <button onClick={() => nav({ to: "/reports", search: { location: undefined}})} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
         <ArrowLeft className="h-4 w-4" /> Back to reports
       </button>
 

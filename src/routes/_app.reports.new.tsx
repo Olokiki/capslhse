@@ -48,6 +48,7 @@ function NewReport() {
     type: "" as ReportType | "",
     severity: "" as Severity | "",
     location: defaultLocation,
+    locationOther: "",
     asset: "",
     assetOther: "",
     reportedBy: defaultReporter,
@@ -180,7 +181,7 @@ function NewReport() {
                 <>
                 <Select value={form.location} onValueChange={(v) => { set("location", v); set("asset", ""); }}>
                   <SelectTrigger className="mt-1.5 h-11"><SelectValue placeholder="CAPSL- your current location" /></SelectTrigger>
-                  <SelectContent>{LOCATIONS.map((l) => <SelectItem key={l} value={l}>{l}</SelectItem>)}
+                  <SelectContent>{LOCATIONS.map((l) => <SelectItem key={l} value={l}>{l}</SelectItem>) }
                   <SelectItem value="__other__"> Other (Specify) </SelectItem>
                   </SelectContent>
                 </Select>
@@ -233,7 +234,7 @@ function NewReport() {
           </div>
 
           <div className="flex items-center justify-end gap-2 border-t border-border pt-4">
-            <Button type="button" variant="ghost" onClick={() => nav({ to: "/reports" })} disabled={submitting}>Cancel</Button>
+            <Button type="button" variant="ghost" onClick={() => nav({ to: "/reports", search: {location: undefined}, })} disabled={submitting}>Cancel</Button>
             <Button type="submit" disabled={submitting} className="rounded-full px-6 font-semibold shadow-sm">{submitting ? "Submitting…" : "Submit Report"}</Button>
           </div>
         </form>

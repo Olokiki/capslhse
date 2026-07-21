@@ -160,7 +160,7 @@ function Dashboard() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button asChild variant="outline" className="rounded-full"><Link to="/reports">View All Reports</Link></Button>
+          <Button asChild variant="outline" className="rounded-full"><Link to="/reports" search = {{location : undefined}}>View All Reports</Link></Button>
           <Button asChild className="rounded-full font-semibold"><Link to="/reports/new">Report an Incident</Link></Button>
         </div>
       </div>
@@ -290,7 +290,7 @@ function Dashboard() {
             <h2 className="text-base font-semibold">Recent HSE reports</h2>
             <p className="text-xs text-muted-foreground">Latest activity across all sites</p>
           </div>
-          <Link to="/reports" className="text-xs font-semibold text-primary hover:underline">View all →</Link>
+          <Link to="/reports" search = {{location: undefined}} className="text-xs font-semibold text-primary hover:underline">View all →</Link>
         </div>
         <div className="mt-4 divide-y divide-border">
           {recent.map((r) => (
