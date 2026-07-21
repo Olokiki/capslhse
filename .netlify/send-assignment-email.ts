@@ -18,8 +18,8 @@ export default async (req: Request) => {
       dueDate,
     } = await req.json();
 
-    await resend.emails.send({
-      from: "CAPSL HSE <notifications@yourdomain.com>",
+  const { data, error} = await resend.emails.send({
+      from: "CAPSL HSE <onboarding@resend.dev>",
       to: email,
       subject: `New HSE Assignment - ${reportRef}`,
       html: `

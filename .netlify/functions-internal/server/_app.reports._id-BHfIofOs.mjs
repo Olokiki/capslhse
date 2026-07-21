@@ -105,18 +105,23 @@ function ReportDetail() {
 			toast.error("Please enter a valid email address");
 			return;
 		}
-		assignReport(report.id, assignee, dueAt ? new Date(dueAt).toISOString() : "", "", email || void 0);
-		await fetch("/.netlify/functions/send-assignment-email", {
+		await assignReport(report.id, assignee, dueAt ? new Date(dueAt).toISOString() : "", "", email || void 0);
+		const response = await fetch("/.netlify/functions/send-assignment-email", {
 			method: "POST",
-			headers: { "Content-Type": "application/json" },
+			headers: { "Content-Type": "application/json", },
 			body: JSON.stringify({
 				assignee,
 				email,
 				reportRef: report.ref,
 				reportTitle: report.title,
 				dueDate: dueAt
-			})
+			}),
 		});
+
+	const result = await response.json(); console.log(result);
+if (!response.ok || !result.success) {
+  throw new Error(result.error || "Email failed");
+}
 		setAssignOpen(false);
 		toast.success(email ? `Assigned to ${assignee} · notification sent to ${email}` : `Assigned to ${assignee}`);
 	};

@@ -44,6 +44,7 @@ import {
   useHseReports,
 } from "@/lib/hse-store";
 import { SeverityBadge, StatusBadge, TypeBadge } from "@/components/hse/badges";
+import { sendAssignmentEmail } from "@/server/send-assignment-email";
 
 export const Route = createFileRoute("/_app/reports/$id")({
   head: ({ params }) => ({
@@ -83,36 +84,93 @@ function ReportDetail() {
   const overdue = report.dueAt && new Date(report.dueAt) < new Date() && report.status !== "closed";
 
   const submitAssign = async () => {
-    if (!assignee) return;
-    const email = assigneeEmail.trim();
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      toast.error("Please enter a valid email address");
-      return;
+
+  if (!assignee.trim()) {
+
+    toast.error("Assignee is required.");
+
+    return;
+
+  }
+
+  const email = assigneeEmail.trim();
+
+  if (
+    email &&
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  ) {
+
+    toast.error("Please enter a valid email address.");
+
+    return;
+
+  }
+
+  try {
+
+    await assignReport(
+
+      report.id,
+
+      assignee,
+
+      dueAt
+        ? new Date(dueAt).toISOString()
+        : "",
+
+      CURRENT_USER,
+
+      email || undefined
+
+    );
+
+    if (email) {
+
+      await sendAssignmentEmail({
+
+        assignee,
+
+        email,
+
+        reportRef: report.ref,
+
+        reportTitle: report.title,
+
+        dueDate: dueAt,
+
+        location: report.location,
+
+      });
+
     }
-    assignReport(report.id, assignee, dueAt ? new Date(dueAt).toISOString() : "", CURRENT_USER, email || undefined);
-    await fetch("/.netlify/functions/send-assignment-email", {
 
-  method: "POST",
+    setAssignOpen(false);
 
-  headers: {
-    "Content-Type": "application/json",
-  },
+    toast.success(
 
-  body: JSON.stringify({
+      email
+        ? `Assigned to ${assignee}. Email notification sent.`
+        : `Assigned to ${assignee}.`
 
-    assignee,
+    );
 
-    email,
+  }
 
-    reportRef: report.ref,
+  catch (err) {
 
-    reportTitle: report.title,
+    console.error(err);
 
-    dueDate: dueAt,
+    toast.error(
 
-  }),
+      err instanceof Error
+        ? err.message
+        : "Assignment completed, but email could not be sent."
 
-});
+    );
+
+  }
+
+};;
     setAssignOpen(false);
     toast.success(email ? `Assigned to ${assignee} · notification sent to ${email}` : `Assigned to ${assignee}`);
   };
