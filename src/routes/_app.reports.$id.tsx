@@ -84,97 +84,64 @@ function ReportDetail() {
   const overdue = report.dueAt && new Date(report.dueAt) < new Date() && report.status !== "closed";
 
   const submitAssign = async () => {
+    if (!assignee.trim()) {
+      toast.error("Assignee is required.");
+      return;
+    }
 
-  if (!assignee.trim()) {
+    const email = assigneeEmail.trim();
 
-    toast.error("Assignee is required.");
-
-    return;
-
-  }
-
-  const email = assigneeEmail.trim();
-
-  if (
-    email &&
-    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-  ) {
-
-    toast.error("Please enter a valid email address.");
-
-    return;
-
-  }
-
-  try {
-
-    await assignReport(
-
-      report.id,
-
-      assignee,
-
-      dueAt
-        ? new Date(dueAt).toISOString()
-        : "",
-
-      CURRENT_USER,
-
-      email || undefined
-
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error("Please enter a valid email address.");
+      return; 
+    }
+    try {
+      await assignReport(
+        report.id,
+        assignee,
+        dueAt ? new Date(dueAt).toISOString(): "",
+        CURRENT_USER,
+        email || undefined
     );
 
     if (email) {
-
-      await sendAssignmentEmail({
-
-        assignee,
-
-        email,
-
-        reportRef: report.ref,
-
-        reportTitle: report.title,
-
-        dueDate: dueAt,
-
-        location: report.location,
-
+        const response = await fetch("/api/send-assignment-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          assignee,
+          email,
+          reportRef: report.ref,
+          reportTitle: report.title,
+          dueDate: dueAt,
+          location: report.location,
+        }),
       });
 
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.message);
+      }
     }
 
     setAssignOpen(false);
-
     toast.success(
-
       email
         ? `Assigned to ${assignee}. Email notification sent.`
-        : `Assigned to ${assignee}.`
-
+        : `Assigned to ${assignee}.`,
     );
-
-  }
-
-  catch (err) {
-
+  } catch (err) {
     console.error(err);
-
     toast.error(
-
       err instanceof Error
         ? err.message
-        : "Assignment completed, but email could not be sent."
-
+        : "Assignment completed, but email could not be sent.",
     );
-
   }
-
-};;
-    setAssignOpen(false);
-    toast.success(email ? `Assigned to ${assignee} · notification sent to ${email}` : `Assigned to ${assignee}`);
   };
-
   const submitClose = () => {
     if (!rootCause.trim() || !corrective.trim()) {
       toast.error("Root cause and corrective action are required to close out.");
@@ -250,7 +217,7 @@ function ReportDetail() {
                             type="email"
                             value={assigneeEmail}
                             onChange={(e) => setAssigneeEmail(e.target.value)}
-                            placeholder="name@capsl.com"
+                            placeholder="name@capslgas.com"
                             className="mt-1.5 h-11"
                           />
                           <p className="mt-1 text-[11px] text-muted-foreground">
@@ -409,3 +376,4 @@ function DetailRow({ label, value, highlight }: { label: string; value: string; 
 function initials(name: string) {
   return name.split(" ").slice(0, 2).map((p) => p[0]).join("").toUpperCase();
 }
+
