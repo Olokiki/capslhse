@@ -279,23 +279,24 @@ export async function assignReport(
   });
 
   if (assigneeEmail) {
-  const response = await fetch("/.netlify/functions/send-assignment-email", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      assignee,
-      email: assigneeEmail,
-      reportRef: existing?.ref,
-      reportTitle: existing?.title,
-      dueDate: dueAt,
-    }),
-  });
+  const { error } = await supabase.functions.invoke(
+    "send-assignment-email",
+    {
+      body: {
+        assignee,
+        email: assigneeEmail,
+        reportRef: existing?.ref,
+        reportTitle: existing?.title,
+        dueDate: dueAt,
+      },
+    }
+  );
 
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Email failed: ${error}`);
+  if (error) {
+    console.error("Email sending failed:", error);
+
+    // Do NOT stop the assignment because of an email failure.
+    // The report has already been assigned successfully.
   }
 }
 
