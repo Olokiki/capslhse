@@ -1,18 +1,23 @@
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
+import { corsHeaders } from "npm:@supabase/supabase-js@^2/cors";
 import { Resend } from "npm:resend";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response("ok", {
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers":
-          "authorization, x-client-info, apikey, content-type",
-      },
-    });
-  }
+  return new Response(null, {
+    status: 204,
+    headers: corsHeaders,
+  });
+}
 
   try {
     const {
@@ -67,30 +72,31 @@ serve(async (req) => {
       throw error;
     }
 
-    return new Response(
-      JSON.stringify(data),
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-        },
-      },
-    );
+   return new Response(
+  JSON.stringify(data),
+  {
+    status: 200,
+    headers: {
+      ...corsHeaders,
+      "Content-Type": "application/json",
+    },
+  },
+);
 
   } catch (err) {
 
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: err.message,
-      }),
-      {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-        },
-      },
-    );
+   return new Response(
+  JSON.stringify({
+    success: false,
+    error: err instanceof Error ? err.message : String(err),
+  }),
+  {
+    status: 500,
+    headers: {
+      ...corsHeaders,
+      "Content-Type": "application/json",
+    },
+  },
+);
   }
 });
