@@ -277,6 +277,28 @@ export async function assignReport(
       dueAt ? ` (due ${new Date(dueAt).toLocaleDateString()})` : ""
     }${emailPart}`,
   });
+
+  if (assigneeEmail) {
+  const response = await fetch("/.netlify/functions/send-assignment-email", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      assignee,
+      email: assigneeEmail,
+      reportRef: existing?.ref,
+      reportTitle: existing?.title,
+      dueDate: dueAt,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Email failed: ${error}`);
+  }
+}
+
   fetchAll().catch(() => {});
 }
 
