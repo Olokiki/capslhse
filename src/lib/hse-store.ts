@@ -279,7 +279,7 @@ export async function assignReport(
   });
 
   if (assigneeEmail) {
-  const { error } = await supabase.functions.invoke(
+  const {data, error } = await supabase.functions.invoke(
     "send-assignment-email",
     {
       body: {
@@ -292,6 +292,9 @@ export async function assignReport(
     }
   );
 
+  console.log("Edge Function data:", data);
+  console.log("Edge Function error:", error);
+  
   if (error) {
     console.error("Email sending failed:", error);
 
