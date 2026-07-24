@@ -7,6 +7,16 @@ export const Route = createFileRoute("/_app/locations")({
   head: () => ({ meta: [{ title: "Locations | CAPSL HSE" }] }),
   component: () => {
     const reports = useHseReports();
+    const locations = [
+  ...new Set([
+    ...LOCATIONS,
+    ...reports
+      .map((r) => r.location)
+      .filter(Boolean),
+  ]),
+]
+.sort((a, b) => a.localeCompare(b))
+
     return (
       <div className="mx-auto max-w-[1400px] space-y-5">
         <div>
@@ -14,7 +24,7 @@ export const Route = createFileRoute("/_app/locations")({
           <h1 className="mt-1 text-3xl font-bold tracking-tight">CAPSL Locations</h1>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {LOCATIONS.map((loc) => {
+          {locations.map((loc) => {
             const items = reports.filter((r) => r.location === loc);
             const open = items.filter((r) => r.status !== "closed").length;
             return (
