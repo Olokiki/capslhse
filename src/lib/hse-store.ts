@@ -47,6 +47,7 @@ const LOCATIONS = [
   "CAPSL - Waltersmith",
   "CAPSL - Warri",
   "CAPSL - Oben",
+  "Other",
 ];
 
 export const PEOPLE = [ " " ];

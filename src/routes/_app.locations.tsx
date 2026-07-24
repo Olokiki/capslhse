@@ -25,7 +25,14 @@ export const Route = createFileRoute("/_app/locations")({
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {locations.map((loc) => {
-            const items = reports.filter((r) => r.location === loc);
+            const items = reports.filter((r) => {
+  const group =
+    LOCATIONS.includes(r.location)
+      ? r.location
+      : "Other";
+
+  return group === loc;
+});
             const open = items.filter((r) => r.status !== "closed").length;
             return (
               <Card key={loc} className="p-5">

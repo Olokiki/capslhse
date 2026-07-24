@@ -101,15 +101,19 @@ function NewReport() {
 
     setSubmitting(true);
     try {
+      const finalLocation =
+  form.location === "__other__"
+    ? form.locationOther.trim()
+    : form.location;
       const r = await createReport({
-        title: form.title.trim(),
-        description: form.description.trim(),
-        type: form.type as ReportType,
-        severity: form.severity as Severity,
-        location: form.location,
-        asset: finalAsset,
-        reportedBy: form.reportedBy,
-      });
+  title: form.title.trim(),
+  description: form.description.trim(),
+  type: form.type as ReportType,
+  severity: form.severity as Severity,
+  location: finalLocation,
+  asset: finalAsset,
+  reportedBy: form.reportedBy,
+});
       toast.success(`Report ${r.ref} submitted`);
       nav({ to: "/reports/$id", params: { id: r.id } });
     } catch (err) {
