@@ -9,7 +9,7 @@ export const Route = createFileRoute("/_app/locations")({
     const reports = useHseReports();
     const locations = [
   ...new Set([
-    ...LOCATIONS,
+    ...LOCATIONS,"Other",
     ...reports
       .map((r) => r.location)
       .filter(Boolean),
@@ -25,13 +25,14 @@ export const Route = createFileRoute("/_app/locations")({
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {locations.map((loc) => {
-            const items = reports.filter((r) => {
-  const group =
-    LOCATIONS.includes(r.location)
-      ? r.location
-      : "Other";
+   const items = reports.filter((r) => {
+  // Is this one of the official locations?
+  const isOfficial = LOCATIONS.includes(r.location);
 
-  return group === loc;
+  // If not, group it under Other
+  const reportGroup = isOfficial ? r.location : "Other";
+
+  return reportGroup === loc;
 });
             const open = items.filter((r) => r.status !== "closed").length;
             return (
