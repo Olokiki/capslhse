@@ -185,9 +185,11 @@ function NewReport() {
                 <>
                 <Select value={form.location} onValueChange={(v) => { set("location", v); set("asset", ""); }}>
                   <SelectTrigger className="mt-1.5 h-11"><SelectValue placeholder="CAPSL- your current location" /></SelectTrigger>
-                  <SelectContent>{LOCATIONS.map((l) => <SelectItem key={l} value={l}>{l}</SelectItem>) }
-                  <SelectItem value="__other__"> Other (Specify) </SelectItem>
-                  </SelectContent>
+                 <SelectContent> {LOCATIONS.map((l) => (
+                <SelectItem
+                 key={l}
+                  value={l === "Other" ? "__other__" : l} > {l} </SelectItem>))}
+                </SelectContent>
                 </Select>
                 {form.location === "__other__" && (
                      <Input
@@ -210,10 +212,10 @@ function NewReport() {
                 <SelectTrigger className="mt-1.5 h-11"><SelectValue placeholder="Select asset" /></SelectTrigger>
                 <SelectContent>
                   {locationAssets.map((a) => <SelectItem key={a} value={a}>{a}</SelectItem>)}
-                  <SelectItem value="__other__">Other (specify)…</SelectItem>
+                  <SelectItem value="other"> Other </SelectItem>
                 </SelectContent>
               </Select>
-              {form.asset === "__other__" && (
+              {form.asset === "other" && (
                 <Input
                   required
                   value={form.assetOther}
