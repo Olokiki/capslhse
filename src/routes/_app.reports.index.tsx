@@ -10,7 +10,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useHseReports, TYPE_LABEL, type ReportStatus, type Severity, type ReportType } from "@/lib/hse-store";
+import {
+  useHseReports,
+  LOCATIONS,
+  TYPE_LABEL,
+  type ReportStatus,
+  type Severity,
+  type ReportType,
+} from "@/lib/hse-store";
 import { useSession } from "@/lib/auth-store";
 import { exportReportsToExcel } from "@/lib/hse-export";
 import { SeverityBadge, StatusBadge, TypeBadge } from "@/components/hse/badges";
@@ -37,10 +44,26 @@ function ReportsList() {
   const navigate = Route.useNavigate();
   const isStaff = session?.role === "staff";
   const activeLocation = isStaff ? session?.location : locationParam;
-  const scopedReports = useMemo(
-    () => (activeLocation ? reports.filter((r) => r.location === activeLocation) : reports),
-    [reports, activeLocation],
+ const scopedReports = useMemo(() => {
+  if (!activeLocation) return reports;
+
+  const officialLocations = LOCATIONS.filter(
+    (l) => l !== "Other"
   );
+
+  // If the user clicked the Other card,
+  // return every report that is NOT in the official locations.
+  if (activeLocation === "Other") {
+    return reports.filter(
+      (r) => !officialLocations.includes(r.location)
+    );
+  }
+
+  // Otherwise filter normally.
+  return reports.filter(
+    (r) => r.location === activeLocation
+  );
+}, [reports, activeLocation]);
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<"all" | ReportStatus>("all");
   const [severity, setSeverity] = useState<"all" | Severity>("all");
