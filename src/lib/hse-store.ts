@@ -47,8 +47,16 @@ const LOCATIONS = [
   "CAPSL - Waltersmith",
   "CAPSL - Warri",
   "CAPSL - Oben",
+];
+
+export const LOCATION_GROUPS = [
+  ...LOCATIONS,
   "Other",
 ];
+
+export function getLocationGroup(location: string): string {
+  return LOCATIONS.includes(location) ? location : "Other";
+}
 
 export const PEOPLE = [ " " ];
 

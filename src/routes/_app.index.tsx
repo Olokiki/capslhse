@@ -25,7 +25,12 @@ import {
 } from "recharts";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { LOCATIONS, useHseReports } from "@/lib/hse-store";
+import {
+  LOCATIONS,
+  LOCATION_GROUPS,
+  getLocationGroup,
+  useHseReports,
+} from "@/lib/hse-store";
 import { useSession } from "@/lib/auth-store";
 import { SeverityBadge, StatusBadge, TypeBadge } from "@/components/hse/badges";
 
@@ -130,15 +135,40 @@ function Dashboard() {
   }, [reports]);
 
   const locationStats = useMemo(() => {
-    return LOCATIONS.map((loc) => {
-      const items = reports.filter((r) => r.location === loc);
-      const open = items.filter((r) => r.status !== "closed").length;
-      const critical = items.filter((r) => r.severity === "critical" && r.status !== "closed").length;
-      const closed = items.filter((r) => r.status === "closed").length;
-      const compliance = items.length === 0 ? 100 : Math.round((closed / items.length) * 100);
-      return { loc, open, critical, closed, compliance, total: items.length };
-    });
-  }, [reports]);
+  return LOCATION_GROUPS.map((loc) => {
+    const items = reports.filter(
+      (r) => getLocationGroup(r.location) === loc
+    );
+
+    const open = items.filter(
+      (r) => r.status !== "closed"
+    ).length;
+
+    const critical = items.filter(
+      (r) =>
+        r.severity === "critical" &&
+        r.status !== "closed"
+    ).length;
+
+    const closed = items.filter(
+      (r) => r.status === "closed"
+    ).length;
+
+    const compliance =
+      items.length === 0
+        ? 100
+        : Math.round((closed / items.length) * 100);
+
+    return {
+      loc,
+      open,
+      critical,
+      closed,
+      compliance,
+      total: items.length,
+    };
+  });
+}, [reports]);
 
   const recent = reports.slice(0, 5);
 

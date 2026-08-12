@@ -1,6 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Card } from "@/components/ui/card";
-import { LOCATIONS, useHseReports } from "@/lib/hse-store";
+import {
+  LOCATION_GROUPS,
+  getLocationGroup,
+  useHseReports,
+} from "@/lib/hse-store";
 import { MapPin } from "lucide-react";
 
 export const Route = createFileRoute("/_app/locations")({
@@ -8,7 +12,7 @@ export const Route = createFileRoute("/_app/locations")({
   component: () => {
   const reports = useHseReports();
 
-  const locations = [...LOCATIONS].sort((a, b) =>
+  const locations = [...LOCATION_GROUPS].sort((a, b) =>
     a.localeCompare(b)
   );
 
@@ -26,7 +30,7 @@ export const Route = createFileRoute("/_app/locations")({
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {locations.map((loc) => {
-          const officialLocations = LOCATIONS.filter(
+          const officialLocations = LOCATION_GROUPS.filter(
             (l) => l !== "Other"
           );
 
