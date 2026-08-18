@@ -39,6 +39,8 @@ export const Route = createFileRoute("/_app/documents")({
 
 type DocCategory =
   | "Policy"
+  | "Quality Policy"
+  | "Environmental Policy"
   | "Procedure"
   | "JSA / Risk Assessment"
   | "MSDS / Chemical"
@@ -48,6 +50,7 @@ type DocCategory =
   | "Emergency Response"
   | "Inspection / Audit"
   | "Regulation";
+ 
 
 type DocItem = {
   id: string;
@@ -61,6 +64,7 @@ type DocItem = {
   size: string;
   pinned?: boolean;
   description: string;
+  fileUrl?: string;
 };
 
 const CATEGORY_META: Record<
@@ -68,6 +72,8 @@ const CATEGORY_META: Record<
   { icon: typeof ShieldCheck; tone: string }
 > = {
   Policy: { icon: ShieldCheck, tone: "text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40" },
+  "Quality Policy": { icon: ShieldCheck, tone: "text-blue-600 bg-blue-50 dark:bg-blue-950/40",},
+   "Environmental Policy": {icon: Leaf, tone: "text-green-700 bg-green-50 dark:bg-green-950/40",},
   Procedure: { icon: ClipboardCheck, tone: "text-sky-600 bg-sky-50 dark:bg-sky-950/40" },
   "JSA / Risk Assessment": { icon: HardHat, tone: "text-amber-600 bg-amber-50 dark:bg-amber-950/40" },
   "MSDS / Chemical": { icon: Flame, tone: "text-rose-600 bg-rose-50 dark:bg-rose-950/40" },
@@ -89,11 +95,42 @@ const DOCS: DocItem[] = [
     updated: "2026-04-10",
     owner: "HSE Director",
     format: "PDF",
-    size: "412 KB",
+    size: "162 KB",
     pinned: true,
     description:
       "Corporate commitment to zero harm, environmental stewardship and regulatory compliance across all CAPSL operations.",
+    fileUrl: "https://widqqskijkutckwgxskd.supabase.co/storage/v1/object/public/hse-documents/hse-policy/CAPSL%20HSE%20POLICY.pdf",
+    },
+  {
+  id: "qms-pol-001",
+  title: "CAPSL QMS Policy Statement",
+  category: "Quality Policy",
+  code: "QMS-POL-001",
+  version: "v1.0",
+  updated: "2025-01-01",
+  owner: "MD/CEO",
+  format: "PDF",
+  size: "190 KB",
+  pinned: false,
+  description:
+    "CAPSL's commitment to delivering reliable, high-quality energy infrastructure equipment and services while maintaining regulatory compliance and continual improvement in accordance with ISO 9001:2015.",
+  fileUrl: "https://widqqskijkutckwgxskd.supabase.co/storage/v1/object/public/hse-documents/quality-policy/CAPSL%20QMS%20POLICY%20STATEMENT.pdf",  
   },
+  {
+  id: "env-pol-001",
+  title: "CAPSL Environmental Policy",
+  category: "Environmental Policy",
+  code: "CAPSL/EMS/EP_OBJ/001",
+  version: "v1.0",
+  updated: "2025-01-01",
+  owner: "MD/CEO",
+  format: "PDF",
+  size: "183 KB",
+  pinned: false,
+  description:
+    "CAPSL's commitment to sustainable environmental practices, pollution prevention, waste minimization, efficient use of energy and resources, and continual improvement in accordance with ISO 14001:2015.",
+  fileUrl: " https://widqqskijkutckwgxskd.supabase.co/storage/v1/object/public/hse-documents/environmental-policy/CAPSL%20ENVIRONMENTAL%20POLICY.pdf",
+},
   {
     id: "pol-002",
     title: "Drug & Alcohol Policy",
@@ -481,22 +518,15 @@ function DocCard({ doc }: { doc: DocItem }) {
   const meta = CATEGORY_META[doc.category];
   const Icon = meta.icon;
 
-  function handleAction(action: "view" | "download") {
-    // Demo behaviour — wire up to real storage when backend is live.
-    const msg =
-      action === "view"
-        ? `Opening ${doc.code} — ${doc.title} (${doc.format}, ${doc.size}).`
-        : `Downloading ${doc.code} — ${doc.title} (${doc.format}, ${doc.size}).`;
-    // eslint-disable-next-line no-alert
-    alert(msg);
-  }
-
   return (
     <Card className="group flex flex-col gap-3 p-5 transition-shadow hover:shadow-elegant">
       <div className="flex items-start justify-between gap-3">
-        <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${meta.tone}`}>
+        <div
+          className={`flex h-10 w-10 items-center justify-center rounded-lg ${meta.tone}`}
+        >
           <Icon className="h-5 w-5" />
         </div>
+
         <Badge variant="outline" className="text-[10px] font-semibold">
           {doc.format} · {doc.size}
         </Badge>
@@ -506,45 +536,101 @@ function DocCard({ doc }: { doc: DocItem }) {
         <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
           {doc.category}
         </div>
-        <h3 className="mt-1 text-base font-semibold leading-snug text-foreground">{doc.title}</h3>
-        <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{doc.description}</p>
+
+        <h3 className="mt-1 text-base font-semibold leading-snug text-foreground">
+          {doc.title}
+        </h3>
+
+        <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+          {doc.description}
+        </p>
       </div>
 
       <div className="grid grid-cols-2 gap-2 rounded-lg bg-secondary/50 px-3 py-2 text-[11px]">
         <div>
           <div className="text-muted-foreground">Code</div>
-          <div className="font-mono font-semibold text-foreground">{doc.code}</div>
+          <div className="font-mono font-semibold text-foreground">
+            {doc.code}
+          </div>
         </div>
+
         <div>
           <div className="text-muted-foreground">Version</div>
-          <div className="font-semibold text-foreground">{doc.version}</div>
+          <div className="font-semibold text-foreground">
+            {doc.version}
+          </div>
         </div>
+
         <div>
           <div className="text-muted-foreground">Owner</div>
-          <div className="font-semibold text-foreground">{doc.owner}</div>
+          <div className="font-semibold text-foreground">
+            {doc.owner}
+          </div>
         </div>
+
         <div>
           <div className="text-muted-foreground">Updated</div>
-          <div className="font-semibold text-foreground">{doc.updated}</div>
+          <div className="font-semibold text-foreground">
+            {doc.updated}
+          </div>
         </div>
       </div>
 
       <div className="mt-auto flex gap-2 pt-1">
-        <Button
-          size="sm"
-          variant="outline"
-          className="flex-1 rounded-full"
-          onClick={() => handleAction("view")}
-        >
-          <ExternalLink className="mr-1.5 h-3.5 w-3.5" /> View
-        </Button>
-        <Button
-          size="sm"
-          className="flex-1 rounded-full"
-          onClick={() => handleAction("download")}
-        >
-          <Download className="mr-1.5 h-3.5 w-3.5" /> Download
-        </Button>
+        {/* VIEW */}
+        {doc.fileUrl ? (
+          <Button
+            size="sm"
+            variant="outline"
+            className="flex-1 rounded-full"
+            asChild
+          >
+            <a
+              href={doc.fileUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
+              View
+            </a>
+          </Button>
+        ) : (
+          <Button
+            size="sm"
+            variant="outline"
+            className="flex-1 rounded-full"
+            disabled
+          >
+            <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
+            View
+          </Button>
+        )}
+
+        {/* DOWNLOAD */}
+        {doc.fileUrl ? (
+          <Button
+            size="sm"
+            className="flex-1 rounded-full"
+            asChild
+          >
+            <a
+              href={`${doc.fileUrl}?download`}
+              download
+            >
+              <Download className="mr-1.5 h-3.5 w-3.5" />
+              Download
+            </a>
+          </Button>
+        ) : (
+          <Button
+            size="sm"
+            className="flex-1 rounded-full"
+            disabled
+          >
+            <Download className="mr-1.5 h-3.5 w-3.5" />
+            Download
+          </Button>
+        )}
       </div>
     </Card>
   );

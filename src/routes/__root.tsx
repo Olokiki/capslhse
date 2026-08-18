@@ -91,11 +91,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/5b3bc08c-5e77-4999-95a7-aac1e3ecaece" },
     ],
     links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
-    ],
+  {
+    rel: "stylesheet",
+    href: appCss,
+  },
+  {
+    rel: "icon",
+    type: "image/png",
+    href: "/logo.png",
+  },
+],
   }),
   shellComponent: RootShell,
   component: RootComponent,
