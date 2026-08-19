@@ -131,6 +131,7 @@ const DOCS: DocItem[] = [
     "CAPSL's commitment to sustainable environmental practices, pollution prevention, waste minimization, efficient use of energy and resources, and continual improvement in accordance with ISO 14001:2015.",
   fileUrl: " https://widqqskijkutckwgxskd.supabase.co/storage/v1/object/public/hse-documents/environmental-policy/CAPSL%20ENVIRONMENTAL%20POLICY.pdf",
 },
+/*
   {
     id: "pol-002",
     title: "Drug & Alcohol Policy",
@@ -143,6 +144,7 @@ const DOCS: DocItem[] = [
     size: "286 KB",
     description: "Zero-tolerance framework, testing protocol and rehabilitation pathway for all personnel and contractors.",
   },
+  */
   {
     id: "proc-010",
     title: "Permit to Work System Procedure",
@@ -152,10 +154,12 @@ const DOCS: DocItem[] = [
     updated: "2026-02-18",
     owner: "HSE Manager",
     format: "PDF",
-    size: "1.2 MB",
+    size: "4.04 MB",
     pinned: true,
     description: "End-to-end PTW workflow covering hot work, confined space, working at height and energy isolation.",
+    fileUrl: "https://widqqskijkutckwgxskd.supabase.co/storage/v1/object/public/hse-documents/permit-to-work/CAPSL%20PERMIT%20TO%20WORK.pdf",
   },
+  /*
   {
     id: "proc-014",
     title: "Lockout / Tagout (LOTO) Procedure",
@@ -216,6 +220,7 @@ const DOCS: DocItem[] = [
     size: "604 KB",
     description: "Flammability, toxicity and emergency response for methanol injection systems.",
   },
+  */
   {
     id: "ptw-201",
     title: "Hot Work Permit Template",
@@ -253,6 +258,7 @@ const DOCS: DocItem[] = [
     pinned: true,
     description: "Mandatory induction covering site rules, PPE, alarms, muster points and reporting.",
   },
+  /*
   {
     id: "trn-310",
     title: "H2S Awareness & Escape",
@@ -289,9 +295,10 @@ const DOCS: DocItem[] = [
     size: "112 KB",
     description: "Hydration, work-rest cycles and early symptom recognition for hot weather operations.",
   },
+  */
   {
     id: "emr-501",
-    title: "Emergency Response Plan — Egbaoma Gas Plant",
+    title: "Emergency Response Plan",
     category: "Emergency Response",
     code: "ERP-EGB-501",
     version: "v3.2",
@@ -302,6 +309,7 @@ const DOCS: DocItem[] = [
     pinned: true,
     description: "Site-specific response for fire, gas release, medical and security events including muster maps.",
   },
+  /*
   {
     id: "emr-505",
     title: "Spill Response & Containment Procedure",
@@ -314,6 +322,7 @@ const DOCS: DocItem[] = [
     size: "780 KB",
     description: "First-line containment, reporting timelines and environmental restoration steps.",
   },
+  */
   {
     id: "ins-601",
     title: "Monthly HSE Inspection Checklist",
@@ -338,6 +347,7 @@ const DOCS: DocItem[] = [
     size: "1.1 MB",
     description: "Audit programme, scoring rubric and non-conformance close-out tracking.",
   },
+  /*
   {
     id: "reg-701",
     title: "DPR EGASPIN — Environmental Guidelines",
@@ -350,6 +360,7 @@ const DOCS: DocItem[] = [
     size: "3.6 MB",
     description: "Department of Petroleum Resources environmental guidelines for petroleum operations in Nigeria.",
   },
+  */
   {
     id: "reg-702",
     title: "ISO 45001:2018 — OH&S Management Systems",
@@ -419,8 +430,8 @@ function DocumentsPage() {
             <BookOpen className="h-7 w-7 text-primary" /> HSE Documents & Materials
           </h1>
           <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-            Controlled library of CAPSL policies, procedures, JSAs, MSDS sheets, permits, training and toolbox talks. All
-            documents are version-controlled and aligned to ISO 45001, ISO 14001 and DPR EGASPIN.
+            Controlled library of CAPSL policies, procedures, JSAs, permits, training and toolbox talks. All
+            documents are version-controlled and aligned to ISO 45001, ISO 14001 and ISO 9001.
           </p>
         </div>
         <div className="flex gap-2">
