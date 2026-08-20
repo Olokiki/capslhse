@@ -97,7 +97,7 @@ function SidebarContent({
           );
         })}
       </nav>
-
+{/*
       <div className="m-3 rounded-xl border border-sidebar-border bg-sidebar-accent/40 p-4">
         <div className="flex items-center gap-2 text-xs font-semibold text-sidebar-foreground">
           <Sparkles className="h-4 w-4 text-[oklch(0.85_0.18_60)]" />
@@ -107,7 +107,7 @@ function SidebarContent({
           Auto-classify reports, suggest root cause and route to the right responder.
         </p>
       </div>
-
+*/}
       <div className="border-t border-sidebar-border p-3">
         <button
           onClick={onSignOut}
