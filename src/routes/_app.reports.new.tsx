@@ -22,6 +22,10 @@ import {
   type ReportType,
   type Severity,
 } from "@/lib/hse-store";
+import {
+  LOCATION_GROUPS,
+  // other imports...
+} from "@/lib/hse-store";
 import { useSession } from "@/lib/auth-store";
 import { ShieldAlert, Sparkles, Upload, MapPin, Lock } from "lucide-react";
 
@@ -185,7 +189,7 @@ function NewReport() {
                 <>
                 <Select value={form.location} onValueChange={(v) => { set("location", v); set("asset", ""); }}>
                   <SelectTrigger className="mt-1.5 h-11"><SelectValue placeholder="CAPSL- your current location" /></SelectTrigger>
-                 <SelectContent> {LOCATIONS.map((l) => (
+                 <SelectContent> {LOCATION_GROUPS.map((l) => (
                 <SelectItem
                  key={l}
                   value={l === "Other" ? "__other__" : l} > {l} </SelectItem>))}

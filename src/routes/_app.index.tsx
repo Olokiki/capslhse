@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   AlertTriangle,
   ShieldCheck,
@@ -68,36 +68,80 @@ function Dashboard() {
     return { open, closed, critical, overdue, daysSinceIncident, total: reports.length };
   }, [reports]);
 
-  const trend = useMemo(() => {
+ const [trendRange, setTrendRange] = useState<
+  "1day" | "7days" | "30days" | "custom">("30days");
 
-  const months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
+const [customFrom, setCustomFrom] = useState("");
+const [customTo, setCustomTo] = useState("");
 
-  const trendData = months.map((month) => ({
-    month,
-    reports: 0,
-    closed: 0,
-  }));
+const trend = useMemo(() => {
+  const today = new Date();
+  today.setHours(23, 59, 59, 999);
 
-  reports.forEach((report) => {
+  let startDate: Date;
+  let endDate: Date = new Date(today);
 
-    const month = new Date(report.reportedAt).toLocaleString("en-US", {
-      month: "short",
+  if (trendRange === "1day") {
+    startDate = new Date(today);
+    startDate.setHours(0, 0, 0, 0);
+  } else if (trendRange === "7days") {
+    startDate = new Date(today);
+    startDate.setDate(startDate.getDate() - 6);
+    startDate.setHours(0, 0, 0, 0);
+  } else if (trendRange === "30days") {
+    startDate = new Date(today);
+    startDate.setDate(startDate.getDate() - 29);
+    startDate.setHours(0, 0, 0, 0);
+  } else {
+    if (!customFrom || !customTo) {
+      return [];
+    }
+
+    startDate = new Date(`${customFrom}T00:00:00`);
+    endDate = new Date(`${customTo}T23:59:59`);
+  }
+
+  const data: {
+    date: string;
+    displayDate: string;
+    reports: number;
+    closed: number;
+  }[] = [];
+
+  const current = new Date(startDate);
+
+  while (current <= endDate) {
+    const year = current.getFullYear();
+    const month = String(current.getMonth() + 1).padStart(2, "0");
+    const day = String(current.getDate()).padStart(2, "0");
+
+    const dateKey = `${year}-${month}-${day}`;
+
+    data.push({
+      date: dateKey,
+      displayDate: current.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      }),
+      reports: 0,
+      closed: 0,
     });
 
-    const row = trendData.find((m) => m.month === month);
+    current.setDate(current.getDate() + 1);
+  }
+
+  reports.forEach((report) => {
+    const reportDate = new Date(report.reportedAt);
+
+    if (isNaN(reportDate.getTime())) return;
+
+    const year = reportDate.getFullYear();
+    const month = String(reportDate.getMonth() + 1).padStart(2, "0");
+    const day = String(reportDate.getDate()).padStart(2, "0");
+
+    const dateKey = `${year}-${month}-${day}`;
+
+    const row = data.find((item) => item.date === dateKey);
 
     if (!row) return;
 
@@ -106,14 +150,10 @@ function Dashboard() {
     if (report.status === "closed") {
       row.closed++;
     }
-
   });
 
-  return trendData.filter(
-    (m) => m.reports > 0 || m.closed > 0
-  );
-
-}, [reports]);
+  return data;
+}, [reports, trendRange, customFrom, customTo]);
 
   const typeMix = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -211,72 +251,257 @@ function Dashboard() {
       {/* KPI cards row — derived from real report data */}
       <RealKpis reports={reports} />
 
-
       {/* Charts row */}
       <div className="grid gap-4 lg:grid-cols-3">
+
+        {/* Reports Trend */}
         <Card className="p-5 lg:col-span-2">
-          <div className="flex items-start justify-between">
+          <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <h2 className="text-base font-semibold">Reports trend</h2>
-              <p className="text-xs text-muted-foreground">Submitted vs closed over the last 7 months</p>
+              <h2 className="text-base font-semibold">
+                Reports trend
+              </h2>
+
+              <p className="text-xs text-muted-foreground">
+                Submitted vs closed reports by day
+              </p>
             </div>
-            <div className="flex items-center gap-3 text-xs">
-              <Legend color="var(--brand-orange)" label="Submitted" />
-              <Legend color="var(--brand-green)" label="Closed" />
+
+            <div className="flex flex-wrap items-center gap-3">
+              <select
+                value={trendRange}
+                onChange={(e) =>
+                  setTrendRange(
+                    e.target.value as
+                      | "1day"
+                      | "7days"
+                      | "30days"
+                      | "custom"
+                  )
+                }
+                className="h-9 rounded-md border border-border bg-background px-3 text-xs"
+              >
+                <option value="1day">1 day</option>
+                <option value="7days">7 days</option>
+                <option value="30days">30 days</option>
+                <option value="custom">Custom</option>
+              </select>
+
+              <div className="flex items-center gap-3 text-xs">
+                <Legend
+                  color="var(--brand-orange)"
+                  label="Submitted"
+                />
+
+                <Legend
+                  color="var(--brand-green)"
+                  label="Closed"
+                />
+              </div>
             </div>
           </div>
+
+          {/* Custom Date Range */}
+          {trendRange === "custom" && (
+            <div className="mt-4 flex flex-wrap items-end gap-3">
+              <div>
+                <label className="mb-1 block text-xs font-medium text-muted-foreground">
+                  From
+                </label>
+
+                <input
+                  type="date"
+                  value={customFrom}
+                  onChange={(e) => setCustomFrom(e.target.value)}
+                  className="h-9 rounded-md border border-border bg-background px-3 text-xs"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-xs font-medium text-muted-foreground">
+                  To
+                </label>
+
+                <input
+                  type="date"
+                  value={customTo}
+                  onChange={(e) => setCustomTo(e.target.value)}
+                  className="h-9 rounded-md border border-border bg-background px-3 text-xs"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Trend Chart */}
           <div className="mt-4 h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={trend} margin={{ top: 10, right: 12, left: -16, bottom: 0 }}>
+              <AreaChart
+                data={trend}
+                margin={{
+                  top: 10,
+                  right: 12,
+                  left: -16,
+                  bottom: 0,
+                }}
+              >
                 <defs>
-                  <linearGradient id="gOrange" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="var(--brand-orange)" stopOpacity={0.45} />
-                    <stop offset="100%" stopColor="var(--brand-orange)" stopOpacity={0} />
+                  <linearGradient
+                    id="gOrange"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop
+                      offset="0%"
+                      stopColor="var(--brand-orange)"
+                      stopOpacity={0.45}
+                    />
+
+                    <stop
+                      offset="100%"
+                      stopColor="var(--brand-orange)"
+                      stopOpacity={0}
+                    />
                   </linearGradient>
-                  <linearGradient id="gGreen" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="var(--brand-green)" stopOpacity={0.45} />
-                    <stop offset="100%" stopColor="var(--brand-green)" stopOpacity={0} />
+
+                  <linearGradient
+                    id="gGreen"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop
+                      offset="0%"
+                      stopColor="var(--brand-green)"
+                      stopOpacity={0.45}
+                    />
+
+                    <stop
+                      offset="100%"
+                      stopColor="var(--brand-green)"
+                      stopOpacity={0}
+                    />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-                <XAxis dataKey="month" stroke="var(--muted-foreground)" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis stroke="var(--muted-foreground)" fontSize={12} tickLine={false} axisLine={false} />
-                <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid var(--border)" }} />
-                <Area type="monotone" dataKey="reports" stroke="var(--brand-orange)" strokeWidth={2.5} fill="url(#gOrange)" />
-                <Area type="monotone" dataKey="closed" stroke="var(--brand-green)" strokeWidth={2.5} fill="url(#gGreen)" />
+
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="var(--border)"
+                  vertical={false}
+                />
+
+                <XAxis
+                  dataKey="displayDate"
+                  stroke="var(--muted-foreground)"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+
+                <YAxis
+                  stroke="var(--muted-foreground)"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                  allowDecimals={false}
+                />
+
+                <Tooltip
+                  contentStyle={{
+                    borderRadius: 12,
+                    border: "1px solid var(--border)",
+                  }}
+                />
+
+                <Area
+                  type="monotone"
+                  dataKey="reports"
+                  name="Submitted"
+                  stroke="var(--brand-orange)"
+                  strokeWidth={2.5}
+                  fill="url(#gOrange)"
+                />
+
+                <Area
+                  type="monotone"
+                  dataKey="closed"
+                  name="Closed"
+                  stroke="var(--brand-green)"
+                  strokeWidth={2.5}
+                  fill="url(#gGreen)"
+                />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </Card>
 
+        {/* Report Mix */}
         <Card className="p-5">
-          <h2 className="text-base font-semibold">Report mix</h2>
-          <p className="text-xs text-muted-foreground">By type, all sites</p>
+          <h2 className="text-base font-semibold">
+            Report mix
+          </h2>
+
+          <p className="text-xs text-muted-foreground">
+            By type, all sites
+          </p>
+
           <div className="mt-2 h-52 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={typeMix} dataKey="value" innerRadius={50} outerRadius={80} paddingAngle={2}>
-                  {typeMix.map((d, i) => <Cell key={i} fill={d.color} />)}
+                <Pie
+                  data={typeMix}
+                  dataKey="value"
+                  innerRadius={50}
+                  outerRadius={80}
+                  paddingAngle={2}
+                >
+                  {typeMix.map((d, i) => (
+                    <Cell
+                      key={i}
+                      fill={d.color}
+                    />
+                  ))}
                 </Pie>
-                <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid var(--border)" }} />
+
+                <Tooltip
+                  contentStyle={{
+                    borderRadius: 12,
+                    border: "1px solid var(--border)",
+                  }}
+                />
               </PieChart>
             </ResponsiveContainer>
           </div>
+
           <div className="mt-2 space-y-1.5">
             {typeMix.map((d) => (
-              <div key={d.name} className="flex items-center justify-between text-xs">
+              <div
+                key={d.name}
+                className="flex items-center justify-between text-xs"
+              >
                 <span className="flex items-center gap-2">
-                  <span className="h-2.5 w-2.5 rounded-sm" style={{ background: d.color }} />
+                  <span
+                    className="h-2.5 w-2.5 rounded-sm"
+                    style={{ background: d.color }}
+                  />
+
                   {d.name}
                 </span>
-                <span className="font-semibold tabular-nums">{d.value}</span>
+
+                <span className="font-semibold tabular-nums">
+                  {d.value}
+                </span>
               </div>
             ))}
           </div>
         </Card>
-      </div>
 
+      </div>
+      
       {/* Locations grid (Limble-style) — admins only */}
+
       {!isStaff && (
       <Card className="p-5">
         <div className="flex items-center justify-between">
@@ -346,7 +571,7 @@ function Dashboard() {
         </div>
       </Card>
     </div>
-  );
+        );
 }
 
 function HeroStat({ icon, label, value, sub }: { icon: React.ReactNode; label: string; value: string; sub: string }) {

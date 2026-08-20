@@ -335,6 +335,7 @@ const DOCS: DocItem[] = [
     size: "64 KB",
     description: "Standardised walk-down checklist used by site HSE officers and supervisors.",
   },
+  /*
   {
     id: "ins-610",
     title: "Internal HSE Audit Protocol (ISO 45001 aligned)",
@@ -347,6 +348,7 @@ const DOCS: DocItem[] = [
     size: "1.1 MB",
     description: "Audit programme, scoring rubric and non-conformance close-out tracking.",
   },
+  */
   /*
   {
     id: "reg-701",
@@ -361,6 +363,7 @@ const DOCS: DocItem[] = [
     description: "Department of Petroleum Resources environmental guidelines for petroleum operations in Nigeria.",
   },
   */
+ /*
   {
     id: "reg-702",
     title: "ISO 45001:2018 — OH&S Management Systems",
@@ -373,6 +376,7 @@ const DOCS: DocItem[] = [
     size: "1.8 MB",
     description: "International standard for occupational health & safety management systems.",
   },
+  */
 ];
 
 const CATEGORIES: ("All" | DocCategory)[] = [
@@ -430,7 +434,7 @@ function DocumentsPage() {
             <BookOpen className="h-7 w-7 text-primary" /> HSE Documents & Materials
           </h1>
           <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-            Controlled library of CAPSL policies, procedures, JSAs, permits, training and toolbox talks. All
+            Controlled library of CAPSL policies, procedures, JSAs  , permits, training and toolbox talks. All
             documents are version-controlled and aligned to ISO 45001, ISO 14001 and ISO 9001.
           </p>
         </div>

@@ -226,7 +226,14 @@ export async function createReport(input: {
   asset?: string;
   reportedBy: string;
 }): Promise<HseReport> {
-  const ref = newRef();
+  const { count, error: countError } = await supabase
+  .from("hse_reports")
+  .select("*", { count: "exact", head: true });
+
+if (countError) throw countError;
+
+  const ref = `HSE-${String((count ?? 0) + 1).padStart(6, "0")}`;
+
   const { data, error } = await supabase
     .from("hse_reports")
     .insert({
@@ -257,6 +264,7 @@ export async function createReport(input: {
   cache = [report, ...cache];
   notify();
   fetchAll().catch(() => {});
+  
   return report;
 }
 
