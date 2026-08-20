@@ -104,17 +104,45 @@ function ReportsList() {
         </div>
         <div className="flex gap-2">
           <Button
-            variant="outline"
-            className="rounded-full"
-            onClick={() => {
-              if (filtered.length === 0) return toast.error("No reports to export.");
-              const suffix = activeLocation ? `-${activeLocation.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}` : "";
-              exportReportsToExcel(filtered, `hse-reports${suffix}-${new Date().toISOString().slice(0, 10)}.xlsx`);
-              toast.success(`Exported ${filtered.length} report${filtered.length === 1 ? "" : "s"} to Excel`);
-            }}
-          >
-            <Download className="mr-2 h-4 w-4" /> Export Excel
-          </Button>
+  variant="outline"
+  className="rounded-full"
+  onClick={async () => {
+  if (filtered.length === 0) {
+    toast.error("No reports to export.");
+    return;
+  }
+
+  try {
+    const suffix = activeLocation
+      ? `-${activeLocation
+          .replace(/[^a-z0-9]+/gi, "-")
+          .toLowerCase()}`
+      : "";
+
+    await exportReportsToExcel(
+      filtered,
+      `hse-reports${suffix}-${new Date()
+        .toISOString()
+        .slice(0, 10)}.xlsx`,
+    );
+
+    toast.success(
+      `Exported ${filtered.length} report${
+        filtered.length === 1 ? "" : "s"
+      } to Excel`,
+    );
+  } catch (error) {
+    console.error("Excel export failed:", error);
+
+    toast.error(
+      "Unable to export the HSE reports to Excel.",
+    );
+  }
+  }}
+>
+  <Download className="mr-2 h-4 w-4" />
+  Export Excel
+</Button>
           <Button asChild className="rounded-full font-semibold"><Link to="/reports/new"><PlusCircle className="mr-2 h-4 w-4" /> New report</Link></Button>
         </div>
       </div>
