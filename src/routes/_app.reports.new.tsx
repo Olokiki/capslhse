@@ -178,60 +178,57 @@ function NewReport() {
               </Select>
             </div>
             <div>
-              <Label className="text-sm font-semibold">Location <span className="text-destructive">*</span></Label>
-              {isStaff ? (
-                <div className="mt-1.5 flex h-11 items-center gap-2 rounded-md border border-input bg-secondary/60 px-3 text-sm">
-                  <Lock className="h-3.5 w-3.5 text-muted-foreground" />
-                  <MapPin className="h-4 w-4 text-primary" />
-                  <span className="font-medium">{form.location}</span>
-                </div>
-              ) : (
-                <>
-                <Select value={form.location} onValueChange={(v) => { set("location", v); set("asset", ""); }}>
-                  <SelectTrigger className="mt-1.5 h-11"><SelectValue placeholder="CAPSL- your current location" /></SelectTrigger>
-                 <SelectContent> {LOCATION_GROUPS.map((l) => (
-                <SelectItem
-                 key={l}
-                  value={l === "Other" ? "__other__" : l} > {l} </SelectItem>))}
-                </SelectContent>
-                </Select>
-                {form.location === "__other__" && (
-                     <Input
-                      required
-                      value={form.locationOther}
-                      onChange={(e)=> set("locationOther", e.target.value)}
-                      placeholder="CAPSL- your current location"
-                      className="mt-2 h-11"
-                    />
-                  )}
-                  </>
-              )}
-              {isStaff && (
-                <p className="mt-1 text-[11px] text-muted-foreground">Fixed to the site you signed in from.</p>
-              )}
-            </div>
-            <div>
-              <Label className="text-sm font-semibold">Asset <span className="text-destructive">*</span></Label>
-              <Select value={form.asset || undefined} onValueChange={(v) => set("asset", v)}>
-                <SelectTrigger className="mt-1.5 h-11"><SelectValue placeholder="Select asset" /></SelectTrigger>
-                <SelectContent>
-                  {locationAssets.map((a) => <SelectItem key={a} value={a}>{a}</SelectItem>)}
-                  <SelectItem value="other"> Other </SelectItem>
-                </SelectContent>
-              </Select>
-              {form.asset === "other" && (
-                <Input
-                  required
-                  value={form.assetOther}
-                  onChange={(e) => set("assetOther", e.target.value)}
-                  placeholder="Enter asset name / tag"
-                  className="mt-2 h-11"
-                />
-              )}
-            </div>
+
+<Label className="text-sm font-semibold">
+  Location <span className="text-destructive">*</span>
+</Label>
+
+<Select
+  value={form.location}
+  onValueChange={(v) => {
+    set("location", v);
+    set("asset", "");
+
+    if (v !== "__other__") {
+      set("locationOther", "");
+    }
+  }}
+>
+  <SelectTrigger className="mt-1.5 h-11">
+    <SelectValue placeholder="Select location" />
+  </SelectTrigger>
+
+  <SelectContent>
+    {LOCATION_GROUPS.map((l) => (
+      <SelectItem
+        key={l}
+        value={l === "Other" ? "__other__" : l}
+      >
+        {l}
+      </SelectItem>
+    ))}
+  </SelectContent>
+</Select>
+
+{form.location === "__other__" && (
+  <Input
+    required
+    value={form.locationOther}
+    onChange={(e) => set("locationOther", e.target.value)}
+    placeholder="Enter location"
+    className="mt-2 h-11"
+  />
+)}
+
+{isStaff && (
+  <p className="mt-1 text-[11px] text-muted-foreground">
+   Select "Other" if the report occurred at another location.
+  </p>
+)}
+</div>
             <div className="sm:col-span-2">
               <Label className="text-sm font-semibold">Reported by <span className="text-destructive">*</span></Label>
-              <Input value={form.reportedBy} onChange={(e) => set("reportedBy", e.target.value)} required className="mt-1.5 h-11" />
+              <Input value={form.reportedBy} onChange={(e) => set("reportedBy", e.target.value)} required readOnly className="bg-muted cursor-not-allowed" />
             </div>
           </div>
 

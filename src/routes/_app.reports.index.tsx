@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select";
 import {
   useHseReports,
-  LOCATIONS,
+  LOCATION_GROUPS,
   TYPE_LABEL,
   type ReportStatus,
   type Severity,
@@ -23,6 +23,7 @@ import { exportReportsToExcel } from "@/lib/hse-export";
 import { SeverityBadge, StatusBadge, TypeBadge } from "@/components/hse/badges";
 import { Search, Filter, Download, PlusCircle, MapPin } from "lucide-react";
 import { toast } from "sonner";
+
 
 export const Route = createFileRoute("/_app/reports/")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -47,7 +48,7 @@ function ReportsList() {
  const scopedReports = useMemo(() => {
   if (!activeLocation) return reports;
 
-  const officialLocations = LOCATIONS.filter(
+  const officialLocations = LOCATION_GROUPS.filter(
     (l) => l !== "Other"
   );
 
