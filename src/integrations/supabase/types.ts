@@ -71,6 +71,7 @@ export type Database = {
           title: string
           type: string
           updated_at: string
+          evidence_url: string | null
         }
         Insert: {
           asset?: string | null
@@ -93,6 +94,7 @@ export type Database = {
           title: string
           type: string
           updated_at?: string
+          evidence_url?: string | null
         }
         Update: {
           asset?: string | null
@@ -115,6 +117,7 @@ export type Database = {
           title?: string
           type?: string
           updated_at?: string
+          evidence_url?: string | null
         }
         Relationships: []
       }

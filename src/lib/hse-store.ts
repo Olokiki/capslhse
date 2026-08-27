@@ -29,6 +29,7 @@ export type HseReport = {
   location: string;
   asset?: string;
   reportedBy: string;
+  evidenceUrl?: string;
   reportedAt: string;
   assignedTo?: string;
   assignedEmail?: string;
@@ -94,6 +95,7 @@ type ReportRow = {
   corrective_action: string | null;
   closed_at: string | null;
   closed_by: string | null;
+  evidence_url: string | null;
 };
 
 type ActivityRow = {
@@ -114,8 +116,9 @@ function rowToReport(r: ReportRow, activities: ActivityRow[]): HseReport {
     type: r.type as ReportType,
     severity: r.severity as Severity,
     location: r.location,
-    asset: r.asset ?? undefined,
+       asset: r.asset ?? undefined,
     reportedBy: r.reported_by,
+    evidenceUrl: r.evidence_url ?? undefined,
     reportedAt: r.reported_at,
     assignedTo: r.assigned_to ?? undefined,
     assignedEmail: r.assigned_email ?? undefined,
@@ -225,14 +228,23 @@ export async function createReport(input: {
   location: string;
   asset?: string;
   reportedBy: string;
+  evidenceFile?: File | null;
 }): Promise<HseReport> {
-  const { count, error: countError } = await supabase
-  .from("hse_reports")
-  .select("*", { count: "exact", head: true });
+  // ---------------------------------------------------------
+  // GENERATE HSE REFERENCE NUMBER
+  // ---------------------------------------------------------
 
-if (countError) throw countError;
+  const { count, error: countError } = await supabase
+    .from("hse_reports")
+    .select("*", { count: "exact", head: true });
+
+  if (countError) throw countError;
 
   const ref = `HSE-${String((count ?? 0) + 1).padStart(6, "0")}`;
+
+  // ---------------------------------------------------------
+  // CREATE THE REPORT
+  // ---------------------------------------------------------
 
   const { data, error } = await supabase
     .from("hse_reports")
@@ -246,25 +258,103 @@ if (countError) throw countError;
       asset: input.asset ?? null,
       reported_by: input.reportedBy,
       status: "open",
+      evidence_url: null,
     })
     .select("*")
     .single();
+
   if (error) throw error;
+
   const row = data as ReportRow;
+
+  // ---------------------------------------------------------
+  // UPLOAD EVIDENCE FILE
+  // ---------------------------------------------------------
+
+  if (input.evidenceFile) {
+    const file = input.evidenceFile;
+
+    const extension =
+      file.name.split(".").pop()?.toLowerCase() || "file";
+
+    const fileName =
+      `${ref}/${crypto.randomUUID()}.${extension}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("hse-evidence")
+      .upload(fileName, file, {
+        contentType: file.type || "application/octet-stream",
+        upsert: false,
+      });
+
+    if (uploadError) {
+      console.error("Evidence upload failed:", uploadError);
+
+      throw new Error(
+        `Report was created, but the evidence file could not be uploaded: ${uploadError.message}`
+      );
+    }
+
+    // -------------------------------------------------------
+    // GET PUBLIC URL
+    // -------------------------------------------------------
+
+    const { data: publicUrlData } = supabase.storage
+      .from("hse-evidence")
+      .getPublicUrl(fileName);
+
+    const evidenceUrl = publicUrlData.publicUrl;
+
+    // -------------------------------------------------------
+    // SAVE EVIDENCE URL TO THE REPORT
+    // -------------------------------------------------------
+
+    const { error: evidenceUpdateError } = await supabase
+      .from("hse_reports")
+      .update({
+        evidence_url: evidenceUrl,
+      })
+      .eq("id", row.id);
+
+    if (evidenceUpdateError) {
+      console.error(
+        "Could not save evidence URL:",
+        evidenceUpdateError
+      );
+
+      throw evidenceUpdateError;
+    }
+
+    // Keep the local row in sync
+    row.evidence_url = evidenceUrl;
+  }
+
+  // ---------------------------------------------------------
+  // CREATE ACTIVITY LOG
+  // ---------------------------------------------------------
 
   await supabase.from("hse_activities").insert({
     report_id: row.id,
     actor: input.reportedBy,
     kind: "created",
-    message: "Report submitted",
+    message: input.evidenceFile
+      ? "Report submitted with evidence"
+      : "Report submitted",
   });
 
+  // ---------------------------------------------------------
+  // UPDATE LOCAL CACHE
+  // ---------------------------------------------------------
+
   const report = rowToReport(row, []);
+
   // Optimistic prepend so navigation to /$id works immediately.
   cache = [report, ...cache];
+
   notify();
+
   fetchAll().catch(() => {});
-  
+
   return report;
 }
 

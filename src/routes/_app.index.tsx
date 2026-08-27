@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   AlertTriangle,
   ShieldCheck,
@@ -26,6 +26,7 @@ import {
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
+  TYPE_LABEL,
   LOCATIONS,
   LOCATION_GROUPS,
   getLocationGroup,
@@ -73,6 +74,50 @@ function Dashboard() {
 
 const [customFrom, setCustomFrom] = useState("");
 const [customTo, setCustomTo] = useState("");
+
+  // Report Mix date range
+  const [reportMixRange, setReportMixRange] = useState<
+    "1day" | "7days" | "30days"
+  >("30days");
+
+  const [reportMixDate, setReportMixDate] = useState("");
+
+  const reportMixDates = useMemo(() => {
+    const dates: string[] = [];
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const numberOfDays =
+      reportMixRange === "1day"
+        ? 1
+        : reportMixRange === "7days"
+          ? 7
+          : 30;
+
+    for (let i = 0; i < numberOfDays; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() - i);
+
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+
+      dates.push(`${year}-${month}-${day}`);
+    }
+
+    return dates;
+  }, [reportMixRange]);
+
+  useEffect(() => {
+    if (reportMixDates.length > 0) {
+      setReportMixDate((current) =>
+        current && reportMixDates.includes(current)
+          ? current
+          : reportMixDates[0],
+      );
+    }
+  }, [reportMixDates]);
 
 const trend = useMemo(() => {
   const today = new Date();
@@ -173,6 +218,41 @@ const trend = useMemo(() => {
       color: colors[i % colors.length],
     }));
   }, [reports]);
+
+    const selectedReportMix = useMemo(() => {
+    if (!reportMixDate) {
+      return typeMix;
+    }
+
+    return typeMix.map((item) => {
+      const count = reports.filter((report) => {
+        const reportDate = new Date(report.reportedAt);
+
+        if (isNaN(reportDate.getTime())) {
+          return false;
+        }
+
+        const year = reportDate.getFullYear();
+        const month = String(reportDate.getMonth() + 1).padStart(2, "0");
+        const day = String(reportDate.getDate()).padStart(2, "0");
+
+        const dateKey = `${year}-${month}-${day}`;
+
+        const reportType =
+          TYPE_LABEL[report.type] ?? report.type;
+
+        return (
+          dateKey === reportMixDate &&
+          reportType === item.name
+        );
+      }).length;
+
+      return {
+        ...item,
+        value: count,
+      };
+    });
+  }, [reports, typeMix, reportMixDate]);
 
   const locationStats = useMemo(() => {
   return LOCATION_GROUPS.map((loc) => {
@@ -436,30 +516,113 @@ const trend = useMemo(() => {
             </ResponsiveContainer>
           </div>
         </Card>
-
-        {/* Report Mix */}
+               {/* Report Mix */}
         <Card className="p-5">
-          <h2 className="text-base font-semibold">
-            Report mix
-          </h2>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h2 className="text-base font-semibold">
+                Report mix
+              </h2>
 
-          <p className="text-xs text-muted-foreground">
-            By type, all sites
-          </p>
+              <p className="text-xs text-muted-foreground">
+                By type, all sites
+              </p>
+            </div>
 
+            <select
+              value={reportMixRange}
+              onChange={(e) =>
+                setReportMixRange(
+                  e.target.value as "1day" | "7days" | "30days"
+                )
+              }
+              className="h-9 rounded-md border border-border bg-background px-3 text-xs"
+            >
+              <option value="1day">1 day</option>
+              <option value="7days">7 days</option>
+              <option value="30days">30 days</option>
+            </select>
+          </div>
+
+          {/* Date navigation */}
+          <div className="mt-3 flex items-center justify-center gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="h-8 w-8 rounded-full p-0"
+              disabled={
+                reportMixDates.length === 0 ||
+                reportMixDates.indexOf(reportMixDate) >=
+                  reportMixDates.length - 1
+              }
+              onClick={() => {
+                const currentIndex =
+                  reportMixDates.indexOf(reportMixDate);
+
+                if (
+                  currentIndex >= 0 &&
+                  currentIndex < reportMixDates.length - 1
+                ) {
+                  setReportMixDate(
+                    reportMixDates[currentIndex + 1]
+                  );
+                }
+              }}
+            >
+              ‹
+            </Button>
+
+            <span className="min-w-[130px] text-center text-xs font-medium">
+              {reportMixDate
+                ? new Date(
+                    `${reportMixDate}T00:00:00`
+                  ).toLocaleDateString("en-US", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })
+                : "No date"}
+            </span>
+
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="h-8 w-8 rounded-full p-0"
+              disabled={
+                reportMixDates.length === 0 ||
+                reportMixDates.indexOf(reportMixDate) <= 0
+              }
+              onClick={() => {
+                const currentIndex =
+                  reportMixDates.indexOf(reportMixDate);
+
+                if (currentIndex > 0) {
+                  setReportMixDate(
+                    reportMixDates[currentIndex - 1]
+                  );
+                }
+              }}
+            >
+              ›
+            </Button>
+          </div>
+
+          {/* Pie Chart */}
           <div className="mt-2 h-52 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
-                  data={typeMix}
+                  data={selectedReportMix}
                   dataKey="value"
                   innerRadius={50}
                   outerRadius={80}
                   paddingAngle={2}
                 >
-                  {typeMix.map((d, i) => (
+                  {selectedReportMix.map((d, i) => (
                     <Cell
-                      key={i}
+                      key={`${d.name}-${i}`}
                       fill={d.color}
                     />
                   ))}
@@ -475,8 +638,9 @@ const trend = useMemo(() => {
             </ResponsiveContainer>
           </div>
 
+          {/* Legend */}
           <div className="mt-2 space-y-1.5">
-            {typeMix.map((d) => (
+            {selectedReportMix.map((d) => (
               <div
                 key={d.name}
                 className="flex items-center justify-between text-xs"
@@ -484,7 +648,9 @@ const trend = useMemo(() => {
                 <span className="flex items-center gap-2">
                   <span
                     className="h-2.5 w-2.5 rounded-sm"
-                    style={{ background: d.color }}
+                    style={{
+                      background: d.color,
+                    }}
                   />
 
                   {d.name}
@@ -499,100 +665,197 @@ const trend = useMemo(() => {
         </Card>
 
       </div>
-      
-      {/* Locations grid (Limble-style) — admins only */}
 
+      {/* Locations grid (Limble-style) — admins only */}
       {!isStaff && (
-      <Card className="p-5">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-base font-semibold">Locations – HSE status</h2>
-            <p className="text-xs text-muted-foreground">Open reports & close-out compliance by site</p>
-          </div>
-        </div>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {locationStats.map((s) => (
-            <div key={s.loc} className="group rounded-xl border border-border bg-card p-4 transition-all hover:border-primary/40 hover:shadow-card">
-              <div className="flex items-start justify-between">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-primary">
-                  <MapPin className="h-5 w-5" />
-                </div>
-                {s.critical > 0 ? (
-                  <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-[10px] font-bold uppercase text-destructive">{s.critical} critical</span>
-                ) : (
-                  <span className="rounded-full bg-success/10 px-2 py-0.5 text-[10px] font-bold uppercase text-success">Healthy</span>
-                )}
-              </div>
-              <div className="mt-3 text-sm font-bold uppercase tracking-tight text-foreground">{s.loc.replace("CAPSL - ", "")}</div>
-              <div className="mt-1 text-xs text-muted-foreground">{s.open} open · {s.closed} closed</div>
-              <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-secondary">
-                <div className="h-full rounded-full bg-success" style={{ width: `${s.compliance}%` }} />
-              </div>
-              <div className="mt-1 flex items-center justify-between text-[11px]">
-                <span className="text-muted-foreground">Close-out</span>
-                <span className="font-semibold text-success">{s.compliance}%</span>
-              </div>
+        <Card className="p-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-base font-semibold">
+                Locations – HSE status
+              </h2>
+
+              <p className="text-xs text-muted-foreground">
+                Open reports & close-out compliance by site
+              </p>
             </div>
-          ))}
-        </div>
-      </Card>
+          </div>
+
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {locationStats.map((s) => (
+              <div
+                key={s.loc}
+                className="group rounded-xl border border-border bg-card p-4 transition-all hover:border-primary/40 hover:shadow-card"
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-primary">
+                    <MapPin className="h-5 w-5" />
+                  </div>
+
+                  {s.critical > 0 ? (
+                    <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-[10px] font-bold uppercase text-destructive">
+                      {s.critical} critical
+                    </span>
+                  ) : (
+                    <span className="rounded-full bg-success/10 px-2 py-0.5 text-[10px] font-bold uppercase text-success">
+                      Healthy
+                    </span>
+                  )}
+                </div>
+
+                <div className="mt-3 text-sm font-bold uppercase tracking-tight text-foreground">
+                  {s.loc.replace("CAPSL - ", "")}
+                </div>
+
+                <div className="mt-1 text-xs text-muted-foreground">
+                  {s.open} open · {s.closed} closed
+                </div>
+
+                <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-secondary">
+                  <div
+                    className="h-full rounded-full bg-success"
+                    style={{ width: `${s.compliance}%` }}
+                  />
+                </div>
+
+                <div className="mt-1 flex items-center justify-between text-[11px]">
+                  <span className="text-muted-foreground">
+                    Close-out
+                  </span>
+
+                  <span className="font-semibold text-success">
+                    {s.compliance}%
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
       )}
 
       {/* Recent reports */}
       <Card className="p-5">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-base font-semibold">Recent HSE reports</h2>
-            <p className="text-xs text-muted-foreground">Latest activity across all sites</p>
+            <h2 className="text-base font-semibold">
+              Recent HSE reports
+            </h2>
+
+            <p className="text-xs text-muted-foreground">
+              Latest activity across all sites
+            </p>
           </div>
-          <Link to="/reports" search = {{location: undefined}} className="text-xs font-semibold text-primary hover:underline">View all →</Link>
+
+          <Link
+            to="/reports"
+            search={{ location: undefined }}
+            className="text-xs font-semibold text-primary hover:underline"
+          >
+            View all →
+          </Link>
         </div>
+
         <div className="mt-4 divide-y divide-border">
           {recent.map((r) => (
-            <Link key={r.id} to="/reports/$id" params={{ id: r.id }} className="flex items-start gap-4 py-3 transition-colors hover:bg-secondary/50">
+            <Link
+              key={r.id}
+              to="/reports/$id"
+              params={{ id: r.id }}
+              className="flex items-start gap-4 py-3 transition-colors hover:bg-secondary/50"
+            >
               <div className="flex h-10 w-10 flex-none items-center justify-center rounded-lg bg-secondary">
                 <Activity className="h-5 w-5 text-muted-foreground" />
               </div>
+
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-xs font-mono text-muted-foreground">{r.ref}</span>
+                  <span className="text-xs font-mono text-muted-foreground">
+                    {r.ref}
+                  </span>
+
                   <SeverityBadge s={r.severity} />
                   <StatusBadge s={r.status} />
                   <TypeBadge t={r.type} />
                 </div>
-                <div className="mt-1 truncate text-sm font-semibold text-foreground">{r.title}</div>
+
+                <div className="mt-1 truncate text-sm font-semibold text-foreground">
+                  {r.title}
+                </div>
+
                 <div className="mt-0.5 truncate text-xs text-muted-foreground">
-                  {r.location} · reported by {r.reportedBy} · {new Date(r.reportedAt).toLocaleDateString()}
+                  {r.location} · reported by {r.reportedBy} ·{" "}
+                  {new Date(r.reportedAt).toLocaleDateString()}
                 </div>
               </div>
+
               <ArrowUpRight className="h-4 w-4 flex-none text-muted-foreground" />
             </Link>
           ))}
         </div>
       </Card>
     </div>
-        );
+  );
 }
 
-function HeroStat({ icon, label, value, sub }: { icon: React.ReactNode; label: string; value: string; sub: string }) {
+function HeroStat({
+  icon,
+  label,
+  value,
+  sub,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  sub: string;
+}) {
   return (
     <div>
       <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-white/85">
         {icon} {label}
       </div>
-      <div className="mt-2 text-4xl font-bold tabular-nums">{value}</div>
-      <div className="mt-1 text-xs text-white/75">{sub}</div>
+
+      <div className="mt-2 text-4xl font-bold tabular-nums">
+        {value}
+      </div>
+
+      <div className="mt-1 text-xs text-white/75">
+        {sub}
+      </div>
     </div>
   );
 }
 
-function MiniStat({ label, value, delta, good, icon }: { label: string; value: string; delta: string; good?: boolean; icon: React.ReactNode }) {
+function MiniStat({
+  label,
+  value,
+  delta,
+  good,
+  icon,
+}: {
+  label: string;
+  value: string;
+  delta: string;
+  good?: boolean;
+  icon: React.ReactNode;
+}) {
   return (
     <Card className="p-4">
-      <div className="text-xs font-medium text-muted-foreground">{label}</div>
+      <div className="text-xs font-medium text-muted-foreground">
+        {label}
+      </div>
+
       <div className="mt-2 flex items-baseline gap-2">
-        <span className="text-2xl font-bold tabular-nums">{value}</span>
-        <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${good ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
+        <span className="text-2xl font-bold tabular-nums">
+          {value}
+        </span>
+
+        <span
+          className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+            good
+              ? "bg-success/10 text-success"
+              : "bg-destructive/10 text-destructive"
+          }`}
+        >
           {icon} {delta}
         </span>
       </div>
@@ -600,42 +863,99 @@ function MiniStat({ label, value, delta, good, icon }: { label: string; value: s
   );
 }
 
-function Legend({ color, label }: { color: string; label: string }) {
+function Legend({
+  color,
+  label,
+}: {
+  color: string;
+  label: string;
+}) {
   return (
     <span className="inline-flex items-center gap-1.5 text-muted-foreground">
-      <span className="h-2.5 w-2.5 rounded-sm" style={{ background: color }} /> {label}
+      <span
+        className="h-2.5 w-2.5 rounded-sm"
+        style={{ background: color }}
+      />
+      {label}
     </span>
   );
 }
 
 // Real KPIs derived from the actual reports the users have submitted.
-function RealKpis({ reports }: { reports: ReturnType<typeof useHseReports> }) {
+function RealKpis({
+  reports,
+}: {
+  reports: ReturnType<typeof useHseReports>;
+}) {
   const now = Date.now();
-  
-  const in12mo = reports.filter((r) => now - new Date(r.reportedAt).getTime() < 365 * 86400000);
-  const in3mo = reports.filter((r) => now - new Date(r.reportedAt).getTime() < 90 * 86400000);
+
+  const in12mo = reports.filter(
+    (r) =>
+      now - new Date(r.reportedAt).getTime() <
+      365 * 86400000
+  );
+
+  const in3mo = reports.filter(
+    (r) =>
+      now - new Date(r.reportedAt).getTime() <
+      90 * 86400000
+  );
+
   const prev3mo = reports.filter((r) => {
-    const age = now - new Date(r.reportedAt).getTime();
-    return age >= 90 * 86400000 && age < 180 * 86400000;
+    const age =
+      now - new Date(r.reportedAt).getTime();
+
+    return (
+      age >= 90 * 86400000 &&
+      age < 180 * 86400000
+    );
   });
 
-  const recordable12 = in12mo.filter((r) => r.type === "incident" || r.type === "injury").length;
-  const lostTime12 = in12mo.filter((r) => r.type === "injury").length;
+  const recordable12 = in12mo.filter(
+    (r) =>
+      r.type === "incident" ||
+      r.type === "injury"
+  ).length;
 
-  const closed = reports.filter((r) => r.status === "closed" && r.closedAt);
+  const lostTime12 = in12mo.filter(
+    (r) => r.type === "injury"
+  ).length;
+
+  const closed = reports.filter(
+    (r) =>
+      r.status === "closed" &&
+      r.closedAt
+  );
+
   const avgCloseDays =
     closed.length === 0
       ? 0
       : closed.reduce(
           (sum, r) =>
-            sum + (new Date(r.closedAt!).getTime() - new Date(r.reportedAt).getTime()) / 86400000,
-          0,
+            sum +
+            (new Date(r.closedAt!).getTime() -
+              new Date(r.reportedAt).getTime()) /
+              86400000,
+          0
         ) / closed.length;
 
-  const closeRate = reports.length === 0 ? 0 : (reports.filter((r) => r.status === "closed").length / reports.length) * 100;
+  const closeRate =
+    reports.length === 0
+      ? 0
+      : (reports.filter(
+          (r) => r.status === "closed"
+        ).length /
+          reports.length) *
+        100;
 
-  const delta3mo = in3mo.length - prev3mo.length;
-  const deltaLabel = delta3mo === 0 ? "±0" : (delta3mo > 0 ? "+" : "") + delta3mo;
+  const delta3mo =
+    in3mo.length - prev3mo.length;
+
+  const deltaLabel =
+    delta3mo === 0
+      ? "±0"
+      : (delta3mo > 0 ? "+" : "") +
+        delta3mo;
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -644,30 +964,64 @@ function RealKpis({ reports }: { reports: ReturnType<typeof useHseReports> }) {
         value={String(recordable12)}
         delta={`${deltaLabel} vs prev 3 mo`}
         good={delta3mo <= 0}
-        icon={delta3mo <= 0 ? <TrendingDown className="h-4 w-4" /> : <TrendingUp className="h-4 w-4" />}
+        icon={
+          delta3mo <= 0 ? (
+            <TrendingDown className="h-4 w-4" />
+          ) : (
+            <TrendingUp className="h-4 w-4" />
+          )
+        }
       />
+
       <MiniStat
         label="Lost-Time Injuries (12 mo)"
         value={String(lostTime12)}
-        delta={lostTime12 === 0 ? "no injuries" : `${lostTime12} logged`}
+        delta={
+          lostTime12 === 0
+            ? "no injuries"
+            : `${lostTime12} logged`
+        }
         good={lostTime12 === 0}
-        icon={lostTime12 === 0 ? <TrendingDown className="h-4 w-4" /> : <TrendingUp className="h-4 w-4" />}
+        icon={
+          lostTime12 === 0 ? (
+            <TrendingDown className="h-4 w-4" />
+          ) : (
+            <TrendingUp className="h-4 w-4" />
+          )
+        }
       />
+
       <MiniStat
         label="Avg. Close-out Time"
-        value={closed.length === 0 ? "—" : `${avgCloseDays.toFixed(1)}d`}
+        value={
+          closed.length === 0
+            ? "—"
+            : `${avgCloseDays.toFixed(1)}d`
+        }
         delta={`${closed.length} closed`}
-        good
-        icon={<TrendingDown className="h-4 w-4" />}
+        good={true}
+        icon={
+          <TrendingDown className="h-4 w-4" />
+        }
       />
+
       <MiniStat
         label="Close-out Rate"
-        value={reports.length === 0 ? "—" : `${Math.round(closeRate)}%`}
+        value={
+          reports.length === 0
+            ? "—"
+            : `${Math.round(closeRate)}%`
+        }
         delta={`${reports.length} total`}
         good={closeRate >= 60}
-        icon={closeRate >= 60 ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
+        icon={
+          closeRate >= 60 ? (
+            <TrendingUp className="h-4 w-4" />
+          ) : (
+            <TrendingDown className="h-4 w-4" />
+          )
+        }
       />
     </div>
   );
 }
-
