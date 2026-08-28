@@ -64,6 +64,7 @@ export const PEOPLE = [ " " ];
 export const ASSETS_BY_LOCATION: Record<string, string[]> = {
   "CAPSL - Egbaoma": ["Unit A", "Unit B"],
   "CAPSL - Oben": ["C501", "C502", "C503", "C504"],
+
 };
 
 export function assetsForLocation(location: string): string[] {

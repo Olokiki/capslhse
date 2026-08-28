@@ -34,6 +34,8 @@ import {
 } from "@/lib/hse-store";
 import { useSession } from "@/lib/auth-store";
 import { SeverityBadge, StatusBadge, TypeBadge } from "@/components/hse/badges";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/_app/")({
   head: () => ({
@@ -70,54 +72,72 @@ function Dashboard() {
   }, [reports]);
 
  const [trendRange, setTrendRange] = useState<
-  "1day" | "7days" | "30days" | "custom">("30days");
+  "1day" | "7days" | "30days" | "custom"> ("30days");
 
 const [customFrom, setCustomFrom] = useState("");
 const [customTo, setCustomTo] = useState("");
 
   // Report Mix date range
   const [reportMixRange, setReportMixRange] = useState<
-    "1day" | "7days" | "30days"
+    "1day" | "7days" | "30days" | "custom"
   >("30days");
 
-  const [reportMixDate, setReportMixDate] = useState("");
+  const [reportMixStartDate, setReportMixStartDate] = useState("");
+  const [reportMixEndDate, setReportMixEndDate] = useState("");
 
-  const reportMixDates = useMemo(() => {
-    const dates: string[] = [];
+ const reportMixDates = useMemo(() => {
+  const dates: string[] = [];
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-    const numberOfDays =
-      reportMixRange === "1day"
-        ? 1
-        : reportMixRange === "7days"
-          ? 7
-          : 30;
+  if (reportMixRange === "custom") {
+    if (!reportMixStartDate || !reportMixEndDate) {
+      return [];
+    }
 
-    for (let i = 0; i < numberOfDays; i++) {
-      const date = new Date(today);
-      date.setDate(today.getDate() - i);
+    const start = new Date(`${reportMixStartDate}T00:00:00`);
+    const end = new Date(`${reportMixEndDate}T00:00:00`);
 
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, "0");
-      const day = String(date.getDate()).padStart(2, "0");
+    if (start > end) {
+      return [];
+    }
+
+    const current = new Date(start);
+
+    while (current <= end) {
+      const year = current.getFullYear();
+      const month = String(current.getMonth() + 1).padStart(2, "0");
+      const day = String(current.getDate()).padStart(2, "0");
 
       dates.push(`${year}-${month}-${day}`);
+
+      current.setDate(current.getDate() + 1);
     }
 
     return dates;
-  }, [reportMixRange]);
+  }
 
-  useEffect(() => {
-    if (reportMixDates.length > 0) {
-      setReportMixDate((current) =>
-        current && reportMixDates.includes(current)
-          ? current
-          : reportMixDates[0],
-      );
-    }
-  }, [reportMixDates]);
+  const numberOfDays =
+    reportMixRange === "1day"
+      ? 1
+      : reportMixRange === "7days"
+        ? 7
+        : 30;
+
+  for (let i = 0; i < numberOfDays; i++) {
+    const date = new Date(today);
+    date.setDate(today.getDate() - i);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    dates.push(`${year}-${month}-${day}`);
+  }
+
+  return dates;
+}, [reportMixRange, reportMixStartDate, reportMixEndDate]);
 
 const trend = useMemo(() => {
   const today = new Date();
@@ -218,41 +238,72 @@ const trend = useMemo(() => {
       color: colors[i % colors.length],
     }));
   }, [reports]);
+const selectedReportMix = useMemo(() => {
+  let startDate: Date;
+  let endDate: Date;
 
-    const selectedReportMix = useMemo(() => {
-    if (!reportMixDate) {
-      return typeMix;
+  const today = new Date();
+  today.setHours(23, 59, 59, 999);
+
+  if (reportMixRange === "1day") {
+    startDate = new Date();
+    startDate.setHours(0, 0, 0, 0);
+
+    endDate = today;
+  } else if (reportMixRange === "7days") {
+    startDate = new Date();
+    startDate.setDate(startDate.getDate() - 6);
+    startDate.setHours(0, 0, 0, 0);
+
+    endDate = today;
+  } else if (reportMixRange === "30days") {
+    startDate = new Date();
+    startDate.setDate(startDate.getDate() - 29);
+    startDate.setHours(0, 0, 0, 0);
+
+    endDate = today;
+  } else {
+    if (!reportMixStartDate || !reportMixEndDate) {
+      return typeMix.map((item) => ({
+        ...item,
+        value: 0,
+      }));
     }
 
-    return typeMix.map((item) => {
-      const count = reports.filter((report) => {
-        const reportDate = new Date(report.reportedAt);
+    startDate = new Date(`${reportMixStartDate}T00:00:00`);
+    endDate = new Date(`${reportMixEndDate}T23:59:59`);
+  }
 
-        if (isNaN(reportDate.getTime())) {
-          return false;
-        }
+  const filteredReports = reports.filter((report) => {
+    const reportDate = new Date(report.reportedAt);
 
-        const year = reportDate.getFullYear();
-        const month = String(reportDate.getMonth() + 1).padStart(2, "0");
-        const day = String(reportDate.getDate()).padStart(2, "0");
+    if (isNaN(reportDate.getTime())) {
+      return false;
+    }
 
-        const dateKey = `${year}-${month}-${day}`;
+    return reportDate >= startDate && reportDate <= endDate;
+  });
 
-        const reportType =
-          TYPE_LABEL[report.type] ?? report.type;
+  return typeMix.map((item) => {
+    const count = filteredReports.filter((report) => {
+      const reportType =
+        TYPE_LABEL[report.type] ?? report.type;
 
-        return (
-          dateKey === reportMixDate &&
-          reportType === item.name
-        );
-      }).length;
+      return reportType === item.name;
+    }).length;
 
-      return {
-        ...item,
-        value: count,
-      };
-    });
-  }, [reports, typeMix, reportMixDate]);
+    return {
+      ...item,
+      value: count,
+    };
+  });
+}, [
+  reports,
+  typeMix,
+  reportMixRange,
+  reportMixStartDate,
+  reportMixEndDate,
+]);
 
   const locationStats = useMemo(() => {
   return LOCATION_GROUPS.map((loc) => {
@@ -516,157 +567,148 @@ const trend = useMemo(() => {
             </ResponsiveContainer>
           </div>
         </Card>
-               {/* Report Mix */}
-        <Card className="p-5">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <h2 className="text-base font-semibold">
-                Report mix
-              </h2>
 
-              <p className="text-xs text-muted-foreground">
-                By type, all sites
-              </p>
-            </div>
+    {/* Report Mix */}
+<Card className="p-5">
 
-            <select
-              value={reportMixRange}
-              onChange={(e) =>
-                setReportMixRange(
-                  e.target.value as "1day" | "7days" | "30days"
-                )
-              }
-              className="h-9 rounded-md border border-border bg-background px-3 text-xs"
-            >
-              <option value="1day">1 day</option>
-              <option value="7days">7 days</option>
-              <option value="30days">30 days</option>
-            </select>
-          </div>
+  {/* Header */}
+  <div className="flex items-start justify-between gap-4">
 
-          {/* Date navigation */}
-          <div className="mt-3 flex items-center justify-center gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="h-8 w-8 rounded-full p-0"
-              disabled={
-                reportMixDates.length === 0 ||
-                reportMixDates.indexOf(reportMixDate) >=
-                  reportMixDates.length - 1
-              }
-              onClick={() => {
-                const currentIndex =
-                  reportMixDates.indexOf(reportMixDate);
+    <div>
+      <h2 className="text-base font-semibold">
+        Report mix
+      </h2>
 
-                if (
-                  currentIndex >= 0 &&
-                  currentIndex < reportMixDates.length - 1
-                ) {
-                  setReportMixDate(
-                    reportMixDates[currentIndex + 1]
-                  );
-                }
-              }}
-            >
-              ‹
-            </Button>
+      <p className="mt-1 text-xs text-muted-foreground">
+        By type, all sites
+      </p>
+    </div>
 
-            <span className="min-w-[130px] text-center text-xs font-medium">
-              {reportMixDate
-                ? new Date(
-                    `${reportMixDate}T00:00:00`
-                  ).toLocaleDateString("en-US", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                  })
-                : "No date"}
-            </span>
+    <select
+      value={reportMixRange}
+      onChange={(e) =>
+        setReportMixRange(
+          e.target.value as
+            | "1day"
+            | "7days"
+            | "30days"
+            | "custom"
+        )
+      }
+      className="h-9 min-w-[108px] rounded-md border border-border bg-background px-3 text-xs"
+    >
+      <option value="1day">1 day</option>
+      <option value="7days">7 days</option>
+      <option value="30days">30 days</option>
+      <option value="custom">Custom</option>
+    </select>
 
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="h-8 w-8 rounded-full p-0"
-              disabled={
-                reportMixDates.length === 0 ||
-                reportMixDates.indexOf(reportMixDate) <= 0
-              }
-              onClick={() => {
-                const currentIndex =
-                  reportMixDates.indexOf(reportMixDate);
+  </div>
 
-                if (currentIndex > 0) {
-                  setReportMixDate(
-                    reportMixDates[currentIndex - 1]
-                  );
-                }
-              }}
-            >
-              ›
-            </Button>
-          </div>
+  {/* Custom Date Range */}
+  {reportMixRange === "custom" && (
+    <div className="mt-4 rounded-lg border border-border bg-secondary/30 p-3">
 
-          {/* Pie Chart */}
-          <div className="mt-2 h-52 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={selectedReportMix}
-                  dataKey="value"
-                  innerRadius={50}
-                  outerRadius={80}
-                  paddingAngle={2}
-                >
-                  {selectedReportMix.map((d, i) => (
-                    <Cell
-                      key={`${d.name}-${i}`}
-                      fill={d.color}
-                    />
-                  ))}
-                </Pie>
+      <div className="grid grid-cols-2 gap-3">
 
-                <Tooltip
-                  contentStyle={{
-                    borderRadius: 12,
-                    border: "1px solid var(--border)",
-                  }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
+        <div>
+          <Label className="text-xs font-medium text-muted-foreground">
+            From
+          </Label>
 
-          {/* Legend */}
-          <div className="mt-2 space-y-1.5">
-            {selectedReportMix.map((d) => (
-              <div
-                key={d.name}
-                className="flex items-center justify-between text-xs"
-              >
-                <span className="flex items-center gap-2">
-                  <span
-                    className="h-2.5 w-2.5 rounded-sm"
-                    style={{
-                      background: d.color,
-                    }}
-                  />
+          <Input
+            type="date"
+            value={reportMixStartDate}
+            onChange={(e) =>
+              setReportMixStartDate(e.target.value)
+            }
+            className="mt-1.5 h-9 w-full"
+          />
+        </div>
 
-                  {d.name}
-                </span>
+        <div>
+          <Label className="text-xs font-medium text-muted-foreground">
+            To
+          </Label>
 
-                <span className="font-semibold tabular-nums">
-                  {d.value}
-                </span>
-              </div>
-            ))}
-          </div>
-        </Card>
+          <Input
+            type="date"
+            value={reportMixEndDate}
+            onChange={(e) =>
+              setReportMixEndDate(e.target.value)
+            }
+            className="mt-1.5 h-9 w-full"
+          />
+        </div>
 
       </div>
 
+    </div>
+  )}
+
+  {/* Pie Chart */}
+  <div className="mt-5 h-56 w-full">
+    <ResponsiveContainer width="100%" height="100%">
+      <PieChart>
+        <Pie
+          data={selectedReportMix}
+          dataKey="value"
+          nameKey="name"
+          cx="50%"
+          cy="50%"
+          innerRadius={52}
+          outerRadius={82}
+          paddingAngle={2}
+        >
+          {selectedReportMix.map((d, i) => (
+            <Cell
+              key={`${d.name}-${i}`}
+              fill={d.color}
+            />
+          ))}
+        </Pie>
+
+        <Tooltip
+          contentStyle={{
+            borderRadius: 12,
+            border: "1px solid var(--border)",
+          }}
+        />
+      </PieChart>
+    </ResponsiveContainer>
+  </div>
+
+  {/* Legend */}
+  <div className="mt-3 space-y-2">
+    {selectedReportMix.map((d) => (
+      <div
+        key={d.name}
+        className="flex items-center justify-between text-xs"
+      >
+        <span className="flex items-center gap-2">
+          <span
+            className="h-2.5 w-2.5 rounded-full"
+            style={{
+              background: d.color,
+            }}
+          />
+
+          {d.name}
+        </span>
+
+        <span className="font-semibold tabular-nums">
+          {d.value}
+        </span>
+      </div>
+    ))}
+  </div>
+
+</Card>
+</div>
+         
+
       {/* Locations grid (Limble-style) — admins only */}
+      
       {!isStaff && (
         <Card className="p-5">
           <div className="flex items-center justify-between">
@@ -793,7 +835,7 @@ const trend = useMemo(() => {
           ))}
         </div>
       </Card>
-    </div>
+      </div>
   );
 }
 

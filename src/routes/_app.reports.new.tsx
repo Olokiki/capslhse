@@ -28,6 +28,7 @@ import {
 } from "@/lib/hse-store";
 import { useSession } from "@/lib/auth-store";
 import { ShieldAlert, Sparkles, Upload, MapPin, Lock } from "lucide-react";
+import { Value } from "@radix-ui/react-select";
 
 export const Route = createFileRoute("/_app/reports/new")({
   head: () => ({
@@ -59,9 +60,17 @@ function NewReport() {
   });
   const [aiBusy, setAiBusy] = useState(false);
 
-  const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) => setForm((f) => ({ ...f, [k]: v }));
+  const set = (
+  key: keyof typeof form,
+  value: string
+) => {
+  setForm((prev) => ({
+    ...prev,
+    [key]: value,
+  }));
+};
 
-  const locationAssets = useMemo(() => assetsForLocation(form.location), [form.location]);
+const locationAssets = assetsForLocation(form.location);
 
   const aiClassify = () => {
     if (!form.description.trim()) {
@@ -145,6 +154,10 @@ const submit = async (e: React.FormEvent) => {
         form.location === "__other__"
           ? form.locationOther.trim()
           : form.location;
+
+  if (!finalLocation) {
+  return toast.error("Location is required.");
+}
 
       const r = await createReport({
         title: form.title.trim(),
@@ -310,7 +323,7 @@ const submit = async (e: React.FormEvent) => {
                   onChange={(e) =>
                     set("locationOther", e.target.value)
                   }
-                  placeholder="Enter location"
+                  placeholder="CAPSL - location"
                   className="mt-2 h-11 w-full"
                 />
               )}
@@ -323,10 +336,16 @@ const submit = async (e: React.FormEvent) => {
                 Asset <span className="text-destructive">*</span>
               </Label>
 
-              <Select
-                value={form.asset || undefined}
-                onValueChange={(v) => set("asset", v)}
-              >
+             <Select value={form.asset || ""}
+            onValueChange={(value) => {
+              console.log("Selected asset:", value);  
+            set("asset", value);
+
+      // Clear custom asset text whenever "Other" is not selected
+      if (value !== "__other__") {
+        set("assetOther", "");
+      }
+    }}>
                 <SelectTrigger className="mt-1.5 h-11 w-full">
                   <SelectValue placeholder="Select asset" />
                 </SelectTrigger>
@@ -347,18 +366,16 @@ const submit = async (e: React.FormEvent) => {
                 </SelectContent>
               </Select>
 
-              {form.asset === "__other__" && (
-                <Input
-                  required
-                  value={form.assetOther}
-                  onChange={(e) =>
-                    set("assetOther", e.target.value)
-                  }
-                  placeholder="Enter asset name / tag"
-                  className="mt-2 h-11 w-full"
-                />
+               {form.asset === "__other__" && (
+             <Input
+               type="text"
+                value={form.assetOther || ""}
+                onChange={(e) => set("assetOther", e.target.value)}
+                placeholder="Enter asset name / tag"
+                className="mt-2 h-11 w-full"
+                required />
               )}
-            </div>
+          </div>
 
           </div>
 
@@ -463,8 +480,7 @@ const submit = async (e: React.FormEvent) => {
             <Button
               type="submit"
               disabled={submitting}
-              className="rounded-full px-6 font-semibold shadow-sm"
-            >
+              className="rounded-full px-6 font-semibold shadow-sm">
               {submitting
                 ? "Submitting…"
                 : "Submit Report"}

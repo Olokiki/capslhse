@@ -230,9 +230,11 @@ function ReportDetail() {
                       <div className="space-y-4 pt-2">
                         <div className="flex items-center justify-between">
                           <p className="text-sm text-muted-foreground">Document the root cause and what was done to prevent recurrence.</p>
+                        {/*
                           <Button type="button" variant="ghost" size="sm" onClick={aiSuggest} className="h-7 gap-1.5 text-xs font-semibold text-primary hover:bg-accent">
-                            <Sparkles className="h-3.5 w-3.5" /> AI suggest
+                           <Sparkles className="h-3.5 w-3.5" /> AI suggest
                           </Button>
+                          */}
                         </div>
                         <div>
                           <Label className="text-sm font-semibold">Root cause</Label>
@@ -327,8 +329,7 @@ function ReportDetail() {
                       addComment(report.id, comment.trim(), CURRENT_USER);
                       setComment("");
                       toast.success("Comment added");
-                    }}
-                  >
+                    }}>
                     <Send className="mr-1.5 h-3.5 w-3.5" /> Post
                   </Button>
                 </div>
