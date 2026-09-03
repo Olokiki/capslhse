@@ -129,7 +129,8 @@ function identity_default(x) {
 }
 //#endregion
 //#region node_modules/d3-format/src/locale.js
-var map = Array.prototype.map, prefixes = [
+var map = Array.prototype.map;
+var prefixes = [
 	"y",
 	"z",
 	"a",

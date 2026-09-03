@@ -44,27 +44,44 @@ function ReportsList() {
   const { location: locationParam } = Route.useSearch();
   const navigate = Route.useNavigate();
   const isStaff = session?.role === "staff";
-  const activeLocation = isStaff ? session?.location : locationParam;
- const scopedReports = useMemo(() => {
-  if (!activeLocation) return reports;
 
-  const officialLocations = LOCATION_GROUPS.filter(
-    (l) => l !== "Other"
-  );
+  const activeLocation = isStaff
+  ? session?.location
+  : locationParam;
 
-  // If the user clicked the Other card,
-  // return every report that is NOT in the official locations.
-  if (activeLocation === "Other") {
+const scopedReports = useMemo(() => {
+  if (!session) return [];
+
+  // Admins can see everything,
+  // with optional location filtering.
+  if (session.role !== "staff") {
+    if (!locationParam) return reports;
+
+    const officialLocations = LOCATION_GROUPS.filter(
+      (l) => l !== "Other"
+    );
+
+    if (locationParam === "Other") {
+      return reports.filter(
+        (r) => !officialLocations.includes(r.location)
+      );
+    }
+
     return reports.filter(
-      (r) => !officialLocations.includes(r.location)
+      (r) => r.location === locationParam
     );
   }
 
-  // Otherwise filter normally.
+  // Staff:
+  // 1. Their own reports, regardless of location
+  // 2. Reports from their registered location
   return reports.filter(
-    (r) => r.location === activeLocation
+    (r) =>
+      r.reportedByUserId === session.userId ||
+      r.location === session.location
   );
-}, [reports, activeLocation]);
+}, [reports, session, locationParam]);
+
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<"all" | ReportStatus>("all");
   const [severity, setSeverity] = useState<"all" | Severity>("all");

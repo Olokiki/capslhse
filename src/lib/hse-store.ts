@@ -29,6 +29,7 @@ export type HseReport = {
   location: string;
   asset?: string;
   reportedBy: string;
+  reportedByUserId?: string;
   evidenceUrl?: string;
   reportedAt: string;
   assignedTo?: string;
@@ -39,6 +40,9 @@ export type HseReport = {
   correctiveAction?: string;
   closedAt?: string;
   closedBy?: string;
+  closureComment?: string;
+closureEvidenceUrl?: string;
+closedByUserId?: string;
   activity: Activity[];
 };
 
@@ -56,7 +60,20 @@ export const LOCATION_GROUPS = [
 ];
 
 export function getLocationGroup(location: string): string {
-  return LOCATIONS.includes(location) ? location : "Other";
+  const normalized = location.trim().toLowerCase();
+
+  if (
+    normalized === "capsl - lagos" ||
+    normalized === "capsl - lagos office"
+  ) {
+    return "CAPSL - Lagos";
+  }
+
+  const match = LOCATIONS.find(
+    (loc) => loc.toLowerCase() === normalized
+  );
+
+  return match ?? "Other";
 }
 
 export const PEOPLE = [ " " ];
@@ -97,6 +114,10 @@ type ReportRow = {
   closed_at: string | null;
   closed_by: string | null;
   evidence_url: string | null;
+  reported_by_user_id: string | null;
+  closure_comment: string | null;
+  closure_evidence_url: string | null;
+  closed_by_user_id: string | null;
 };
 
 type ActivityRow = {
@@ -119,6 +140,10 @@ function rowToReport(r: ReportRow, activities: ActivityRow[]): HseReport {
     location: r.location,
        asset: r.asset ?? undefined,
     reportedBy: r.reported_by,
+    reportedByUserId: r.reported_by_user_id ?? undefined,
+    closureComment: r.closure_comment ?? undefined,
+    closureEvidenceUrl: r.closure_evidence_url ?? undefined,
+    closedByUserId: r.closed_by_user_id ?? undefined,
     evidenceUrl: r.evidence_url ?? undefined,
     reportedAt: r.reported_at,
     assignedTo: r.assigned_to ?? undefined,
@@ -221,6 +246,16 @@ function newRef() {
   return `HSE-${t}`;
 }
 
+{/*
+const [closureComment, setClosureComment] =
+  useState("");
+
+const [closureEvidenceFile, setClosureEvidenceFile] =
+  useState<File | null>(null);
+
+const [isClosing, setIsClosing] =
+  useState(false);
+*/} 
 export async function createReport(input: {
   title: string;
   description: string;
@@ -229,6 +264,7 @@ export async function createReport(input: {
   location: string;
   asset?: string;
   reportedBy: string;
+  reportedByUserId: string;
   evidenceFile?: File | null;
 }): Promise<HseReport> {
   // ---------------------------------------------------------
@@ -258,6 +294,7 @@ export async function createReport(input: {
       location: input.location,
       asset: input.asset ?? null,
       reported_by: input.reportedBy,
+      reported_by_user_id: input.reportedByUserId,
       status: "open",
       evidence_url: null,
     })
@@ -436,8 +473,41 @@ export async function addComment(id: string, message: string, actor: string) {
 
 export async function closeReport(
   id: string,
-  data2: { rootCause: string; correctiveAction: string; actor: string },
+  data2: {
+    rootCause: string;
+    correctiveAction: string;
+    actor: string;
+    closureEvidenceFile?: File | null;
+  },
 ) {
+  let closureEvidenceUrl: string | null = null;
+
+  // Upload closure evidence if provided
+  if (data2.closureEvidenceFile) {
+    const file = data2.closureEvidenceFile;
+
+    const extension =
+      file.name.split(".").pop()?.toLowerCase() ?? "jpg";
+
+    const fileName = `closure-${crypto.randomUUID()}.${extension}`;
+
+    const filePath = `closure/${id}/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("hse-evidence")
+      .upload(filePath, file, {
+        upsert: false,
+      });
+
+    if (uploadError) throw uploadError;
+
+    const { data } = supabase.storage
+      .from("hse-evidence")
+      .getPublicUrl(filePath);
+
+    closureEvidenceUrl = data.publicUrl;
+  }
+
   const { error } = await supabase
     .from("hse_reports")
     .update({
@@ -446,16 +516,22 @@ export async function closeReport(
       corrective_action: data2.correctiveAction,
       closed_at: new Date().toISOString(),
       closed_by: data2.actor,
+      closure_evidence_url: closureEvidenceUrl,
     })
     .eq("id", id);
+
   if (error) throw error;
+
   await supabase.from("hse_activities").insert({
     report_id: id,
     actor: data2.actor,
     kind: "closed",
-    message: "Report closed out with root cause & corrective action",
+    message:
+      "Report closed out with root cause, corrective action and closure evidence",
   });
+
   fetchAll().catch(() => {});
+
 }
 
 // Kept for compatibility with any legacy imports

@@ -51,25 +51,82 @@ function Dashboard() {
   const all = useHseReports();
   const session = useSession();
   const isStaff = session?.role === "staff";
-  const reports = isStaff
-    ? all.filter((r) => r.location === session?.location)
-    : all;
+
+  // Reports visible to the current user
+  const reports = useMemo(() => {
+    if (!session) return [];
+
+    // Admins see everything
+    if (session.role !== "staff") {
+      return all;
+    }
+
+    // Staff see:
+    // 1. Every report they personally submitted, regardless of location
+    // 2. Every report submitted at their registered location
+    return all.filter(
+      (report) =>
+        report.reportedByUserId === session.userId ||
+        report.location === session.location
+    );
+  }, [all, session]);
+
+  // Dashboard statistics use the same reports visible to the user
+  const statsReports = reports;
 
   const stats = useMemo(() => {
-    const open = reports.filter((r) => r.status !== "closed").length;
-    const closed = reports.filter((r) => r.status === "closed").length;
-    const critical = reports.filter((r) => r.severity === "critical" && r.status !== "closed").length;
-    const overdue = reports.filter((r) => r.dueAt && new Date(r.dueAt) < new Date() && r.status !== "closed").length;
+    const open = statsReports.filter(
+      (r) => r.status !== "closed"
+    ).length;
+
+    const closed = statsReports.filter(
+      (r) => r.status === "closed"
+    ).length;
+
+    const critical = statsReports.filter(
+      (r) =>
+        r.severity === "critical" &&
+        r.status !== "closed"
+    ).length;
+
+    const overdue = statsReports.filter(
+      (r) =>
+        r.dueAt &&
+        new Date(r.dueAt) < new Date() &&
+        r.status !== "closed"
+    ).length;
+
     const daysSinceIncident = (() => {
-      const inc = reports
-        .filter((r) => r.type === "incident" || r.type === "injury")
-        .map((r) => new Date(r.reportedAt).getTime())
+      const inc = statsReports
+        .filter(
+          (r) =>
+            r.type === "incident" ||
+            r.type === "injury"
+        )
+        .map((r) =>
+          new Date(r.reportedAt).getTime()
+        )
         .sort((a, b) => b - a)[0];
+
       if (!inc) return 365;
-      return Math.max(0, Math.floor((Date.now() - inc) / 86400000));
+
+      return Math.max(
+        0,
+        Math.floor(
+          (Date.now() - inc) / 86400000
+        )
+      );
     })();
-    return { open, closed, critical, overdue, daysSinceIncident, total: reports.length };
-  }, [reports]);
+
+    return {
+      open,
+      closed,
+      critical,
+      overdue,
+      daysSinceIncident,
+      total: statsReports.length,
+    };
+  }, [statsReports]);
 
  const [trendRange, setTrendRange] = useState<
   "1day" | "7days" | "30days" | "custom"> ("30days");
@@ -410,8 +467,7 @@ const selectedReportMix = useMemo(() => {
                       | "custom"
                   )
                 }
-                className="h-9 rounded-md border border-border bg-background px-3 text-xs"
-              >
+                className="h-9 rounded-md border border-border bg-background px-3 text-xs">
                 <option value="1day">1 day</option>
                 <option value="7days">7 days</option>
                 <option value="30days">30 days</option>
@@ -421,13 +477,11 @@ const selectedReportMix = useMemo(() => {
               <div className="flex items-center gap-3 text-xs">
                 <Legend
                   color="var(--brand-orange)"
-                  label="Submitted"
-                />
+                  label="Submitted" />
 
                 <Legend
                   color="var(--brand-green)"
-                  label="Closed"
-                />
+                  label="Closed" />
               </div>
             </div>
           </div>

@@ -167,6 +167,7 @@ const submit = async (e: React.FormEvent) => {
         location: finalLocation,
         asset: finalAsset,
         reportedBy: form.reportedBy,
+        reportedByUserId: session!.userId,
         evidenceFile,
       });
 

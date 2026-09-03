@@ -94,7 +94,8 @@ function object_default(a, b) {
 }
 //#endregion
 //#region node_modules/d3-interpolate/src/string.js
-var reA = /[-+]?(?:\d+\.?\d*|\.?\d+)(?:[eE][-+]?\d+)?/g, reB = new RegExp(reA.source, "g");
+var reA = /[-+]?(?:\d+\.?\d*|\.?\d+)(?:[eE][-+]?\d+)?/g;
+var reB = new RegExp(reA.source, "g");
 function zero(b) {
 	return function() {
 		return b;

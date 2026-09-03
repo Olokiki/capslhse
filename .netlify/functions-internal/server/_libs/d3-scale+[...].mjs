@@ -685,7 +685,8 @@ function threshold() {
 }
 //#endregion
 //#region node_modules/d3-time/src/interval.js
-var t0 = /* @__PURE__ */ new Date(), t1 = /* @__PURE__ */ new Date();
+var t0 = /* @__PURE__ */ new Date();
+var t1 = /* @__PURE__ */ new Date();
 function timeInterval(floori, offseti, count, field) {
 	function interval(date) {
 		return floori(date = arguments.length === 0 ? /* @__PURE__ */ new Date() : /* @__PURE__ */ new Date(+date)), date;
@@ -1384,7 +1385,10 @@ var pads = {
 	"-": "",
 	"_": " ",
 	"0": "0"
-}, numberRe = /^\s*\d+/, percentRe = /^%/, requoteRe = /[\\^$*+?|[\]().{}]/g;
+};
+var numberRe = /^\s*\d+/;
+var percentRe = /^%/;
+var requoteRe = /[\\^$*+?|[\]().{}]/g;
 function pad(value, fill, width) {
 	var sign = value < 0 ? "-" : "", string = (sign ? -value : value) + "", length = string.length;
 	return sign + (length < width ? new Array(width - length + 1).join(fill) + string : string);

@@ -70,6 +70,8 @@ function ReportDetail() {
   const [dueAt, setDueAt] = useState(report?.dueAt?.slice(0, 10) ?? "");
   const [rootCause, setRootCause] = useState("");
   const [corrective, setCorrective] = useState("");
+  const [closureEvidenceFile, setClosureEvidenceFile] =
+  useState<File | null>(null);
 
   if (!report) {
     return (
@@ -119,15 +121,50 @@ function ReportDetail() {
     );
   }
   };
-  const submitClose = () => {
-    if (!rootCause.trim() || !corrective.trim()) {
-      toast.error("Root cause and corrective action are required to close out.");
-      return;
-    }
-    closeReport(report.id, { rootCause, correctiveAction: corrective, actor: CURRENT_USER });
+const submitClose = async () => {
+  if (!rootCause.trim() || !corrective.trim()) {
+    toast.error(
+      "Root cause and corrective action are required to close out."
+    );
+    return;
+  }
+
+  const requiresClosureEvidence =
+    report.severity === "high" ||
+    report.severity === "critical";
+
+  if (
+    requiresClosureEvidence &&
+    !closureEvidenceFile
+  ) {
+    toast.error(
+      "Closure evidence is required for High and Critical reports."
+    );
+    return;
+  }
+
+  try {
+    await closeReport(report.id, {
+      rootCause: rootCause.trim(),
+      correctiveAction: corrective.trim(),
+      actor: CURRENT_USER,
+      closureEvidenceFile,
+    });
+
+    setClosureEvidenceFile(null);
     setCloseOpen(false);
+
     toast.success(`${report.ref} closed`);
-  };
+  } catch (err) {
+    console.error(err);
+
+    toast.error(
+      err instanceof Error
+        ? err.message
+        : "Unable to close the report."
+    );
+  }
+};
 
   const aiSuggest = () => {
     const map: Record<string, { rc: string; ca: string }> = {
@@ -228,8 +265,40 @@ function ReportDetail() {
                         <DialogTitle>Close out report</DialogTitle>
                       </DialogHeader>
                       <div className="space-y-4 pt-2">
+
                         <div className="flex items-center justify-between">
                           <p className="text-sm text-muted-foreground">Document the root cause and what was done to prevent recurrence.</p>
+
+                          {report.evidenceUrl && (
+  <div className="space-y-2 rounded-lg border border-border bg-secondary/30 p-3">
+    <div className="text-sm font-semibold">
+      Original Evidence
+    </div>
+
+    <div className="overflow-hidden rounded-lg border border-border bg-background">
+      {/\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(
+        report.evidenceUrl) ? (
+        <img
+          src={report.evidenceUrl}
+          alt="Original HSE report evidence"
+          className="max-h-[300px] w-full object-contain"
+        />
+      ) : (
+        <div className="p-4 text-sm text-muted-foreground">
+          Original evidence is a document.
+        </div>
+      )}
+    </div>
+
+    <a
+      href={report.evidenceUrl}
+      target="_blank"
+      rel="noreferrer"
+      className="text-xs font-medium text-primary hover:underline" >
+      View original evidence
+    </a>
+  </div>
+)}
                         {/*
                           <Button type="button" variant="ghost" size="sm" onClick={aiSuggest} className="h-7 gap-1.5 text-xs font-semibold text-primary hover:bg-accent">
                            <Sparkles className="h-3.5 w-3.5" /> AI suggest
@@ -267,91 +336,191 @@ function ReportDetail() {
                 <div className="flex items-center gap-2 text-sm font-bold text-success">
                   <CheckCircle2 className="h-4 w-4" /> Closed out on {report.closedAt ? new Date(report.closedAt).toLocaleDateString() : "—"} by {report.closedBy}
                 </div>
-                <div className="mt-3 space-y-3 text-sm">
-                  <div>
-                    <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Root cause</div>
-                    <div className="mt-1 text-foreground/90">{report.rootCause}</div>
-                  </div>
-                  <div>
-                    <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Corrective action</div>
-                    <div className="mt-1 text-foreground/90">{report.correctiveAction}</div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+              
+                <div className="mt-4 space-y-5 text-sm">
 
-          <div className="space-y-4">
-            <DetailRow label="Type" value={TYPE_LABEL[report.type]} />
-            <DetailRow label="Assigned to" value={report.assignedTo ?? "Unassigned"} />
-            <DetailRow label="Due" value={report.dueAt ? new Date(report.dueAt).toLocaleDateString() : "—"} highlight={!!overdue} />
-            <DetailRow label="Reported" value={new Date(report.reportedAt).toLocaleDateString()} />
-            {report.closedAt && <DetailRow label="Closed" value={new Date(report.closedAt).toLocaleDateString()} />}
-          </div>
-        </div>
-      </Card>
+  {/* Root Cause */}
+  <div>
+    <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+      Root cause
+    </div>
 
-      {/* Activity */}
-      <Card className="p-6">
-        <h2 className="flex items-center gap-2 text-base font-semibold">
-          <MessageSquare className="h-4 w-4" /> Activity & comments
-        </h2>
-        <div className="mt-4 space-y-4">
-          {report.activity.slice().reverse().map((a) => (
-            <div key={a.id} className="flex gap-3">
-              <div className="mt-0.5 flex h-8 w-8 flex-none items-center justify-center rounded-full brand-gradient text-[11px] font-bold text-white">
-                {initials(a.actor)}
-              </div>
-              <div className="flex-1 rounded-xl border border-border bg-card p-3">
-                <div className="flex items-center justify-between gap-2 text-xs">
-                  <span className="font-semibold text-foreground">{a.actor}</span>
-                  <span className="text-muted-foreground">{new Date(a.at).toLocaleString()}</span>
-                </div>
-                <div className="mt-1 text-sm text-foreground/90">{a.message}</div>
-              </div>
+    <div className="mt-1 text-foreground/90">
+      {report.rootCause}
+    </div>
+  </div>
+
+  {/* Corrective Action */}
+  <div>
+    <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+      Corrective action
+    </div>
+
+    <div className="mt-1 text-foreground/90">
+      {report.correctiveAction}
+    </div>
+  </div>
+
+  {/* Evidence */}
+  {(report.evidenceUrl || report.closureEvidenceUrl) && (
+    <div>
+      <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        Evidence
+      </div>
+
+      <div className="mt-3 grid gap-4 md:grid-cols-2">
+
+        {/* BEFORE */}
+        {report.evidenceUrl && (
+          <div className="space-y-2">
+            <div className="text-sm font-semibold">
+              Before — Original Evidence
             </div>
-          ))}
-        </div>
 
-        {report.status !== "closed" && (
+            <div className="overflow-hidden rounded-lg border border-border bg-secondary/30">
+              {/\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(
+                report.evidenceUrl
+              ) ? (
+                <img
+                  src={report.evidenceUrl}
+                  alt="Original HSE report evidence"
+                  className="max-h-[300px] w-full object-contain"
+                />
+              ) : (
+                <div className="p-4">
+                  <a
+                    href={report.evidenceUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-sm font-medium text-primary hover:underline"
+                  >
+                    View original evidence
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* AFTER */}
+        {report.closureEvidenceUrl && (
+          <div className="space-y-2">
+            <div className="text-sm font-semibold">
+              After — Closure Evidence
+            </div>
+
+            <div className="overflow-hidden rounded-lg border border-border bg-secondary/30">
+              {/\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(
+                report.closureEvidenceUrl
+              ) ? (
+                <img
+                  src={report.closureEvidenceUrl}
+                  alt="Closure evidence"
+                  className="max-h-[300px] w-full object-contain"
+                />
+              ) : (
+                <div className="p-4">
+                  <a
+                    href={report.closureEvidenceUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-sm font-medium text-primary hover:underline"
+                  >
+                    View closure evidence
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+      </div>
+    </div>
+  )}
+</div>
+               {report.status !== "closed" && (
           <>
             <Separator className="my-5" />
+
             <div className="flex gap-3">
-              <div className="flex h-8 w-8 flex-none items-center justify-center rounded-full brand-gradient text-[11px] font-bold text-white">AO</div>
+              <div className="flex h-8 w-8 flex-none items-center justify-center rounded-full brand-gradient text-[11px] font-bold text-white">
+                AO
+              </div>
+
               <div className="flex-1">
-                <Textarea value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Add an update or progress note…" rows={2} />
+                <Textarea
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="Add an update or progress note…"
+                  rows={2}
+                />
+
                 <div className="mt-2 flex justify-end">
                   <Button
                     size="sm"
                     className="rounded-full font-semibold"
                     onClick={() => {
                       if (!comment.trim()) return;
-                      addComment(report.id, comment.trim(), CURRENT_USER);
+
+                      addComment(
+                        report.id,
+                        comment.trim(),
+                        CURRENT_USER
+                      );
+
                       setComment("");
                       toast.success("Comment added");
-                    }}>
-                    <Send className="mr-1.5 h-3.5 w-3.5" /> Post
+                    }}
+                  >
+                    <Send className="mr-1.5 h-3.5 w-3.5" />
+                    Post
                   </Button>
                 </div>
               </div>
             </div>
           </>
         )}
-      </Card>
+
+      </div>
+            )}
+            </div>
     </div>
+  </Card>
+</div>
   );
 }
 
-function DetailRow({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
+function DetailRow({
+  label,
+  value,
+  highlight,
+}: {
+  label: string;
+  value: string;
+  highlight?: boolean;
+}) {
   return (
     <div className="rounded-lg border border-border bg-secondary/40 p-3">
-      <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</div>
-      <div className={`mt-1 text-sm font-semibold ${highlight ? "text-destructive" : "text-foreground"}`}>{value}</div>
+      <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </div>
+
+      <div
+        className={`mt-1 text-sm font-semibold ${
+          highlight ? "text-destructive" : "text-foreground"
+        }`}
+      >
+        {value}
+      </div>
     </div>
   );
 }
 
 function initials(name: string) {
-  return name.split(" ").slice(0, 2).map((p) => p[0]).join("").toUpperCase();
+  return name
+    .split(" ")
+    .slice(0, 2)
+    .map((p) => p[0])
+    .join("")
+    .toUpperCase();
 }
-

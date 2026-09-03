@@ -162,7 +162,15 @@ function hashKey(queryKey) {
 function partialMatchKey(a, b) {
 	if (a === b) return true;
 	if (typeof a !== typeof b) return false;
-	if (a && b && typeof a === "object" && typeof b === "object") return Object.keys(b).every((key) => partialMatchKey(a[key], b[key]));
+	if (a && b && typeof a === "object" && typeof b === "object") {
+		if (Array.isArray(a) && Array.isArray(b)) {
+			for (let i = 0; i < b.length; i++) if (!partialMatchKey(a[i], b[i])) return false;
+			return true;
+		}
+		const bKeys = Object.keys(b);
+		for (const key of bKeys) if (!partialMatchKey(a[key], b[key])) return false;
+		return true;
+	}
 	return false;
 }
 var hasOwn = Object.prototype.hasOwnProperty;
@@ -553,8 +561,88 @@ var Removable = class {
 	}
 };
 //#endregion
+//#region node_modules/@tanstack/query-core/build/modern/infiniteQueryBehavior.js
+function infiniteQueryBehavior(pages) {
+	return { onFetch: (context, query) => {
+		const options = context.options;
+		const direction = context.fetchOptions?.meta?.fetchMore?.direction;
+		const oldPages = context.state.data?.pages || [];
+		const oldPageParams = context.state.data?.pageParams || [];
+		let result = {
+			pages: [],
+			pageParams: []
+		};
+		let currentPage = 0;
+		const fetchFn = async () => {
+			let cancelled = false;
+			const addSignalProperty = (object) => {
+				addConsumeAwareSignal(object, () => context.signal, () => cancelled = true);
+			};
+			const queryFn = ensureQueryFn(context.options, context.fetchOptions);
+			const fetchPage = async (data, param, previous) => {
+				if (cancelled) return Promise.reject(context.signal.reason);
+				if (param == null && data.pages.length) return Promise.resolve(data);
+				const createQueryFnContext = () => {
+					const queryFnContext2 = {
+						client: context.client,
+						queryKey: context.queryKey,
+						pageParam: param,
+						direction: previous ? "backward" : "forward",
+						meta: context.options.meta
+					};
+					addSignalProperty(queryFnContext2);
+					return queryFnContext2;
+				};
+				const queryFnContext = createQueryFnContext();
+				const page = await queryFn(queryFnContext);
+				const { maxPages } = context.options;
+				const addTo = previous ? addToStart : addToEnd;
+				return {
+					pages: addTo(data.pages, page, maxPages),
+					pageParams: addTo(data.pageParams, param, maxPages)
+				};
+			};
+			if (direction && oldPages.length) {
+				const previous = direction === "backward";
+				const pageParamFn = previous ? getPreviousPageParam : getNextPageParam;
+				const oldData = {
+					pages: oldPages,
+					pageParams: oldPageParams
+				};
+				result = await fetchPage(oldData, pageParamFn(options, oldData), previous);
+			} else {
+				const remainingPages = pages ?? oldPages.length;
+				do {
+					const param = currentPage === 0 ? oldPageParams[0] ?? options.initialPageParam : getNextPageParam(options, result);
+					if (currentPage > 0 && param == null) break;
+					result = await fetchPage(result, param);
+					currentPage++;
+				} while (currentPage < remainingPages);
+			}
+			return result;
+		};
+		if (context.options.persister) context.fetchFn = () => {
+			return context.options.persister?.(fetchFn, {
+				client: context.client,
+				queryKey: context.queryKey,
+				meta: context.options.meta,
+				signal: context.signal
+			}, query);
+		};
+		else context.fetchFn = fetchFn;
+	} };
+}
+function getNextPageParam(options, { pages, pageParams }) {
+	const lastIndex = pages.length - 1;
+	return pages.length > 0 ? options.getNextPageParam(pages[lastIndex], pages, pageParams[lastIndex], pageParams) : void 0;
+}
+function getPreviousPageParam(options, { pages, pageParams }) {
+	return pages.length > 0 ? options.getPreviousPageParam?.(pages[0], pages, pageParams[0], pageParams) : void 0;
+}
+//#endregion
 //#region node_modules/@tanstack/query-core/build/modern/query.js
 var Query = class extends Removable {
+	#queryType;
 	#initialState;
 	#revertState;
 	#cache;
@@ -579,6 +667,9 @@ var Query = class extends Removable {
 	get meta() {
 		return this.options.meta;
 	}
+	get queryType() {
+		return this.#queryType;
+	}
 	get promise() {
 		return this.#retryer?.promise;
 	}
@@ -587,6 +678,7 @@ var Query = class extends Removable {
 			...this.#defaultOptions,
 			...options
 		};
+		if (options?._type) this.#queryType = options._type;
 		this.updateGcTime(this.options.gcTime);
 		if (this.state && this.state.data === void 0) {
 			const defaultState = getDefaultState$1(this.options);
@@ -609,11 +701,10 @@ var Query = class extends Removable {
 		});
 		return data;
 	}
-	setState(state, setStateOptions) {
+	setState(state) {
 		this.#dispatch({
 			type: "setState",
-			state,
-			setStateOptions
+			state
 		});
 	}
 	cancel(options) {
@@ -751,7 +842,7 @@ var Query = class extends Removable {
 			return context2;
 		};
 		const context = createFetchContext();
-		this.options.behavior?.onFetch(context, this);
+		(this.#queryType === "infinite" ? infiniteQueryBehavior(this.options.pages) : this.options.behavior)?.onFetch(context, this);
 		this.#revertState = this.state;
 		if (this.state.fetchStatus === "idle" || this.state.fetchMeta !== context.fetchOptions?.meta) this.#dispatch({
 			type: "fetch",
@@ -919,84 +1010,6 @@ function getDefaultState$1(options) {
 		status: hasData ? "success" : "pending",
 		fetchStatus: "idle"
 	};
-}
-//#endregion
-//#region node_modules/@tanstack/query-core/build/modern/infiniteQueryBehavior.js
-function infiniteQueryBehavior(pages) {
-	return { onFetch: (context, query) => {
-		const options = context.options;
-		const direction = context.fetchOptions?.meta?.fetchMore?.direction;
-		const oldPages = context.state.data?.pages || [];
-		const oldPageParams = context.state.data?.pageParams || [];
-		let result = {
-			pages: [],
-			pageParams: []
-		};
-		let currentPage = 0;
-		const fetchFn = async () => {
-			let cancelled = false;
-			const addSignalProperty = (object) => {
-				addConsumeAwareSignal(object, () => context.signal, () => cancelled = true);
-			};
-			const queryFn = ensureQueryFn(context.options, context.fetchOptions);
-			const fetchPage = async (data, param, previous) => {
-				if (cancelled) return Promise.reject();
-				if (param == null && data.pages.length) return Promise.resolve(data);
-				const createQueryFnContext = () => {
-					const queryFnContext2 = {
-						client: context.client,
-						queryKey: context.queryKey,
-						pageParam: param,
-						direction: previous ? "backward" : "forward",
-						meta: context.options.meta
-					};
-					addSignalProperty(queryFnContext2);
-					return queryFnContext2;
-				};
-				const page = await queryFn(createQueryFnContext());
-				const { maxPages } = context.options;
-				const addTo = previous ? addToStart : addToEnd;
-				return {
-					pages: addTo(data.pages, page, maxPages),
-					pageParams: addTo(data.pageParams, param, maxPages)
-				};
-			};
-			if (direction && oldPages.length) {
-				const previous = direction === "backward";
-				const pageParamFn = previous ? getPreviousPageParam : getNextPageParam;
-				const oldData = {
-					pages: oldPages,
-					pageParams: oldPageParams
-				};
-				result = await fetchPage(oldData, pageParamFn(options, oldData), previous);
-			} else {
-				const remainingPages = pages ?? oldPages.length;
-				do {
-					const param = currentPage === 0 ? oldPageParams[0] ?? options.initialPageParam : getNextPageParam(options, result);
-					if (currentPage > 0 && param == null) break;
-					result = await fetchPage(result, param);
-					currentPage++;
-				} while (currentPage < remainingPages);
-			}
-			return result;
-		};
-		if (context.options.persister) context.fetchFn = () => {
-			return context.options.persister?.(fetchFn, {
-				client: context.client,
-				queryKey: context.queryKey,
-				meta: context.options.meta,
-				signal: context.signal
-			}, query);
-		};
-		else context.fetchFn = fetchFn;
-	} };
-}
-function getNextPageParam(options, { pages, pageParams }) {
-	const lastIndex = pages.length - 1;
-	return pages.length > 0 ? options.getNextPageParam(pages[lastIndex], pages, pageParams[lastIndex], pageParams) : void 0;
-}
-function getPreviousPageParam(options, { pages, pageParams }) {
-	return pages.length > 0 ? options.getPreviousPageParam?.(pages[0], pages, pageParams[0], pageParams) : void 0;
 }
 //#endregion
 //#region node_modules/@tanstack/query-core/build/modern/mutation.js
@@ -1569,14 +1582,14 @@ var QueryClient = class {
 		return this.fetchQuery(options).then(noop).catch(noop);
 	}
 	fetchInfiniteQuery(options) {
-		options.behavior = infiniteQueryBehavior(options.pages);
+		options._type = "infinite";
 		return this.fetchQuery(options);
 	}
 	prefetchInfiniteQuery(options) {
 		return this.fetchInfiniteQuery(options).then(noop).catch(noop);
 	}
 	ensureInfiniteQueryData(options) {
-		options.behavior = infiniteQueryBehavior(options.pages);
+		options._type = "infinite";
 		return this.ensureQueryData(options);
 	}
 	resumePausedMutations() {

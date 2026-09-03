@@ -1,11 +1,26 @@
 //#region node_modules/decimal.js-light/decimal.mjs
-var MAX_DIGITS = 1e9, defaults = {
+var MAX_DIGITS = 1e9;
+var defaults = {
 	precision: 20,
 	rounding: 4,
 	toExpNeg: -7,
 	toExpPos: 21,
 	LN10: "2.302585092994045684017991454684364207601101488628772976033327900967572609677352480235997205089598298341967784042286"
-}, Decimal, external = true, decimalError = "[DecimalError] ", invalidArgument = decimalError + "Invalid argument: ", exponentOutOfRange = decimalError + "Exponent out of range: ", mathfloor = Math.floor, mathpow = Math.pow, isDecimal = /^(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?$/i, ONE, BASE = 1e7, LOG_BASE = 7, MAX_SAFE_INTEGER = 9007199254740991, MAX_E = mathfloor(MAX_SAFE_INTEGER / LOG_BASE), P = {};
+};
+var Decimal;
+var external = true;
+var decimalError = "[DecimalError] ";
+var invalidArgument = decimalError + "Invalid argument: ";
+var exponentOutOfRange = decimalError + "Exponent out of range: ";
+var mathfloor = Math.floor;
+var mathpow = Math.pow;
+var isDecimal = /^(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?$/i;
+var ONE;
+var BASE = 1e7;
+var LOG_BASE = 7;
+var MAX_SAFE_INTEGER = 9007199254740991;
+var MAX_E = mathfloor(MAX_SAFE_INTEGER / LOG_BASE);
+var P = {};
 P.absoluteValue = P.abs = function() {
 	var x = new this.constructor(this);
 	if (x.s) x.s = 1;
