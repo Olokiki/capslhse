@@ -185,7 +185,7 @@ export async function signUp(input: SignUpInput) {
     };
   }
 
-  const APP_URL = "https://capsl-hse.netlify.app";
+  const APP_URL = "https://hse.capslgas.com";
 
   const { data, error } = await supabase.auth.signUp({
     email,
@@ -194,7 +194,7 @@ export async function signUp(input: SignUpInput) {
     options: {
       // After the user clicks the confirmation email,
       // send them directly to the Staff Login page.
-      emailRedirectTo: `${APP_URL}/login/staff`,
+      emailRedirectTo: `${APP_URL}/login/${input.role}`,
 
       data: {
         full_name: input.fullName,
@@ -204,6 +204,16 @@ export async function signUp(input: SignUpInput) {
       },
     },
   });
+
+
+   if (error) {
+      console.error("[auth] signup error:", error);
+
+      return {
+        ok: false as const,
+        error: error.message || "Unable to create account.",
+      };
+    }
 
   // Supabase signup error
   if (error) {

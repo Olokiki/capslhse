@@ -32,6 +32,7 @@ export function AuthPanel({ role }: Props) {
   const [location, setLocation] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     if (session) navigate({ to: "/" });
@@ -76,8 +77,19 @@ export function AuthPanel({ role }: Props) {
         role,
         location: role === "staff" ? location : undefined,
       });
-      setBusy(false);
-      if (!res.ok) setError(res.error);
+setBusy(false);
+
+if (!res.ok) {
+  setError(
+    typeof res.error === "string"
+      ? res.error
+      : "Unable to create account. Please try again."
+  );
+} else {
+  setSuccess(
+    "Account created successfully. Please check your email to confirm your account."
+  );
+}
     }
   }
 
@@ -300,6 +312,12 @@ export function AuthPanel({ role }: Props) {
   </div>
 )}
 
+
+{success && (
+  <div className="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-700">
+    {success}
+  </div>
+)}
             {error && (
               <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
                 {error}
