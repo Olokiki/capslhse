@@ -12,6 +12,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { LOCATIONS, signIn, signUp, useSession, type Role } from "@/lib/auth-store";
+import { Eye, EyeOff } from "lucide-react";
+
 
 type Props = { role: Role };
 
@@ -22,6 +24,9 @@ export function AuthPanel({ role }: Props) {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [fullName, setFullName] = useState("");
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("");
@@ -57,6 +62,12 @@ export function AuthPanel({ role }: Props) {
         setError("Password must be at least 8 characters.");
         return;
       }
+       if (password !== confirmPassword) {
+    setBusy(false);
+    setError("Passwords do not match.");
+    return;
+  }
+      
       const res = await signUp({
         email,
         password,
@@ -202,19 +213,92 @@ export function AuthPanel({ role }: Props) {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">
-                Password{mode === "signup" ? " (min. 8 characters)" : ""}
-              </Label>
-              <Input
-                id="password"
-                type="password"
-                autoComplete={mode === "signin" ? "current-password" : "new-password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={mode === "signup" ? 8 : undefined}
-              />
-            </div>
+  <Label htmlFor="password">
+    Password{mode === "signup" ? " (min. 8 characters)" : ""}
+  </Label>
+
+  <div className="relative">
+    <Input
+      id="password"
+      type={showPassword ? "text" : "password"}
+      autoComplete={
+        mode === "signin" ? "current-password" : "new-password"
+      }
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+      required
+      minLength={mode === "signup" ? 8 : undefined}
+      className="pr-11"
+    />
+
+    <button
+      type="button"
+      onClick={() => setShowPassword((prev) => !prev)}
+      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+      aria-label={showPassword ? "Hide password" : "Show password"}
+    >
+      {showPassword ? (
+        <EyeOff className="h-4 w-4" />
+      ) : (
+        <Eye className="h-4 w-4" />
+      )}
+    </button>
+  </div>
+</div>
+
+{mode === "signup" && (
+  <div className="space-y-2">
+    <Label htmlFor="confirmPassword">
+      Confirm password
+    </Label>
+
+    <div className="relative">
+      <Input
+        id="confirmPassword"
+        type={showConfirmPassword ? "text" : "password"}
+        autoComplete="new-password"
+        value={confirmPassword}
+        onChange={(e) => setConfirmPassword(e.target.value)}
+        required
+        className="pr-11"
+        placeholder="Confirm your password"
+      />
+
+      <button
+        type="button"
+        onClick={() =>
+          setShowConfirmPassword((prev) => !prev)
+        }
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+        aria-label={
+          showConfirmPassword
+            ? "Hide confirmation password"
+            : "Show confirmation password"
+        }
+      >
+        {showConfirmPassword ? (
+          <EyeOff className="h-4 w-4" />
+        ) : (
+          <Eye className="h-4 w-4" />
+        )}
+      </button>
+    </div>
+
+    {confirmPassword.length > 0 && (
+      <p
+        className={`text-xs ${
+          password === confirmPassword
+            ? "text-emerald-600"
+            : "text-destructive"
+        }`}
+      >
+        {password === confirmPassword
+          ? "Passwords match"
+          : "Passwords do not match"}
+      </p>
+    )}
+  </div>
+)}
 
             {error && (
               <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
