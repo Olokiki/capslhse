@@ -236,7 +236,8 @@ export type SignUpResult =
   | { ok: true; needsConfirmation: boolean }
   | { ok: false; error: string };
 
-const APP_URL = "https://hse.capslgas.com";
+/** Canonical production base URL for the CAPSL HSE app. Used for email confirmation redirects. */
+export const APP_URL = "https://hse.capslgas.com";
 
 /** Public self-registration. Always creates a staff account. */
 export async function signUp(input: SignUpInput): Promise<SignUpResult> {

@@ -8,5 +8,5 @@ export const Route = createFileRoute("/login/staff")({
       { name: "description", content: "Sign in or register as CAPSL field staff." },
     ],
   }),
-  component: () => <AuthPanel role="staff" />,
+  component: () => <AuthPanel role="staff" initialMode="signin" />,
 });
