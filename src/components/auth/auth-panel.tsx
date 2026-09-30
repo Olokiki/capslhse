@@ -160,6 +160,7 @@ export function AuthPanel({ role }: Props) {
               onClick={() => {
                 setMode("signin");
                 setError(null);
+                setSuccess(null);
               }}
               className={`rounded-full px-4 py-1.5 font-medium transition ${
                 mode === "signin" ? "bg-background shadow-sm" : "text-muted-foreground"
@@ -172,6 +173,7 @@ export function AuthPanel({ role }: Props) {
               onClick={() => {
                 setMode("signup");
                 setError(null);
+                setSuccess(null);
               }}
               className={`rounded-full px-4 py-1.5 font-medium transition ${
                 mode === "signup" ? "bg-background shadow-sm" : "text-muted-foreground"
@@ -182,7 +184,12 @@ export function AuthPanel({ role }: Props) {
           </div>
 
           <form onSubmit={onSubmit} className="mt-6 space-y-4">
-            {mode === "signup" && (
+            {adminSignupBlocked && (
+              <div className="rounded-md border border-border bg-secondary px-3 py-3 text-sm text-muted-foreground">
+                Administrator accounts are created by an existing administrator. Please sign in or contact your HSE administrator.
+              </div>
+            )}
+            {mode === "signup" && !isAdmin && (
               <>
                 <div className="space-y-2">
                   <Label htmlFor="fullName">Full name</Label>
@@ -337,7 +344,7 @@ export function AuthPanel({ role }: Props) {
               </div>
             )}
 
-            <Button type="submit" disabled={busy} className="h-11 w-full rounded-full font-semibold">
+            <Button type="submit" disabled={busy || adminSignupBlocked} className="h-11 w-full rounded-full font-semibold">
               {busy
                 ? mode === "signin"
                   ? "Signing in…"

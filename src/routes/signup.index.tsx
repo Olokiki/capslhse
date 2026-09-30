@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { LOCATIONS, signUp, useSession, type Role } from "@/lib/auth-store";
+import { LOCATIONS, signUp, useSession } from "@/lib/auth-store";
 
 export const Route = createFileRoute("/signup/")({
   head: () => ({
@@ -41,7 +41,6 @@ function SignupPage() {
 
   const [fullName, setFullName] = useState("");
   const [title, setTitle] = useState("");
-  const [role, setRole] = useState<Role>("staff");
   const [location, setLocation] = useState("");
   const [email, setEmail] = useState("");
 
@@ -53,6 +52,7 @@ function SignupPage() {
 
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     if (session) navigate({ to: "/" });
@@ -81,6 +81,7 @@ function SignupPage() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setSuccess(null);
 
     // Strong password validation
     if (!strongPassword) {
@@ -97,7 +98,7 @@ function SignupPage() {
     }
 
     // Staff must select a location
-    if (role === "staff" && !location) {
+    if (!location) {
       setError("Please select your work location.");
       return;
     }
@@ -109,14 +110,17 @@ function SignupPage() {
       password,
       fullName: fullName.trim(),
       title: title.trim(),
-      role,
-      location: role === "staff" ? location : undefined,
+      location,
     });
 
     setBusy(false);
 
     if (!res.ok) {
       setError(res.error);
+    } else if (res.needsConfirmation) {
+      setSuccess("Account created successfully. Please check your email to confirm your account.");
+    } else {
+      setSuccess("Account created successfully. Signing you in…");
     }
   }
 
@@ -212,32 +216,8 @@ function SignupPage() {
               />
             </div>
 
-            {/* ROLE */}
-            <div className="space-y-2">
-              <Label>I am signing up as</Label>
-
-              <Select
-                value={role}
-                onValueChange={(v) => setRole(v as Role)}
-              >
-                <SelectTrigger className="h-11">
-                  <SelectValue />
-                </SelectTrigger>
-
-                <SelectContent>
-                  <SelectItem value="staff">
-                    Field / Staff
-                  </SelectItem>
-
-                  <SelectItem value="admin">
-                    HSE Administrator
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
             {/* LOCATION */}
-            {role === "staff" && (
+            {(
               <div className="space-y-2">
                 <Label
                   htmlFor="location"
@@ -417,6 +397,12 @@ function SignupPage() {
                 </div>
               )}
             </div>
+
+            {success && (
+              <div className="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-700">
+                {success}
+              </div>
+            )}
 
             {/* ERROR */}
             {error && (
