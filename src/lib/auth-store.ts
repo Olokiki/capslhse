@@ -162,91 +162,49 @@ export type SignUpInput = {
   password: string;
   fullName: string;
   title: string;
-  role: Role;
-  location?: string;
+  location: string;
 };
 
-export async function signUp(input: SignUpInput) {
+export type SignUpResult =
+  | { ok: true; needsConfirmation: boolean }
+  | { ok: false; error: string };
+
+const APP_URL = "https://hse.capslgas.com";
+
+/** Public self-registration. Always creates a staff account. */
+export async function signUp(input: SignUpInput): Promise<SignUpResult> {
   const email = input.email.trim().toLowerCase();
+  const fullName = input.fullName.trim();
+  const title = input.title.trim();
+  const location = input.location?.trim() ?? "";
 
-  // Check company email
   if (!email.endsWith("@capslgas.com")) {
-    return {
-      ok: false as const,
-      error: "You must use a @capslgas.com email address",
-    };
+    return { ok: false, error: "You must use a @capslgas.com email address" };
   }
-
-  // Staff must select a location
-  if (input.role === "staff" && !input.location) {
-    return {
-      ok: false as const,
-      error: "Please select your work location",
-    };
-  }
-
-  const APP_URL = "https://hse.capslgas.com";
+  if (!fullName) return { ok: false, error: "Please enter your full name" };
+  if (!title) return { ok: false, error: "Please enter your job title" };
+  if (!location) return { ok: false, error: "Please select your work location" };
 
   const { data, error } = await supabase.auth.signUp({
     email,
     password: input.password,
-
     options: {
-      // After the user clicks the confirmation email,
-      // send them directly to the Staff Login page.
-      emailRedirectTo: `${APP_URL}/login/${input.role}`,
-
-      data: {
-        full_name: input.fullName,
-        title: input.title,
-        role: input.role,
-        location: input.location ?? null,
-      },
+      emailRedirectTo: `${APP_URL}/login/staff`,
+      data: { full_name: fullName, title, role: "staff", location },
     },
   });
 
-
-   if (error) {
-      console.error("[auth] signup error:", error);
-
-      return {
-        ok: false as const,
-        error: error.message || "Unable to create account.",
-      };
-    }
-
-  // Supabase signup error
   if (error) {
+    console.error("[auth] signup error:", error);
     return {
-      ok: false as const,
-      error: error.message,
+      ok: false,
+      error: typeof error.message === "string" && error.message ? error.message : "Unable to create account.",
     };
   }
 
-  // If email confirmation is required,
-  // Supabase creates the user but does not create a session.
-  if (data.user && !data.session) {
-    return {
-      ok: false as const,
-      error:
-        "Email not confirmed, check your inbox for confirmation mail",
-    };
-  }
-
-  // If email confirmation is disabled,
-  // Supabase will return an active session.
-  if (data.session) {
-    return {
-      ok: true as const,
-    };
-  }
-
-  // Fallback
-  return {
-    ok: false as const,
-    error:
-      "Email not confirmed, check your inbox for confirmation mail",
-  };
+  if (data.session) return { ok: true, needsConfirmation: false };
+  if (data.user) return { ok: true, needsConfirmation: true };
+  return { ok: false, error: "Unable to create account. Please try again." };
 }
 
 export async function signOut() {
