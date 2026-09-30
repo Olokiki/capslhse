@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { LOCATIONS, signUp, useSession } from "@/lib/auth-store";
+import { LOCATIONS, normalizeAuthError, signUp, useSession } from "@/lib/auth-store";
 
 export const Route = createFileRoute("/signup/")({
   head: () => ({
@@ -116,7 +116,9 @@ function SignupPage() {
     setBusy(false);
 
     if (!res.ok) {
-      setError(res.error);
+      setError(
+        normalizeAuthError(res.error, "Unable to create account. Please try again."),
+      );
     } else if (res.needsConfirmation) {
       setSuccess("Account created successfully. Please check your email to confirm your account.");
     } else {

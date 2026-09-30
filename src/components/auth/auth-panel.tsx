@@ -11,7 +11,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { LOCATIONS, signIn, signUp, useSession, type Role } from "@/lib/auth-store";
+import {
+  LOCATIONS,
+  normalizeAuthError,
+  signIn,
+  signUp,
+  useSession,
+  type Role,
+} from "@/lib/auth-store";
 import { Eye, EyeOff } from "lucide-react";
 
 
@@ -60,7 +67,13 @@ export function AuthPanel({ role }: Props) {
       setBusy(true);
       const res = await signIn(email, password);
       setBusy(false);
-      if (!res.ok) setError(res.error);
+      if (!res.ok)
+        setError(
+          normalizeAuthError(
+            res.error,
+            "Unable to sign in. Please check your details and try again.",
+          ),
+        );
       return;
     }
 
@@ -98,7 +111,9 @@ export function AuthPanel({ role }: Props) {
     setBusy(false);
 
     if (!res.ok) {
-      setError(res.error);
+      setError(
+        normalizeAuthError(res.error, "Unable to create account. Please try again."),
+      );
     } else if (res.needsConfirmation) {
       setSuccess("Account created successfully. Please check your email to confirm your account.");
     } else {
