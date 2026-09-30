@@ -139,22 +139,89 @@ export function useAuthLoading() {
   return l;
 }
 
-export async function signIn(email: string, password: string) {
-  const { error } = await supabase.auth.signInWithPassword({
-    email: email.trim().toLowerCase(),
-    password,
-  });
+const FALLBACK_SIGN_IN_ERROR =
+  "Unable to sign in. Please check your email and password and try again.";
+const FALLBACK_SIGN_UP_ERROR = "Unable to create account. Please try again.";
 
-  if (error) {
-    return {
-      ok: false as const,
-      error: error.message,
-    };
+/**
+ * Turns any thrown value or Supabase error-shaped object into a string that is
+ * safe to render in the UI. Never returns "{}", "null" or "[object Object]".
+ */
+export function normalizeAuthError(error: unknown, fallback: string): string {
+  if (typeof error === "string") {
+    return error.trim() ? error : fallback;
   }
 
-  return {
-    ok: true as const,
-  };
+  if (
+    error instanceof Error &&
+    typeof error.message === "string" &&
+    error.message.trim()
+  ) {
+    return error.message;
+  }
+
+  if (error && typeof error === "object") {
+    const candidate = error as Record<string, unknown>;
+    const keys = [
+      "message",
+      "error_description",
+      "errorDescription",
+      "msg",
+      "details",
+    ];
+
+    for (const key of keys) {
+      const value = candidate[key];
+      if (typeof value === "string" && value.trim()) return value;
+    }
+
+    try {
+      const json = JSON.stringify(error);
+      if (json && json !== "{}" && json !== "null") return json;
+    } catch {
+      // Circular or non-serializable payload — fall through to the string form.
+    }
+  }
+
+  const text = String(error);
+  if (
+    text &&
+    text !== "{}" &&
+    text !== "[object Object]" &&
+    text !== "null" &&
+    text !== "undefined"
+  ) {
+    return text;
+  }
+
+  return fallback;
+}
+
+export async function signIn(email: string, password: string) {
+  try {
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email.trim().toLowerCase(),
+      password,
+    });
+
+    if (error) {
+      console.error("[auth] sign-in error:", error);
+      return {
+        ok: false as const,
+        error: normalizeAuthError(error, FALLBACK_SIGN_IN_ERROR),
+      };
+    }
+
+    return {
+      ok: true as const,
+    };
+  } catch (caught) {
+    console.error("[auth] sign-in exception:", caught);
+    return {
+      ok: false as const,
+      error: normalizeAuthError(caught, FALLBACK_SIGN_IN_ERROR),
+    };
+  }
 }
 
 export type SignUpInput = {
@@ -185,26 +252,34 @@ export async function signUp(input: SignUpInput): Promise<SignUpResult> {
   if (!title) return { ok: false, error: "Please enter your job title" };
   if (!location) return { ok: false, error: "Please select your work location" };
 
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password: input.password,
-    options: {
-      emailRedirectTo: `${APP_URL}/login/staff`,
-      data: { full_name: fullName, title, role: "staff", location },
-    },
-  });
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password: input.password,
+      options: {
+        emailRedirectTo: `${APP_URL}/login/staff`,
+        data: { full_name: fullName, title, role: "staff", location },
+      },
+    });
 
-  if (error) {
-    console.error("[auth] signup error:", error);
+    if (error) {
+      console.error("[auth] signup error:", error);
+      return {
+        ok: false,
+        error: normalizeAuthError(error, FALLBACK_SIGN_UP_ERROR),
+      };
+    }
+
+    if (data.session) return { ok: true, needsConfirmation: false };
+    if (data.user) return { ok: true, needsConfirmation: true };
+    return { ok: false, error: FALLBACK_SIGN_UP_ERROR };
+  } catch (caught) {
+    console.error("[auth] signup exception:", caught);
     return {
       ok: false,
-      error: typeof error.message === "string" && error.message ? error.message : "Unable to create account.",
+      error: normalizeAuthError(caught, FALLBACK_SIGN_UP_ERROR),
     };
   }
-
-  if (data.session) return { ok: true, needsConfirmation: false };
-  if (data.user) return { ok: true, needsConfirmation: true };
-  return { ok: false, error: "Unable to create account. Please try again." };
 }
 
 export async function signOut() {
