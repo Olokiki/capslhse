@@ -8,5 +8,5 @@ export const Route = createFileRoute("/login/admin")({
       { name: "description", content: "Sign in or register as a CAPSL HSE Administrator." },
     ],
   }),
-  component: () => <AuthPanel role="admin" />,
+  component: () => <AuthPanel role="admin" initialMode="signin" />,
 });

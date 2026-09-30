@@ -22,12 +22,12 @@ import {
 import { Eye, EyeOff } from "lucide-react";
 
 
-type Props = { role: Role };
+type Props = { role: Role; initialMode?: "signin" | "signup" };
 
-export function AuthPanel({ role }: Props) {
+export function AuthPanel({ role, initialMode = "signin" }: Props) {
   const session = useSession();
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [mode, setMode] = useState<"signin" | "signup">(initialMode);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
