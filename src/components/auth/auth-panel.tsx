@@ -49,47 +49,60 @@ export function AuthPanel({ role }: Props) {
     : "bg-[oklch(0.78_0.17_60)]/20 text-[oklch(0.85_0.18_60)]";
   const roleLabel = isAdmin ? "HSE Administrator" : "Field Staff";
 
+  const adminSignupBlocked = isAdmin && mode === "signup";
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    setBusy(true);
+    setSuccess(null);
+
     if (mode === "signin") {
+      setBusy(true);
       const res = await signIn(email, password);
       setBusy(false);
       if (!res.ok) setError(res.error);
-    } else {
-      if (password.length < 8) {
-        setBusy(false);
-        setError("Password must be at least 8 characters.");
-        return;
-      }
-       if (password !== confirmPassword) {
-    setBusy(false);
-    setError("Passwords do not match.");
-    return;
-  }
-      
-      const res = await signUp({
-        email,
-        password,
-        fullName: fullName.trim(),
-        title: title.trim(),
-        role,
-        location: role === "staff" ? location : undefined,
-      });
-setBusy(false);
+      return;
+    }
 
-if (!res.ok) {
-  setError(
-    typeof res.error === "string"
-      ? res.error
-      : "Unable to create account. Please try again."
-  );
-} else {
-  setSuccess(
-    "Account created successfully. Please check your email to confirm your account."
-  );
-}
+    if (isAdmin) {
+      setError(
+        "Administrator accounts are created by an existing administrator. Please sign in or contact your HSE administrator.",
+      );
+      return;
+    }
+
+    if (!fullName.trim()) return setError("Please enter your full name.");
+    if (!title.trim()) return setError("Please enter your job title.");
+    if (!location) return setError("Please select your work location.");
+    const strong =
+      password.length >= 8 &&
+      /[A-Z]/.test(password) &&
+      /[a-z]/.test(password) &&
+      /[0-9]/.test(password) &&
+      /[^A-Za-z0-9]/.test(password);
+    if (!strong) {
+      return setError(
+        "Password must be at least 8 characters and include uppercase, lowercase, a number and a special character.",
+      );
+    }
+    if (password !== confirmPassword) return setError("Passwords do not match.");
+
+    setBusy(true);
+    const res = await signUp({
+      email,
+      password,
+      fullName: fullName.trim(),
+      title: title.trim(),
+      location,
+    });
+    setBusy(false);
+
+    if (!res.ok) {
+      setError(res.error);
+    } else if (res.needsConfirmation) {
+      setSuccess("Account created successfully. Please check your email to confirm your account.");
+    } else {
+      setSuccess("Account created successfully. Signing you in…");
     }
   }
 
