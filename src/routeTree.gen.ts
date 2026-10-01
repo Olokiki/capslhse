@@ -13,6 +13,7 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as SignupIndexRouteImport } from './routes/signup.index'
 import { Route as LoginIndexRouteImport } from './routes/login.index'
 import { Route as AppIndexRouteImport } from './routes/_app.index'
+import { Route as SignupConfirmationRouteImport } from './routes/signup.confirmation'
 import { Route as LoginStaffRouteImport } from './routes/login.staff'
 import { Route as LoginAdminRouteImport } from './routes/login.admin'
 import { Route as AppUsersRouteImport } from './routes/_app.users'
@@ -42,6 +43,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppRoute,
+} as any)
+const SignupConfirmationRoute = SignupConfirmationRouteImport.update({
+  id: '/signup/confirmation',
+  path: '/signup/confirmation',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const LoginStaffRoute = LoginStaffRouteImport.update({
   id: '/login/staff',
@@ -103,6 +109,7 @@ export interface FileRoutesByFullPath {
   '/users': typeof AppUsersRoute
   '/login/admin': typeof LoginAdminRoute
   '/login/staff': typeof LoginStaffRoute
+  '/signup/confirmation': typeof SignupConfirmationRoute
   '/login/': typeof LoginIndexRoute
   '/signup/': typeof SignupIndexRoute
   '/reports/$id': typeof AppReportsIdRoute
@@ -117,6 +124,7 @@ export interface FileRoutesByTo {
   '/users': typeof AppUsersRoute
   '/login/admin': typeof LoginAdminRoute
   '/login/staff': typeof LoginStaffRoute
+  '/signup/confirmation': typeof SignupConfirmationRoute
   '/': typeof AppIndexRoute
   '/login': typeof LoginIndexRoute
   '/signup': typeof SignupIndexRoute
@@ -134,6 +142,7 @@ export interface FileRoutesById {
   '/_app/users': typeof AppUsersRoute
   '/login/admin': typeof LoginAdminRoute
   '/login/staff': typeof LoginStaffRoute
+  '/signup/confirmation': typeof SignupConfirmationRoute
   '/_app/': typeof AppIndexRoute
   '/login/': typeof LoginIndexRoute
   '/signup/': typeof SignupIndexRoute
@@ -152,6 +161,7 @@ export interface FileRouteTypes {
     | '/users'
     | '/login/admin'
     | '/login/staff'
+    | '/signup/confirmation'
     | '/login/'
     | '/signup/'
     | '/reports/$id'
@@ -166,6 +176,7 @@ export interface FileRouteTypes {
     | '/users'
     | '/login/admin'
     | '/login/staff'
+    | '/signup/confirmation'
     | '/'
     | '/login'
     | '/signup'
@@ -182,6 +193,7 @@ export interface FileRouteTypes {
     | '/_app/users'
     | '/login/admin'
     | '/login/staff'
+    | '/signup/confirmation'
     | '/_app/'
     | '/login/'
     | '/signup/'
@@ -194,6 +206,7 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   LoginAdminRoute: typeof LoginAdminRoute
   LoginStaffRoute: typeof LoginStaffRoute
+  SignupConfirmationRoute: typeof SignupConfirmationRoute
   LoginIndexRoute: typeof LoginIndexRoute
   SignupIndexRoute: typeof SignupIndexRoute
 }
@@ -227,6 +240,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
+    }
+    '/signup/confirmation': {
+      id: '/signup/confirmation'
+      path: '/signup/confirmation'
+      fullPath: '/signup/confirmation'
+      preLoaderRoute: typeof SignupConfirmationRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/login/staff': {
       id: '/login/staff'
@@ -331,6 +351,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   LoginAdminRoute: LoginAdminRoute,
   LoginStaffRoute: LoginStaffRoute,
+  SignupConfirmationRoute: SignupConfirmationRoute,
   LoginIndexRoute: LoginIndexRoute,
   SignupIndexRoute: SignupIndexRoute,
 }

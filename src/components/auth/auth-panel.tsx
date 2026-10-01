@@ -115,7 +115,10 @@ export function AuthPanel({ role, initialMode = "signin" }: Props) {
         normalizeAuthError(res.error, "Unable to create account. Please try again."),
       );
     } else if (res.needsConfirmation) {
-      setSuccess("Account created successfully. Please check your email to confirm your account.");
+      navigate({
+        to: "/signup/confirmation",
+        search: { email: email.trim().toLowerCase() },
+      });
     } else {
       setSuccess("Account created successfully. Signing you in…");
     }
