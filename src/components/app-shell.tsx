@@ -14,6 +14,7 @@ import {
   Menu,
   Trophy,
   Users as UsersIcon,
+  UserRound,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";  
 import { Button } from "@/components/ui/button";
@@ -109,6 +110,13 @@ function SidebarContent({
       </div>
 */}
       <div className="border-t border-sidebar-border p-3">
+        <Link
+          to="/profile"
+          onClick={onNavigate}
+          className="mb-1 flex w-full items-center gap-3 rounded-lg px-2 py-2 text-sm text-sidebar-foreground/80 hover:bg-sidebar-accent"
+        >
+          <UserRound className="h-[18px] w-[18px]" /> My profile
+        </Link>
         <button
           onClick={onSignOut}
           className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-sm text-sidebar-foreground/80 hover:bg-sidebar-accent"
@@ -184,15 +192,19 @@ export function AppShell({ children }: { children: ReactNode }) {
                   <span className="hidden sm:inline">New HSE Report</span>
                 </Link>
               </Button>
-              <div className="ml-1 hidden items-center gap-3 lg:flex">
-                <div className="text-right leading-tight">
+              <Link
+                to="/profile"
+                aria-label="My profile"
+                className="ml-1 flex items-center gap-3 rounded-full p-0.5 transition-opacity hover:opacity-80"
+              >
+                <div className="hidden text-right leading-tight lg:block">
                   <div className="text-xs font-semibold">{session.name}</div>
                   <div className="text-[11px] text-muted-foreground">{session.title}</div>
                 </div>
                 <div className="flex h-9 w-9 items-center justify-center rounded-full brand-gradient text-xs font-bold text-white">
                   {session.initials}
                 </div>
-              </div>
+              </Link>
               <Button
                 variant="outline"
                 size="sm"
