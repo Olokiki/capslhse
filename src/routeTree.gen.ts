@@ -17,6 +17,7 @@ import { Route as SignupConfirmationRouteImport } from './routes/signup.confirma
 import { Route as LoginStaffRouteImport } from './routes/login.staff'
 import { Route as LoginAdminRouteImport } from './routes/login.admin'
 import { Route as AppUsersRouteImport } from './routes/_app.users'
+import { Route as AppProfileRouteImport } from './routes/_app.profile'
 import { Route as AppLocationsRouteImport } from './routes/_app.locations'
 import { Route as AppLeaderboardRouteImport } from './routes/_app.leaderboard'
 import { Route as AppDocumentsRouteImport } from './routes/_app.documents'
@@ -64,6 +65,11 @@ const AppUsersRoute = AppUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AppRoute,
 } as any)
+const AppProfileRoute = AppProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppLocationsRoute = AppLocationsRouteImport.update({
   id: '/locations',
   path: '/locations',
@@ -106,6 +112,7 @@ export interface FileRoutesByFullPath {
   '/documents': typeof AppDocumentsRoute
   '/leaderboard': typeof AppLeaderboardRoute
   '/locations': typeof AppLocationsRoute
+  '/profile': typeof AppProfileRoute
   '/users': typeof AppUsersRoute
   '/login/admin': typeof LoginAdminRoute
   '/login/staff': typeof LoginStaffRoute
@@ -121,6 +128,7 @@ export interface FileRoutesByTo {
   '/documents': typeof AppDocumentsRoute
   '/leaderboard': typeof AppLeaderboardRoute
   '/locations': typeof AppLocationsRoute
+  '/profile': typeof AppProfileRoute
   '/users': typeof AppUsersRoute
   '/login/admin': typeof LoginAdminRoute
   '/login/staff': typeof LoginStaffRoute
@@ -139,6 +147,7 @@ export interface FileRoutesById {
   '/_app/documents': typeof AppDocumentsRoute
   '/_app/leaderboard': typeof AppLeaderboardRoute
   '/_app/locations': typeof AppLocationsRoute
+  '/_app/profile': typeof AppProfileRoute
   '/_app/users': typeof AppUsersRoute
   '/login/admin': typeof LoginAdminRoute
   '/login/staff': typeof LoginStaffRoute
@@ -158,6 +167,7 @@ export interface FileRouteTypes {
     | '/documents'
     | '/leaderboard'
     | '/locations'
+    | '/profile'
     | '/users'
     | '/login/admin'
     | '/login/staff'
@@ -173,6 +183,7 @@ export interface FileRouteTypes {
     | '/documents'
     | '/leaderboard'
     | '/locations'
+    | '/profile'
     | '/users'
     | '/login/admin'
     | '/login/staff'
@@ -190,6 +201,7 @@ export interface FileRouteTypes {
     | '/_app/documents'
     | '/_app/leaderboard'
     | '/_app/locations'
+    | '/_app/profile'
     | '/_app/users'
     | '/login/admin'
     | '/login/staff'
@@ -269,6 +281,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppUsersRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/profile': {
+      id: '/_app/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AppProfileRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/locations': {
       id: '/_app/locations'
       path: '/locations'
@@ -326,6 +345,7 @@ interface AppRouteChildren {
   AppDocumentsRoute: typeof AppDocumentsRoute
   AppLeaderboardRoute: typeof AppLeaderboardRoute
   AppLocationsRoute: typeof AppLocationsRoute
+  AppProfileRoute: typeof AppProfileRoute
   AppUsersRoute: typeof AppUsersRoute
   AppIndexRoute: typeof AppIndexRoute
   AppReportsIdRoute: typeof AppReportsIdRoute
@@ -338,6 +358,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppDocumentsRoute: AppDocumentsRoute,
   AppLeaderboardRoute: AppLeaderboardRoute,
   AppLocationsRoute: AppLocationsRoute,
+  AppProfileRoute: AppProfileRoute,
   AppUsersRoute: AppUsersRoute,
   AppIndexRoute: AppIndexRoute,
   AppReportsIdRoute: AppReportsIdRoute,
