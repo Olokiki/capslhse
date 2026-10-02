@@ -290,3 +290,61 @@ export async function signOut() {
 
   notify();
 }
+
+/** Re-reads profile + role for the current user and updates the cached session everywhere. */
+export async function refreshSession() {
+  const { data } = await supabase.auth.getUser();
+  const u = data.user;
+  if (u) await hydrate(u.id, u.email ?? "");
+  else await clearSession();
+}
+
+export type ProfileUpdate = { fullName: string; title: string; location: string };
+
+/** Updates the signed-in user's own profile row (RLS limits it to user_id = auth.uid()). */
+export async function updateMyProfile(
+  input: ProfileUpdate,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const fullName = input.fullName.trim();
+  const title = input.title.trim();
+  const location = input.location.trim();
+  if (!fullName) return { ok: false, error: "Please enter your full name" };
+  if (!title) return { ok: false, error: "Please enter your job title" };
+  try {
+    const { data } = await supabase.auth.getUser();
+    const uid = data.user?.id;
+    if (!uid) return { ok: false, error: "You are not signed in." };
+    const { data: rows, error } = await supabase
+      .from("profiles")
+      .update({ full_name: fullName, title, location: location || null })
+      .eq("user_id", uid)
+      .select("user_id");
+    if (error) return { ok: false, error: normalizeAuthError(error, "Unable to save profile.") };
+    if (!rows || rows.length === 0) {
+      const { error: insErr } = await supabase.from("profiles").insert({
+        user_id: uid,
+        email: data.user?.email ?? "",
+        full_name: fullName,
+        title,
+        location: location || null,
+      });
+      if (insErr) return { ok: false, error: normalizeAuthError(insErr, "Unable to save profile.") };
+    }
+    await refreshSession();
+    return { ok: true };
+  } catch (caught) {
+    return { ok: false, error: normalizeAuthError(caught, "Unable to save profile.") };
+  }
+}
+
+export async function updateMyPassword(
+  newPassword: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  try {
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) return { ok: false, error: normalizeAuthError(error, "Unable to change password.") };
+    return { ok: true };
+  } catch (caught) {
+    return { ok: false, error: normalizeAuthError(caught, "Unable to change password.") };
+  }
+}
