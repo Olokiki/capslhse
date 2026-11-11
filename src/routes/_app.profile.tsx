@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Eye, EyeOff, KeyRound, Mail, ShieldCheck, HardHat, UserRound } from "lucide-react";
+import { Eye, EyeOff, KeyRound, Mail, ShieldCheck, HardHat, UserRound, Bell } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { LOCATIONS, updateMyPassword, updateMyProfile, useSession } from "@/lib/auth-store";
+import { LOCATIONS, updateMyPassword, updateMyProfile, useSession, getMyReportNotificationPreference, updateMyReportNotificationPreference } from "@/lib/auth-store";
 
 export const Route = createFileRoute("/_app/profile")({
   head: () => ({
@@ -58,6 +59,14 @@ function ProfilePage() {
   const [pwBusy, setPwBusy] = useState(false);
   const [pwMsg, setPwMsg] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
 
+  const [emailNotifications, setEmailNotifications] = useState(false);
+  const [notificationLoading, setNotificationLoading] = useState(true);
+  const [notificationSaving, setNotificationSaving] = useState(false);
+  const [notificationMsg, setNotificationMsg] = useState<{
+  kind: "ok" | "err";
+  text: string;
+} | null>(null);
+
   useEffect(() => {
     if (!session) return;
     setFullName(session.name);
@@ -66,6 +75,38 @@ function ProfilePage() {
     // only on user change
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.userId]);
+
+  useEffect(() => {
+  let active = true;
+
+  async function loadPreference() {
+    if (!session || session.role !== "admin") {
+      setNotificationLoading(false);
+      return;
+    }
+
+    setNotificationLoading(true);
+
+    const result = await getMyReportNotificationPreference(session.userId);
+
+    if (!active) return;
+
+    if (result.ok) {
+      setEmailNotifications(result.enabled);
+    } else {
+      setEmailNotifications(false);
+      setNotificationMsg({ kind: "err", text: result.error });
+    }
+
+    setNotificationLoading(false);
+  }
+
+  loadPreference();
+
+  return () => {
+    active = false;
+  };
+  }, [session?.userId, session?.role]);
 
   if (!session) return null;
   const isAdmin = session.role === "admin";
@@ -110,6 +151,36 @@ function ProfilePage() {
       setPwMsg({ kind: "ok", text: "Password changed successfully." });
     } else setPwMsg({ kind: "err", text: res.error });
   }
+
+    async function handleNotificationChange(enabled: boolean) {
+    if (!session || session.role !== "admin") return;
+
+    const previousValue = emailNotifications;
+
+    setEmailNotifications(enabled);
+    setNotificationSaving(true);
+    setNotificationMsg(null);
+
+    const result = await updateMyReportNotificationPreference(
+      session.userId,
+      enabled,
+    );
+
+    setNotificationSaving(false);
+
+    if (!result.ok) {
+      setEmailNotifications(previousValue);
+      setNotificationMsg({ kind: "err", text: result.error });
+      return;
+    }
+
+    setNotificationMsg({
+      kind: "ok",
+      text: enabled
+        ? "You have enabled new HSE report email notifications."
+        : "You have disabled new HSE report email notifications.",
+    });
+    }
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -184,6 +255,58 @@ function ProfilePage() {
           </form>
         </CardContent>
       </Card>
+
+
+      {isAdmin && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Bell className="h-4 w-4" />
+              Email notification preferences
+            </CardTitle>
+          </CardHeader>
+
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between gap-4">
+              <div className="space-y-1">
+                <p className="text-sm font-medium">
+                  New HSE report notifications
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Receive an email when a new HSE report is submitted.
+                </p>
+              </div>
+
+              <Switch
+                checked={emailNotifications}
+                onCheckedChange={handleNotificationChange}
+                disabled={notificationLoading || notificationSaving}
+                aria-label="Enable new HSE report email notifications"
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-muted-foreground">
+                {notificationLoading
+                  ? "Loading preference..."
+                  : notificationSaving
+                    ? "Saving preference..."
+                    : emailNotifications
+                      ? "Email notifications enabled"
+                      : "Email notifications disabled"}
+              </span>
+            </div>
+
+            {notificationMsg && (
+              <Feedback
+                kind={notificationMsg.kind}
+                text={notificationMsg.text}
+              />
+            )}
+          </CardContent>
+        </Card>
+      )}
+
 
       <Card>
         <CardHeader>

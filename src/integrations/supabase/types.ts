@@ -136,6 +136,66 @@ export type Database = {
         }
         Relationships: []
       }
+
+
+report_notification_recipients: {
+  Row: {
+    user_id: string;
+    enabled: boolean;
+    created_at: string;
+    updated_at: string;
+  };
+  Insert: {
+    user_id: string;
+    enabled?: boolean;
+    created_at?: string;
+    updated_at?: string;
+  };
+  Update: {
+    user_id?: string;
+    enabled?: boolean;
+    created_at?: string;
+    updated_at?: string;
+  };
+  Relationships: [];
+};
+report_notification_logs: {
+  Row: {
+    id: string;
+    report_id: string;
+    recipient_user_id: string;
+    recipient_email: string;
+    status: string;
+    resend_message_id: string | null;
+    error_message: string | null;
+    created_at: string;
+    sent_at: string | null;
+  };
+  Insert: {
+    id?: string;
+    report_id: string;
+    recipient_user_id: string;
+    recipient_email: string;
+    status?: string;
+    resend_message_id?: string | null;
+    error_message?: string | null;
+    created_at?: string;
+    sent_at?: string | null;
+  };
+  Update: {
+    id?: string;
+    report_id?: string;
+    recipient_user_id?: string;
+    recipient_email?: string;
+    status?: string;
+    resend_message_id?: string | null;
+    error_message?: string | null;
+    created_at?: string;
+    sent_at?: string | null;
+  };
+  Relationships: [];
+};
+
       profiles: {
         Row: {
           created_at: string
