@@ -348,3 +348,66 @@ export async function updateMyPassword(
     return { ok: false, error: normalizeAuthError(caught, "Unable to change password.") };
   }
 }
+
+
+export async function getMyReportNotificationPreference(
+  userId: string,
+): Promise<
+  { ok: true; enabled: boolean } | { ok: false; error: string }
+> {
+  try {
+    const { data, error } = await supabase
+      .from("report_notification_recipients")
+      .select("enabled")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (error) {
+      return {
+        ok: false,
+        error: normalizeAuthError(error, "Unable to load notification preference."),
+      };
+    }
+
+    return { ok: true, enabled: data?.enabled ?? false };
+  } catch (caught) {
+    return {
+      ok: false,
+      error: normalizeAuthError(caught, "Unable to load notification preference."),
+    };
+  }
+}
+
+export async function updateMyReportNotificationPreference(
+  userId: string,
+  enabled: boolean,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  try {
+    const { data: authData, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !authData.user || authData.user.id !== userId) {
+      return { ok: false, error: "Your session could not be verified. Please sign in again." };
+    }
+
+    const { error } = await supabase
+      .from("report_notification_recipients")
+      .upsert(
+        { user_id: userId, enabled },
+        { onConflict: "user_id" },
+      );
+
+    if (error) {
+      return {
+        ok: false,
+        error: normalizeAuthError(error, "Unable to save notification preference."),
+      };
+    }
+
+    return { ok: true };
+  } catch (caught) {
+    return {
+      ok: false,
+      error: normalizeAuthError(caught, "Unable to save notification preference."),
+    };
+  }
+}
